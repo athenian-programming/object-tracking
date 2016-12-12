@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package object_tracking;
+
+service ColorTracker {
+
+    rpc ReportLocation (ClientInfo) returns (stream Location) {
+    }
+
+}
+
+message ClientInfo {
+    string info = 1;
+}
+
+message Location {
+    int32 x = 1;
+    int32 y = 2;
+    int32 width = 3;
+    int32 height = 4;
+}
+
