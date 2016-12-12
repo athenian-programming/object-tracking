@@ -1,3 +1,4 @@
+import platform
 import time
 
 import cv2
@@ -20,38 +21,36 @@ def find_max_contour(contours):
     return max_index
 
 
-def is_raspi(val):
-    return val.lower() in ("raspi", "pi", "raspberry", "raspberrypi", "rp")
-
-
 class Camera:
-    def __init__(self, using_raspi, src=0, use_picamera=False, resolution=(320, 240), framerate=32):
-        if using_raspi:
-            self.using_raspi = using_raspi
+    def __init__(self, src=0, use_picamera=True, resolution=(320, 240), framerate=32):
+        if self.is_raspi():
             from imutils.video import VideoStream
             # initialize the video stream and allow the cammera sensor to warmup
-            self.vs = VideoStream(src=src, usePiCamera=use_picamera, resolution=resolution, framerate=framerate).start()
+            self._vs = VideoStream(src=src, usePiCamera=use_picamera, resolution=resolution,
+                                   framerate=framerate).start()
             time.sleep(2.0)
         else:
-            self.using_raspi = using_raspi
-            self.cap = cv2.VideoCapture(0)
+            self._cap = cv2.VideoCapture(0)
 
     def is_open(self):
-        return True if self.using_raspi else self.cap.isOpened()
+        return True if self.is_raspi() else self._cap.isOpened()
 
     def close(self):
-        if self.using_raspi:
-            self.vs.stop()
+        if self.is_raspi():
+            self._vs.stop()
         else:
-            self.cap.release()
+            self._cap.release()
 
         cv2.destroyAllWindows()
 
     def read(self):
-        return self.vs.read() if self.using_raspi else self.cap.read()[1]
+        return self._vs.read() if self.is_raspi() else self._cap.read()[1]
 
     def is_raspi(self):
-        return self.using_raspi
+        return platform.system() == "Linux"
+
+    def text_size(self):
+        return .70 if self.is_raspi() else .75
 
     @staticmethod
     def text_loc():
@@ -60,6 +59,3 @@ class Camera:
     @staticmethod
     def text_font():
         return cv2.FONT_HERSHEY_SIMPLEX
-
-    def text_size(self):
-        return .70 if self.using_raspi else .75

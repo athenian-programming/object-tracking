@@ -17,7 +17,7 @@ class GrpcDataSource(GenericDataSource):
         while True:
             try:
                 channel = grpc.insecure_channel(self._hostname)
-                stub = gen.color_tracker_pb2.ColorTrackerStub(channel)
+                stub = gen.color_tracker_pb2.ObjectTrackerStub(channel)
                 locations = stub.ReportLocation(gen.color_tracker_pb2.ClientInfo(info='Session {0}'.format(cnt)))
                 cnt += 1
                 for location in locations:

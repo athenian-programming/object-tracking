@@ -1,3 +1,5 @@
+#!/usr/local/bin/python2
+
 import argparse
 import datetime
 import logging
@@ -17,8 +19,8 @@ import opencv_utils as utils
 from location_server import LocationServer
 
 
-class ColorTracker:
-    def __init__(self, url, location_server, is_raspi, middle, bgr_color, hsv_range, resize_width, display_image=False):
+class ObjectTracker:
+    def __init__(self, url, location_server, middle, bgr_color, hsv_range, resize_width, display_image=False):
         self._url = url
         self._location_server = location_server
         self._middle = middle
@@ -32,13 +34,18 @@ class ColorTracker:
         self._display_image = display_image
         self._finished = False
         self._cnt = 0
-        self._cam = utils.Camera(True, use_picamera=True) if is_raspi else utils.Camera(False)
+        self._cam = utils.Camera()
 
         self._lock = threading.Lock()
         self._data_ready = threading.Event()
         self._currval = None
 
     def write_values(self, x, y, width, height):
+        # Raspi specific
+        # lcd.clear()
+        # lcd.write('X, Y: {0}, {1}'.format(cX, cY))
+
+
         if self._url:
             params = urllib.urlencode({'x': x, 'y': y, 'w': width, 'h': height})
             try:
@@ -48,6 +55,8 @@ class ColorTracker:
         elif self._location_server:
             loc = gen.color_tracker_pb2.Location(x=x, y=y, width=width, height=height)
             self._location_server.write_location(loc)
+        else:
+            print("{0}, {1} {2}x{3}".format(x, y, width, height))
 
     # Do not run this in a background thread. cv2.waitKey has to run in main thread
     def start(self):
@@ -133,16 +142,15 @@ class ColorTracker:
                 # cv2.imshow("Mask", mask)
                 # cv2.imshow("Res", result)
 
-            # Raspi specific
-            # lcd.clear()
-            # lcd.write('X, Y: {0}, {1}'.format(cX, cY))
+                key = cv2.waitKey(30) & 0xFF
 
-            key = cv2.waitKey(30) & 0xFF
-
-            if key == ord("q"):
-                break
-            elif key == ord('p'):
-                self.save_frame(frame)
+                if key == ord("q"):
+                    break
+                elif key == ord('p'):
+                    self.save_frame(frame)
+            else:
+                # Nap if display is not on
+                time.sleep(.1)
 
             self._cnt += 1
 
@@ -161,15 +169,14 @@ class ColorTracker:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-g", "--grpc", default=False, action="store_true", help="Run gRPC server [false]")
-    parser.add_argument("-t", "--test", default=False, action="store_true", help="Test mode [false]")
-    parser.add_argument("-n", "--hostname", default="", type=str, help="Servo controller hostname")
-    parser.add_argument("-c", "--client", default="raspi", type=str, help="Client type [raspi]")
-    parser.add_argument("-w", "--width", default=600, type=int, help="Image width [600]")
-    parser.add_argument("-d", "--display", default=False, action="store_true", help="Display image [false]")
-    parser.add_argument("-r", "--range", default=20, type=int, help="HSV range")
-    parser.add_argument("-b", "--bgr", type=str, help="BGR target value, e.g., \"[174, 56, 5]\"")
+    parser.add_argument("-b", "--bgr", type=str, required=True, help="BGR target value, e.g., -b \"[174, 56, 5]\"")
+    parser.add_argument("-w", "--width", default=400, type=int, help="Image width [400]")
     parser.add_argument("-m", "--middle", default=15, type=int, help="Middle percent [15]")
+    parser.add_argument("-r", "--range", default=20, type=int, help="HSV range")
+    parser.add_argument("-d", "--display", default=False, action="store_true", help="Display image [false]")
+    parser.add_argument("-g", "--grpc", default=False, action="store_true", help="Run gRPC server [false]")
+    parser.add_argument("-n", "--hostname", default="", type=str, help="Servo controller hostname")
+    parser.add_argument("-t", "--test", default=False, action="store_true", help="Test mode [false]")
     parser.add_argument('-v', '--verbose', default=logging.INFO, help="Include debugging info",
                         action="store_const", dest="loglevel", const=logging.DEBUG)
     args = vars(parser.parse_args())
@@ -179,9 +186,6 @@ if __name__ == "__main__":
 
     display_image = args["display"]
     logging.info("Display images: {0}".format(display_image))
-
-    is_raspi = utils.is_raspi(args["client"])
-    logging.info("Is RaspberryPi: {0}".format(is_raspi))
 
     # Note this is a BGR value, not RGB!
     bgr_color = eval(args["bgr"])
@@ -198,16 +202,21 @@ if __name__ == "__main__":
     logging.info("Middle percent: {0}".format(middle))
 
     use_grpc = args["grpc"] or args["test"]
-    logging.info("Run gRPC server: {0}".format(use_grpc))
+    hostname = args["hostname"]
+    url = None
+    location_server = None
+
     if use_grpc:
         location_server = LocationServer('[::]:50051')
         try:
             thread.start_new_thread(LocationServer.start, (location_server,))
             logging.info("Started gRPC location server")
         except BaseException as e:
-            logging.error("Unable to start gRPC server [{0}]".format(e))
-    else:
-        location_server = None
+            logging.error("Unable to start gRPC location server [{0}]".format(e))
+            sys.exit(1)
+    elif hostname:
+        url = "http://" + hostname + "/set_values" if hostname != "" else ""
+        logging.info("Servo controller hostname: {0}".format(hostname))
 
     if args["test"]:
         for i in range(0, 1000):
@@ -217,14 +226,10 @@ if __name__ == "__main__":
         print("Exiting...")
         sys.exit(0)
 
-    hostname = args["hostname"]
-    url = "http://" + hostname + "/set_values" if hostname != "" else ""
-    logging.info("Servo controller hostname: {0}".format(hostname))
-
     # Raspi specific
     # import dothat.backlight as backlight
     # import dothat.lcd as lcd
     # backlight.rgb(200, 0,0)
 
-    tracker = ColorTracker(url, location_server, is_raspi, middle, bgr_color, hsv_range, width, display_image)
+    tracker = ObjectTracker(url, location_server, middle, bgr_color, hsv_range, width, display_image)
     tracker.start()

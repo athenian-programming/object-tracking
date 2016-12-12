@@ -9,7 +9,7 @@ from concurrent import futures
 import gen.color_tracker_pb2
 
 
-class LocationServer(gen.color_tracker_pb2.ColorTrackerServicer):
+class LocationServer(gen.color_tracker_pb2.ObjectTrackerServicer):
     def __init__(self, hostname):
         self._hostname = hostname
         self._lock = threading.Lock()
@@ -47,7 +47,7 @@ class LocationServer(gen.color_tracker_pb2.ColorTrackerServicer):
     @staticmethod
     def start(server):
         grpc_server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-        gen.color_tracker_pb2.add_ColorTrackerServicer_to_server(server, grpc_server)
+        gen.color_tracker_pb2.add_ObjectTrackerServicer_to_server(server, grpc_server)
         grpc_server.add_insecure_port(server.hostname())
         grpc_server.start()
         try:

@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package object_tracking;
 
-service ColorTracker {
+service ObjectTracker {
 
     rpc ReportLocation (ClientInfo) returns (stream Location) {
     }

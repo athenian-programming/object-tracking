@@ -9,8 +9,8 @@ import gen.color_tracker_pb2
 
 def connect(hostname):
     channel = grpc.insecure_channel(hostname)
-    stub = gen.color_tracker_pb2.ColorTrackerStub(channel)
-    locations = stub.ReportLocation(gen.color_tracker_pb2.ClientInfo(info='Test info'))
+    stub = gen.color_tracker_pb2.ObjectTrackerStub(channel)
+    locations = stub.ReportLocation(gen.color_tracker_pb2.ClientInfo(info='Test client'))
     for location in locations:
         print("Client received: \n" + str(location))
 

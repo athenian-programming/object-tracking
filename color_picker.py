@@ -1,6 +1,4 @@
-import argparse
-import logging
-import sys
+#!/usr/local/bin/python2
 
 import cv2
 import imutils
@@ -15,19 +13,7 @@ x_adj = 0
 y_adj = 0
 mag_width = 400
 
-parser = argparse.ArgumentParser()
-parser.add_argument("-c", "--client", default="raspi", help="Client type [raspi]")
-parser.add_argument('-v', '--verbose', default=logging.INFO, help="Include debugging info",
-                    action="store_const", dest="loglevel", const=logging.DEBUG)
-
-args = vars(parser.parse_args())
-
-logging.basicConfig(stream=sys.stdout, level=args['loglevel'],
-                    format="%(funcName)s():%(lineno)i: %(message)s %(levelname)s")
-
-is_raspi = utils.is_raspi(args["client"])
-logging.info("Is RaspberryPi: {0}".format(is_raspi))
-cam = utils.Camera(True, use_picamera=True) if is_raspi else utils.Camera(False)
+cam = utils.Camera()
 
 cnt = 0
 while cam.is_open():
@@ -60,27 +46,19 @@ while cam.is_open():
               + 'X,Y: ({0}, {1})'.format(roi_x, roi_y)
     cv2.putText(frame, xy_text, cam.text_loc(), cam.text_font(), cam.text_size(), utils.RED, 1)
 
-    bgr_text = "BGR: {0}, {1}, {2} ".format(avg_color[0], avg_color[1], avg_color[2])
+    bgr_text = "BGR value: [{0}, {1}, {2}]".format(avg_color[0], avg_color[1], avg_color[2])
     cv2.putText(color_img, bgr_text, cam.text_loc(), cam.text_font(), cam.text_size(), utils.RED, 1)
 
     # Display images
-    cv2.imshow('ROI', roi_canvas)
-    cv2.imshow('Magnified ROI', mag_img)
-    cv2.imshow('Average ROI Color', color_img)
+    # cv2.imshow('ROI', roi_canvas)
+    # cv2.imshow('Magnified ROI', mag_img)
+    cv2.imshow('Average BGR Value', color_img)
     cv2.imshow('Image', frame)
 
     key = cv2.waitKey(30) & 0xFF
 
-    if key == ord('q'):
-        break
-    elif roi_size >= roi_inc * 2 and (key == ord('-') or key == ord('_')):
-        roi_size -= roi_inc
-        x_adj = 0
-        y_adj = 0
-    elif roi_size <= roi_inc * 49 and (key == ord('+') or key == ord('=')):
-        roi_size += roi_inc
-        x_adj = 0
-        y_adj = 0
+    if key == ord('c') or key == ord(' '):
+        print(bgr_text)
     elif roi_y >= move_inc and (key == 0 or key == ord('k')):  # Up
         y_adj -= move_inc
     elif roi_y <= frame_h - roi_size - move_inc and (key == 1 or key == ord('j')):  # Down
@@ -89,8 +67,16 @@ while cam.is_open():
         x_adj -= move_inc
     elif roi_x <= frame_w - roi_size - move_inc - move_inc and (key == 3 or key == ord('l')):  # Right
         x_adj += move_inc
-    elif key == ord('c') or key == ord(' '):
-        print(bgr_text)
+    elif roi_size >= roi_inc * 2 and (key == ord('-') or key == ord('_')):
+        roi_size -= roi_inc
+        x_adj = 0
+        y_adj = 0
+    elif roi_size <= roi_inc * 49 and (key == ord('+') or key == ord('=')):
+        roi_size += roi_inc
+        x_adj = 0
+        y_adj = 0
+    elif key == ord('q'):
+        break
 
     cnt += 1
 
