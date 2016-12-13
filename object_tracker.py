@@ -69,7 +69,7 @@ class ObjectTracker:
                 stub = gen.location_server_pb2.LocationServerStub(channel)
                 client_info = gen.location_server_pb2.ClientInfo(
                     info='Client running on {0}'.format(socket.gethostname()))
-                server_info = stub.Register(client_info)
+                server_info = stub.RegisterClient(client_info)
                 logging.info("Connected to {0}: {1}".format(hostname, server_info.info))
                 stub.ReportLocation(self._generate_locations())
                 logging.info("Disconnected from {0}: {1}".format(hostname, server_info.info))

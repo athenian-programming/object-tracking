@@ -92,8 +92,8 @@ class Servo:
         while True:
             val = raw_input("{0} {1} ({2}, {3})> ".format(name.upper(),
                                                           servo.read(),
-                                                          listener.get_x(False)[0],
-                                                          listener.get_y(False)[0]))
+                                                          listener.get_pos("x"),
+                                                          listener.get_pos("y")))
             if val.lower() == "q":
                 return
             elif val == "c":
@@ -114,7 +114,7 @@ class Servo:
                 end_pos = -1
                 for i in range(0, 180, 1):
                     servo.write(i, .1)
-                    if listener.get_nowait_pos(name) != -1:
+                    if listener.get_pos(name) != -1:
                         start_pos = i
                         break
 
@@ -124,11 +124,11 @@ class Servo:
 
                 for i in range(start_pos, 180, 1):
                     servo.write(i, .1)
-                    if listener.get_nowait_pos(name) == -1:
+                    if listener.get_pos(name) == -1:
                         break
                     end_pos = i
 
-                total_pixels = listener.get_nowait_size(name)
+                total_pixels = listener.get_size(name)
                 total_pos = end_pos - start_pos
                 pix_deg = round(total_pixels / float(total_pos), 2)
                 servo.write(90)

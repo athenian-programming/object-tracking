@@ -18,7 +18,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
     package='object_tracking',
     syntax='proto3',
     serialized_pb=_b(
-        '\n\x15location_server.proto\x12\x0fobject_tracking\"\x1a\n\nClientInfo\x12\x0c\n\x04info\x18\x01 \x01(\t\"\x1a\n\nServerInfo\x12\x0c\n\x04info\x18\x01 \x01(\t\"?\n\x08Location\x12\t\n\x01x\x18\x01 \x01(\x05\x12\t\n\x01y\x18\x02 \x01(\x05\x12\r\n\x05width\x18\x03 \x01(\x05\x12\x0e\n\x06height\x18\x04 \x01(\x05\"\x07\n\x05\x45mpty2\xa1\x01\n\x0eLocationServer\x12\x46\n\x08Register\x12\x1b.object_tracking.ClientInfo\x1a\x1b.object_tracking.ServerInfo\"\x00\x12G\n\x0eReportLocation\x12\x19.object_tracking.Location\x1a\x16.object_tracking.Empty\"\x00(\x01\x62\x06proto3')
+        '\n\x15location_server.proto\x12\x0fobject_tracking\"\x1a\n\nClientInfo\x12\x0c\n\x04info\x18\x01 \x01(\t\"\x1a\n\nServerInfo\x12\x0c\n\x04info\x18\x01 \x01(\t\"?\n\x08Location\x12\t\n\x01x\x18\x01 \x01(\x05\x12\t\n\x01y\x18\x02 \x01(\x05\x12\r\n\x05width\x18\x03 \x01(\x05\x12\x0e\n\x06height\x18\x04 \x01(\x05\"\x07\n\x05\x45mpty2\xa7\x01\n\x0eLocationServer\x12L\n\x0eRegisterClient\x12\x1b.object_tracking.ClientInfo\x1a\x1b.object_tracking.ServerInfo\"\x00\x12G\n\x0eReportLocation\x12\x19.object_tracking.Location\x1a\x16.object_tracking.Empty\"\x00(\x01\x62\x06proto3')
 )
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
@@ -52,6 +52,7 @@ _CLIENTINFO = _descriptor.Descriptor(
     serialized_end=68,
 )
 
+
 _SERVERINFO = _descriptor.Descriptor(
     name='ServerInfo',
     full_name='object_tracking.ServerInfo',
@@ -81,6 +82,7 @@ _SERVERINFO = _descriptor.Descriptor(
     serialized_start=70,
     serialized_end=96,
 )
+
 
 _LOCATION = _descriptor.Descriptor(
     name='Location',
@@ -132,6 +134,7 @@ _LOCATION = _descriptor.Descriptor(
     serialized_start=98,
     serialized_end=161,
 )
+
 
 _EMPTY = _descriptor.Descriptor(
     name='Empty',
@@ -189,6 +192,7 @@ Empty = _reflection.GeneratedProtocolMessageType('Empty', (_message.Message,), d
 ))
 _sym_db.RegisterMessage(Empty)
 
+
 try:
     # THESE ELEMENTS WILL BE DEPRECATED.
     # Please use the generated *_pb2_grpc.py files instead.
@@ -207,8 +211,8 @@ try:
             Args:
               channel: A grpc.Channel.
             """
-            self.Register = channel.unary_unary(
-                '/object_tracking.LocationServer/Register',
+            self.RegisterClient = channel.unary_unary(
+                '/object_tracking.LocationServer/RegisterClient',
                 request_serializer=ClientInfo.SerializeToString,
                 response_deserializer=ServerInfo.FromString,
             )
@@ -221,7 +225,7 @@ try:
 
     class LocationServerServicer(object):
 
-        def Register(self, request, context):
+        def RegisterClient(self, request, context):
             context.set_code(grpc.StatusCode.UNIMPLEMENTED)
             context.set_details('Method not implemented!')
             raise NotImplementedError('Method not implemented!')
@@ -234,8 +238,8 @@ try:
 
     def add_LocationServerServicer_to_server(servicer, server):
         rpc_method_handlers = {
-            'Register': grpc.unary_unary_rpc_method_handler(
-                servicer.Register,
+            'RegisterClient': grpc.unary_unary_rpc_method_handler(
+                servicer.RegisterClient,
                 request_deserializer=ClientInfo.FromString,
                 response_serializer=ServerInfo.SerializeToString,
             ),
@@ -257,7 +261,7 @@ try:
         file not marked beta) for all further purposes. This class was generated
         only to ease transition from grpcio<0.15.0 to grpcio>=0.15.0."""
 
-        def Register(self, request, context):
+        def RegisterClient(self, request, context):
             context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
 
         def ReportLocation(self, request_iterator, context):
@@ -271,10 +275,10 @@ try:
         file not marked beta) for all further purposes. This class was generated
         only to ease transition from grpcio<0.15.0 to grpcio>=0.15.0."""
 
-        def Register(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
+        def RegisterClient(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
             raise NotImplementedError()
 
-        Register.future = None
+        RegisterClient.future = None
 
         def ReportLocation(self, request_iterator, timeout, metadata=None, with_call=False, protocol_options=None):
             raise NotImplementedError()
@@ -290,15 +294,16 @@ try:
         file not marked beta) for all further purposes. This function was
         generated only to ease transition from grpcio<0.15.0 to grpcio>=0.15.0"""
         request_deserializers = {
-            ('object_tracking.LocationServer', 'Register'): ClientInfo.FromString,
+            ('object_tracking.LocationServer', 'RegisterClient'): ClientInfo.FromString,
             ('object_tracking.LocationServer', 'ReportLocation'): Location.FromString,
         }
         response_serializers = {
-            ('object_tracking.LocationServer', 'Register'): ServerInfo.SerializeToString,
+            ('object_tracking.LocationServer', 'RegisterClient'): ServerInfo.SerializeToString,
             ('object_tracking.LocationServer', 'ReportLocation'): Empty.SerializeToString,
         }
         method_implementations = {
-            ('object_tracking.LocationServer', 'Register'): face_utilities.unary_unary_inline(servicer.Register),
+            ('object_tracking.LocationServer', 'RegisterClient'): face_utilities.unary_unary_inline(
+                servicer.RegisterClient),
             ('object_tracking.LocationServer', 'ReportLocation'): face_utilities.stream_unary_inline(
                 servicer.ReportLocation),
         }
@@ -317,15 +322,15 @@ try:
         file not marked beta) for all further purposes. This function was
         generated only to ease transition from grpcio<0.15.0 to grpcio>=0.15.0"""
         request_serializers = {
-            ('object_tracking.LocationServer', 'Register'): ClientInfo.SerializeToString,
+            ('object_tracking.LocationServer', 'RegisterClient'): ClientInfo.SerializeToString,
             ('object_tracking.LocationServer', 'ReportLocation'): Location.SerializeToString,
         }
         response_deserializers = {
-            ('object_tracking.LocationServer', 'Register'): ServerInfo.FromString,
+            ('object_tracking.LocationServer', 'RegisterClient'): ServerInfo.FromString,
             ('object_tracking.LocationServer', 'ReportLocation'): Empty.FromString,
         }
         cardinalities = {
-            'Register': cardinality.Cardinality.UNARY_UNARY,
+            'RegisterClient': cardinality.Cardinality.UNARY_UNARY,
             'ReportLocation': cardinality.Cardinality.STREAM_UNARY,
         }
         stub_options = beta_implementations.stub_options(host=host, metadata_transformer=metadata_transformer,

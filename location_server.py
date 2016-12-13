@@ -15,7 +15,7 @@ class LocationServer(gen.location_server_pb2.LocationServerServicer):
         self._invoke_cnt = 0
         self._lock = threading.Lock()
 
-    def Register(self, request, context):
+    def RegisterClient(self, request, context):
         print("Connected {0} [{1}]".format(request.info, context.peer()))
         with self._lock:
             self._invoke_cnt += 1

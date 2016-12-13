@@ -10,8 +10,8 @@ class LocationServerStub(object):
         Args:
           channel: A grpc.Channel.
         """
-        self.Register = channel.unary_unary(
-            '/object_tracking.LocationServer/Register',
+        self.RegisterClient = channel.unary_unary(
+            '/object_tracking.LocationServer/RegisterClient',
             request_serializer=location__server__pb2.ClientInfo.SerializeToString,
             response_deserializer=location__server__pb2.ServerInfo.FromString,
         )
@@ -23,7 +23,7 @@ class LocationServerStub(object):
 
 
 class LocationServerServicer(object):
-    def Register(self, request, context):
+    def RegisterClient(self, request, context):
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
@@ -36,8 +36,8 @@ class LocationServerServicer(object):
 
 def add_LocationServerServicer_to_server(servicer, server):
     rpc_method_handlers = {
-        'Register': grpc.unary_unary_rpc_method_handler(
-            servicer.Register,
+        'RegisterClient': grpc.unary_unary_rpc_method_handler(
+            servicer.RegisterClient,
             request_deserializer=location__server__pb2.ClientInfo.FromString,
             response_serializer=location__server__pb2.ServerInfo.SerializeToString,
         ),

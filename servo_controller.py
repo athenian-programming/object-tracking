@@ -46,8 +46,8 @@ if __name__ == "__main__":
 
     if args["test"]:
         for i in range(0, 1000):
-            x_val = source.get_x(True)
-            y_val = source.get_y(True)
+            x_val = source.get_x()
+            y_val = source.get_y()
             print("Received location {0}: {1}, {2} {3}x{4}".format(i, x_val[0], y_val[0], x_val[1], y_val[1]))
         print("Exiting...")
         sys.exit(0)
@@ -62,8 +62,8 @@ if __name__ == "__main__":
         sys.exit(0)
 
     # Create servos
-    servo_x = servo.Servo(board, "X servo", "d:5:s", middle, lambda: source.get_x(True), True)
-    servo_y = servo.Servo(board, "Y Servo", "d:6:s", middle, lambda: source.get_y(True), False)
+    servo_x = servo.Servo(board, "X servo", "d:5:s", middle, lambda: source.get_x(), True)
+    servo_y = servo.Servo(board, "Y Servo", "d:6:s", middle, lambda: source.get_y(), False)
 
     if args["calib"]:
         servo.Servo.calibrate(source, servo_x, servo_y)

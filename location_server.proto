@@ -4,7 +4,7 @@ package object_tracking;
 
 service LocationServer {
 
-    rpc Register (ClientInfo) returns (ServerInfo) {
+    rpc RegisterClient (ClientInfo) returns (ServerInfo) {
     }
     rpc ReportLocation (stream Location) returns (Empty) {
     }
