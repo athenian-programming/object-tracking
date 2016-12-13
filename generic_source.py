@@ -1,7 +1,7 @@
 import threading
 
 
-class GenericDataSource:
+class GenericSource:
     def __init__(self):
         self._x = -1
         self._y = -1

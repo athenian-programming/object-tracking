@@ -207,7 +207,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-b", "--bgr", type=str, required=True, help="BGR target value, e.g., -b \"[174, 56, 5]\"")
     parser.add_argument("-w", "--width", default=400, type=int, help="Image width [400]")
-    parser.add_argument("-p", "--percent", default=15, type=int, help="Middle percent [15]")
+    parser.add_argument("-e", "--percent", default=15, type=int, help="Middle percent [15]")
     parser.add_argument("-m", "--min", default=100, type=int, help="Minimum pixel area [15]")
     parser.add_argument("-r", "--range", default=20, type=int, help="HSV range")
     parser.add_argument("-d", "--display", default=False, action="store_true", help="Display image [false]")

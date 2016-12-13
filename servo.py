@@ -3,34 +3,34 @@ import time
 
 
 class Servo:
-    def __init__(self, board, name, pin_args, middle, func, forward):
+    def __init__(self, board, name, pin_args, percent, func, forward):
         self._name = name
         self._pin = board.get_pin(pin_args)
-        self._middle = middle
+        self._percent = percent
         self._func = func
         self._forward = forward
         self._jiggle()
 
     def _jiggle(self):
         # Provoke an update from the color tracker
-        self.write(85, .5)
-        self.write(90, 1)
+        self.write_pin(85, .5)
+        self.write_pin(90, 1)
 
     @property
     def name(self):
         return self._name
 
-    def read(self):
+    def read_pin(self):
         return self._pin.read()
 
-    def write(self, val, pause=0.0):
+    def write_pin(self, val, pause=0.0):
         self._pin.write(val)
         if pause > 0:
             time.sleep(pause)
 
     def start(self):
-        middle_pct = (self._middle / 100.0) / 2
-        curr_pos = self.read()
+        middle_pct = (self._percent / 100.0) / 2
+        curr_pos = self.read_pin()
         printed = False
         pix_per_deg = 6.5
 
@@ -40,7 +40,7 @@ class Servo:
 
             # Skip if object is not seen
             if img_pos == -1 or img_total == -1:
-                curr_pos = self.read()
+                curr_pos = self.read_pin()
                 logging.info("No target seen: {0}".format(self._name))
                 continue
 
@@ -82,7 +82,7 @@ class Servo:
             curr_pos = new_pos
 
     @staticmethod
-    def calibrate(listener, servo_x, servo_y):
+    def calibrate(source, servo_x, servo_y):
         def center_servos(pause=0.0):
             servo_x.write(90, pause)
             servo_y.write(90, pause)
@@ -91,9 +91,9 @@ class Servo:
         servo = servo_x
         while True:
             val = raw_input("{0} {1} ({2}, {3})> ".format(name.upper(),
-                                                          servo.read(),
-                                                          listener.get_pos("x"),
-                                                          listener.get_pos("y")))
+                                                          servo.read_pin(),
+                                                          source.get_pos("x"),
+                                                          source.get_pos("y")))
             if val.lower() == "q":
                 return
             elif val == "c":
@@ -114,7 +114,7 @@ class Servo:
                 end_pos = -1
                 for i in range(0, 180, 1):
                     servo.write(i, .1)
-                    if listener.get_pos(name) != -1:
+                    if source.get_pos(name) != -1:
                         start_pos = i
                         break
 
@@ -124,11 +124,11 @@ class Servo:
 
                 for i in range(start_pos, 180, 1):
                     servo.write(i, .1)
-                    if listener.get_pos(name) == -1:
+                    if source.get_pos(name) == -1:
                         break
                     end_pos = i
 
-                total_pixels = listener.get_size(name)
+                total_pixels = source.get_size(name)
                 total_pos = end_pos - start_pos
                 pix_deg = round(total_pixels / float(total_pos), 2)
                 servo.write(90)
@@ -136,9 +136,9 @@ class Servo:
             elif len(val) == 0:
                 pass
             elif val == "-" or val == "_":
-                servo.write(servo.read() - 1, .5)
+                servo.write(servo.read_pin() - 1, .5)
             elif val == "+" or val == "=":
-                servo.write(servo.read() + 1, .5)
+                servo.write(servo.read_pin() + 1, .5)
             elif val.isdigit():
                 servo.write(int(val), .5)
             else:

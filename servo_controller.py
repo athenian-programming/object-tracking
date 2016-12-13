@@ -7,8 +7,8 @@ import time
 from pyfirmata import Arduino
 
 import servo
-from  grpc_source import GrpcDataSource
-from http_source import HttpDataSource
+from  grpc_source import GrpcSource
+from http_source import HttpSource
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -16,9 +16,11 @@ if __name__ == "__main__":
     parser.add_argument("-o", "--http", default=False, action="store_true", help="Run HTTP server [false]")
     parser.add_argument("-t", "--test", default=False, action="store_true", help="Test mode [false]")
     parser.add_argument("-c", "--calib", default=False, action="store_true", help="Calibration mode [false]")
-    parser.add_argument("-m", "--middle", default=15, type=int, help="Middle percent [15]")
+    parser.add_argument("-e", "--percent", default=15, type=int, help="Middle percent [15]")
     parser.add_argument("-p", "--port", default="ttyACM0", type=str,
-                        help="Arduino serial port [ttyACM0] (OSX is cu.usbmodemX)")
+                        help="Arduino serial port [ttyACM0] (OSX is cu.usbmodemXXXX)")
+    parser.add_argument("-x", "--xservo", default=5, type=int, help="X servo PWM pin [5]")
+    parser.add_argument("-y", "--yservo", default=6, type=int, help="Y servo PWM pin [6]")
     parser.add_argument('-v', '--verbose', default=logging.INFO, help="Include debugging info",
                         action="store_const", dest="loglevel", const=logging.DEBUG)
     args = vars(parser.parse_args())
@@ -28,27 +30,27 @@ if __name__ == "__main__":
     # logging.basicConfig(filename='error.log', level=args['loglevel'],
     #                    format="%(funcName)s():%(lineno)i: %(message)s %(levelname)s")
 
-    middle = int(args["middle"])
-    logging.info("Middle percent: {0}".format(middle))
+    percent = int(args["percent"])
+    logging.info("Middle percent: {0}".format(percent))
 
     if args["grpc"] or args["test"]:
-        source = GrpcDataSource(50051)
+        source = GrpcSource(50051)
     elif args["http"]:
-        source = HttpDataSource(8080)
+        source = HttpSource(8080)
     else:
-        source = None
+        print("Requires --http or --grpc option to be specified")
+        sys.exit(1)
 
     try:
-        if source:
-            thread.start_new_thread(source.start, ())
+        thread.start_new_thread(source.start, ())
     except BaseException as e:
-        logging.error("Unable to start data source [{0}]".format(e))
+        logging.error("Unable to start source server [{0}]".format(e))
 
     if args["test"]:
         for i in range(0, 1000):
-            x_val = source.get_x()
-            y_val = source.get_y()
-            print("Received location {0}: {1}, {2} {3}x{4}".format(i, x_val[0], y_val[0], x_val[1], y_val[1]))
+            x_vals = source.get_x()
+            y_vals = source.get_y()
+            print("Received location {0}: {1}, {2} {3}x{4}".format(i, x_vals[0], y_vals[0], x_vals[1], y_vals[1]))
         print("Exiting...")
         sys.exit(0)
 
@@ -62,8 +64,8 @@ if __name__ == "__main__":
         sys.exit(0)
 
     # Create servos
-    servo_x = servo.Servo(board, "X servo", "d:5:s", middle, lambda: source.get_x(), True)
-    servo_y = servo.Servo(board, "Y Servo", "d:6:s", middle, lambda: source.get_y(), False)
+    servo_x = servo.Servo(board, "X servo", "d:{0}:s".format(args["xservo"]), percent, lambda: source.get_x(), True)
+    servo_y = servo.Servo(board, "Y Servo", "d:{0}:s".format(args["yservo"]), percent, lambda: source.get_y(), False)
 
     if args["calib"]:
         servo.Servo.calibrate(source, servo_x, servo_y)

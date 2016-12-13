@@ -2,13 +2,13 @@ import logging
 import sys
 import thread
 
-from  generic_source import GenericDataSource
+from  generic_source import GenericSource
 from location_server import LocationServer
 
 
-class GrpcDataSource(GenericDataSource):
+class GrpcSource(GenericSource):
     def __init__(self, port):
-        GenericDataSource.__init__(self)
+        GenericSource.__init__(self)
         self._location_server = LocationServer('[::]:' + str(port), self)
 
     def start(self):

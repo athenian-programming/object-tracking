@@ -3,12 +3,12 @@ import logging
 from flask import Flask
 from flask import request
 
-from  generic_source import GenericDataSource
+from  generic_source import GenericSource
 
 
-class HttpDataSource(GenericDataSource):
+class HttpSource(GenericSource):
     def __init__(self, port=8080):
-        GenericDataSource.__init__(self)
+        GenericSource.__init__(self)
         self._port = port
         self._flask = Flask(__name__)
         self._flask.logger.disabled = True
