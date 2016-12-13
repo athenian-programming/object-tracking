@@ -1,7 +1,6 @@
-#!/usr/local/bin/python2
-
 import argparse
 import logging
+import socket
 import sys
 import thread
 import threading
@@ -10,19 +9,18 @@ import urllib
 import urllib2
 
 import cv2
+import grpc
 import imutils
 import numpy as np
 
 import camera
-import gen.color_tracker_pb2
+import gen.location_server_pb2
 import opencv_utils as utils
-from location_server import LocationServer
 
 
 class ObjectTracker:
-    def __init__(self, bgr_color, width, percent, minimum, hsv_range, url, location_server, display=False):
+    def __init__(self, bgr_color, width, percent, minimum, hsv_range, url, grpc_hostname, display=False):
         self._url = url
-        self._location_server = location_server
         self._percent = percent
         self._minimum = minimum
         bgr_img = np.uint8([[bgr_color]])
@@ -41,22 +39,59 @@ class ObjectTracker:
         self._data_ready = threading.Event()
         self._currval = None
 
-    def write_values(self, x, y, width, height):
+        self._use_grpc = False
+        if grpc_hostname:
+            self._use_grpc = True
+            try:
+                thread.start_new_thread(self._connect_to_grpc, (grpc_hostname,))
+            except BaseException as e:
+                logging.error("Unable to start gRPC client at {0} [{1}]".format(hostname, e))
 
+    def _write_location(self, val):
+        with self._lock:
+            self._currloc = val
+            self._data_ready.set()
+
+    def _read_location(self):
+        self._data_ready.wait()
+        with self._lock:
+            self._data_ready.clear()
+            return self._currloc
+
+    def _generate_locations(self):
+        while True:
+            yield self._read_location()
+
+    def _connect_to_grpc(self, hostname):
+        while True:
+            try:
+                channel = grpc.insecure_channel(hostname)
+                stub = gen.location_server_pb2.LocationServerStub(channel)
+                client_info = gen.location_server_pb2.ClientInfo(
+                    info='Client running on {0}'.format(socket.gethostname()))
+                server_info = stub.Register(client_info)
+                logging.info("Connected to {0}: {1}".format(hostname, server_info.info))
+                stub.ReportLocation(self._generate_locations())
+                logging.info("Disconnected from {0}: {1}".format(hostname, server_info.info))
+            except BaseException as e:
+                logging.error("Failed to connect to gRPC server at {0} - [{1}]".format(hostname, e))
+                time.sleep(1)
+
+    def _write_values(self, x, y, width, height):
         # Raspi specific
         # lcd.clear()
         # lcd.write('X, Y: {0}, {1}'.format(cX, cY))
-
         if self._url:
-            params = urllib.urlencode({'x': x, 'y': y, 'w': width, 'h': height})
             try:
+                params = urllib.urlencode({'x': x, 'y': y, 'w': width, 'h': height})
                 urllib2.urlopen(self._url, params).read()
             except BaseException as e:
                 logging.warning("Unable to reach HTTP server {0} [{1}]".format(self._url, e))
-        elif self._location_server:
-            loc = gen.color_tracker_pb2.Location(x=x, y=y, width=width, height=height)
-            self._location_server.write_location(loc)
+        elif self._use_grpc:
+            loc = gen.location_server_pb2.Location(x=x, y=y, width=width, height=height)
+            self._write_location(loc)
         else:
+            # Print to console
             print("{0}, {1} {2}x{3}".format(x, y, width, height))
 
     # Do not run this in a background thread. cv2.waitKey has to run in main thread
@@ -71,7 +106,7 @@ class ObjectTracker:
         inc_y = -1
         middle_pct = (self._percent / 100.0) / 2
 
-        self.write_values(-1, -1, 0, 0)
+        self._write_values(-1, -1, 0, 0)
 
         while self._cam.is_open() and not self._finished:
 
@@ -125,7 +160,7 @@ class ObjectTracker:
 
             # Write location if it is different from previous value written
             if img_x != prev_x or img_y != prev_y:
-                self.write_values(img_x, img_y, img_width, img_height)
+                self._write_values(img_x, img_y, img_width, img_height)
                 prev_x = img_x
                 prev_y = img_y
 
@@ -161,6 +196,12 @@ class ObjectTracker:
         self._finished = True
         self._cam.close()
 
+    def test(self):
+        for i in range(0, 1000):
+            self._write_values(i, i + 1, i + 2, i + 3)
+            time.sleep(1)
+        print("Exiting...")
+        sys.exit(0)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -170,8 +211,8 @@ if __name__ == "__main__":
     parser.add_argument("-m", "--min", default=100, type=int, help="Minimum pixel area [15]")
     parser.add_argument("-r", "--range", default=20, type=int, help="HSV range")
     parser.add_argument("-d", "--display", default=False, action="store_true", help="Display image [false]")
-    parser.add_argument("-g", "--grpc", default=False, action="store_true", help="Run gRPC server [false]")
-    parser.add_argument("-n", "--hostname", default="", type=str, help="Servo controller hostname")
+    parser.add_argument("-g", "--grpc", default="", help="Servo controller gRPC server hostname")
+    parser.add_argument("-o", "--http", default="", type=str, help="Servo controller HTTP hostname")
     parser.add_argument("-t", "--test", default=False, action="store_true", help="Test mode [false]")
     parser.add_argument('-v', '--verbose', default=logging.INFO, help="Include debugging info",
                         action="store_const", dest="loglevel", const=logging.DEBUG)
@@ -200,35 +241,33 @@ if __name__ == "__main__":
     display = args["display"]
     logging.info("Display images: {0}".format(display))
 
-    use_grpc = args["grpc"] or args["test"]
-    hostname = args["hostname"]
-    url = None
-    location_server = None
+    grpc_hostname = args["grpc"]
+    hostname = args["http"]
 
-    if use_grpc:
-        location_server = LocationServer('[::]:50051')
-        try:
-            thread.start_new_thread(LocationServer.start, (location_server,))
-            logging.info("Started gRPC location server")
-        except BaseException as e:
-            logging.error("Unable to start gRPC location server [{0}]".format(e))
-            sys.exit(1)
+    url = None
+
+    if grpc_hostname:
+        grpc_hostname += ":50051"
+        logging.info("Servo controller gRPC hostname: {0}".format(grpc_hostname))
     elif hostname:
         url = "http://" + hostname + "/set_values" if hostname != "" else ""
-        logging.info("Servo controller hostname: {0}".format(hostname))
-
-    if args["test"]:
-        for i in range(0, 1000):
-            loc = gen.color_tracker_pb2.Location(x=i, y=i + 1, width=i + 2, height=i + 3)
-            location_server.write_location(loc)
-            time.sleep(1)
-        print("Exiting...")
-        sys.exit(0)
+        logging.info("Servo controller HTTP URL: {0}".format(hostname))
 
     # Raspi specific
     # import dothat.backlight as backlight
     # import dothat.lcd as lcd
     # backlight.rgb(200, 0,0)
 
-    tracker = ObjectTracker(bgr_color, width, percent, minimum, hsv_range, url, location_server, display)
-    tracker.start()
+    tracker = ObjectTracker(bgr_color, width, percent, minimum, hsv_range, url, grpc_hostname, display)
+
+    if args["test"]:
+        try:
+            thread.start_new_thread(tracker.test, ())
+        except BaseException as e:
+            logging.error("Unable to run test thread [{0}]".format(e))
+            sys.exit(1)
+
+    try:
+        tracker.start()
+    except KeyboardInterrupt as e:
+        print("Exiting...")

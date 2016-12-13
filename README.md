@@ -33,7 +33,7 @@ the minimum taerget pixel area.
 $ ./object_tracker.py 
 ```
 
-| CLI Args       | Description                                        | Default |
+| CLI Options    | Description                                        | Default |
 |:---------------|----------------------------------------------------|---------|
 | -b, --bgr      | BGR target value, e.g., -b "[174, 56, 5]"          |         |
 | -w, --width    | Image width                                        | 400     |
@@ -41,10 +41,11 @@ $ ./object_tracker.py
 | -m, --min      | Minimum target pixel area                          | 100     |
 | -r, --range    | HSV Range                                          | 20      |
 | -d, --display  | Display image                                      | false   |
-| -g, --grpc     | Run gRPC server                                    | false   |
-| -h, --hostname | Servo controller hostname                          |         |
+| -g, --grpc     | Servo controller gRPC server hostname              |         |
+| -o, --http     | Servo controller HTTP server hostname              |         |
 | -t, --test     | Test mode                                          | false   |
 | -v, --verbose  | Include debugging info                             | false   |
+| -h, --help     | Summary of options                                 |         |
 
 
 ## Servo Controller

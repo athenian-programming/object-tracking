@@ -1,5 +1,3 @@
-#!/usr/local/bin/python2
-
 import argparse
 import logging
 import sys
@@ -14,7 +12,8 @@ from http_source import HttpDataSource
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-g", "--grpc", default="", help="gRPC server hostname")
+    parser.add_argument("-g", "--grpc", default=False, action="store_true", help="Run gRPC server [false]")
+    parser.add_argument("-o", "--http", default=False, action="store_true", help="Run HTTP server [false]")
     parser.add_argument("-t", "--test", default=False, action="store_true", help="Test mode [false]")
     parser.add_argument("-c", "--calib", default=False, action="store_true", help="Calibration mode [false]")
     parser.add_argument("-m", "--middle", default=15, type=int, help="Middle percent [15]")
@@ -32,16 +31,16 @@ if __name__ == "__main__":
     middle = int(args["middle"])
     logging.info("Middle percent: {0}".format(middle))
 
-    grpc_hostname = args["grpc"]
-    logging.info("gRPC hostname: {0}".format(grpc_hostname))
-
-    if grpc_hostname:
-        source = GrpcDataSource(grpc_hostname + ":50051")
-    else:
+    if args["grpc"] or args["test"]:
+        source = GrpcDataSource(50051)
+    elif args["http"]:
         source = HttpDataSource(8080)
+    else:
+        source = None
 
     try:
-        thread.start_new_thread(source.start, ())
+        if source:
+            thread.start_new_thread(source.start, ())
     except BaseException as e:
         logging.error("Unable to start data source [{0}]".format(e))
 
@@ -49,7 +48,7 @@ if __name__ == "__main__":
         for i in range(0, 1000):
             x_val = source.get_x(True)
             y_val = source.get_y(True)
-            print("Received {0} {1}, {2} {3}x{4}".format(i, x_val[0], y_val[0], x_val[1], y_val[1]))
+            print("Received location {0}: {1}, {2} {3}x{4}".format(i, x_val[0], y_val[0], x_val[1], y_val[1]))
         print("Exiting...")
         sys.exit(0)
 
@@ -62,6 +61,7 @@ if __name__ == "__main__":
         logging.error("Failed to connect to arduino at {0} - [{1}]".format(port, e))
         sys.exit(0)
 
+    # Create servos
     servo_x = servo.Servo(board, "X servo", "d:5:s", middle, lambda: source.get_x(True), True)
     servo_y = servo.Servo(board, "Y Servo", "d:6:s", middle, lambda: source.get_y(True), False)
 
@@ -69,17 +69,19 @@ if __name__ == "__main__":
         servo.Servo.calibrate(source, servo_x, servo_y)
         print("Exiting...")
         board.exit()
-        sys.exit(0)
+    else:
+        try:
+            thread.start_new_thread(servo_x.start, ())
+        except BaseException as e:
+            logging.error("Unable to start controller for {0} [{1}]".format(servo_x.name(), e))
 
-    try:
-        thread.start_new_thread(servo_x.start, ())
-    except BaseException as e:
-        logging.error("Unable to start controller for {0} [{1}]".format(servo_x.name(), e))
+        try:
+            thread.start_new_thread(servo_y.start, ())
+        except BaseException as e:
+            logging.error("Unable to start controller for {0} [{1}]".format(servo_y.name(), e))
 
-    try:
-        thread.start_new_thread(servo_y.start, ())
-    except BaseException as e:
-        logging.error("Unable to start controller for {0} [{1}]".format(servo_y.name(), e))
-
-    while True:
-        time.sleep(60)
+        try:
+            while True:
+                time.sleep(60)
+        except KeyboardInterrupt as e:
+            print("Exiting...")
