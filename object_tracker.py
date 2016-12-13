@@ -1,7 +1,6 @@
 #!/usr/local/bin/python2
 
 import argparse
-import datetime
 import logging
 import sys
 import thread
@@ -149,7 +148,7 @@ class ObjectTracker:
                 if key == ord("q"):
                     break
                 elif key == ord('p'):
-                    self.save_frame(frame)
+                    utils.save_frame(frame)
             else:
                 # Nap if display is not on
                 time.sleep(.1)
@@ -161,12 +160,6 @@ class ObjectTracker:
     def close(self):
         self._finished = True
         self._cam.close()
-
-    @staticmethod
-    def save_frame(frame):
-        file_name = "ct-{0}.png".format(datetime.datetime.now().strftime("%H-%M-%S"))
-        cv2.imwrite(file_name, frame)
-        logging.info("Wrote image to {0}".format(file_name))
 
 
 if __name__ == "__main__":

@@ -1,3 +1,5 @@
+import datetime
+import logging
 import platform
 
 import cv2
@@ -19,6 +21,11 @@ def find_max_contour(contours):
                 max_index = i
     return max_index
 
+
+def save_frame(frame):
+    file_name = "ct-{0}.png".format(datetime.datetime.now().strftime("%H-%M-%S"))
+    cv2.imwrite(file_name, frame)
+    logging.info("Wrote image to {0}".format(file_name))
 
 def is_raspi():
     return platform.system() == "Linux"
