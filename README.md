@@ -1,7 +1,9 @@
 # OpenCV Object Tracking 
 
 
-## Choose a target BGR value 
+## Color Picker 
+
+color_picker.py is used to choose a target BGR value.
 
 ```bash
 $ ./color_picker.py 
@@ -21,6 +23,12 @@ $ ./color_picker.py
 
 ## Object Tracker
 
+object_tracker.py provides the location of the largest object having the 
+target BGR value. It can be run stand-alone or can supply data to s
+ervo_controller.py via gRPC or HTTP. The smaller the image width, the smaller 
+the target area. Thus, decreasing the image width may require also decreasing 
+the minimum taerget pixel area.
+
 ```bash
 $ ./object_tracker.py 
 ```
@@ -29,15 +37,15 @@ $ ./object_tracker.py
 |:---------------|----------------------------------------------------|---------|
 | -b, --bgr      | BGR target value, e.g., -b "[174, 56, 5]"          |         |
 | -w, --width    | Image width                                        | 400     |
-| -r, --ranhge   | HSV Range                                          | 20      |
+| -p, --percent  | Middle percent                                     | 15      |
+| -m, --min      | Minimum target pixel area                          | 100     |
+| -r, --range    | HSV Range                                          | 20      |
 | -d, --display  | Display image                                      | false   |
 | -g, --grpc     | Run gRPC server                                    | false   |
-| -h, --hostname | Servo controller hostname                          | ""      |
+| -h, --hostname | Servo controller hostname                          |         |
 | -t, --test     | Test mode                                          | false   |
 | -v, --verbose  | Include debugging info                             | false   |
 
-The object_tracker can be run stand-alone or can supply data to the servo_controller 
-via gRPC or HTTP.
 
 ## Servo Controller
 

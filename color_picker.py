@@ -4,6 +4,7 @@ import cv2
 import imutils
 import numpy as np
 
+import camera
 import opencv_utils as utils
 
 roi_size = 24
@@ -13,7 +14,7 @@ x_adj = 0
 y_adj = 0
 mag_width = 400
 
-cam = utils.Camera()
+cam = camera.Camera()
 
 cnt = 0
 while cam.is_open():
@@ -44,10 +45,10 @@ while cam.is_open():
     xy_text = 'Frame: {0} '.format(cnt) \
               + 'ROI: {0}x{1} '.format(str(roi_size), str(roi_size)) \
               + 'X,Y: ({0}, {1})'.format(roi_x, roi_y)
-    cv2.putText(frame, xy_text, cam.text_loc(), cam.text_font(), cam.text_size(), utils.RED, 1)
+    cv2.putText(frame, xy_text, utils.text_loc(), utils.text_font(), utils.text_size(), utils.RED, 1)
 
     bgr_text = "BGR value: [{0}, {1}, {2}]".format(avg_color[0], avg_color[1], avg_color[2])
-    cv2.putText(color_img, bgr_text, cam.text_loc(), cam.text_font(), cam.text_size(), utils.RED, 1)
+    cv2.putText(color_img, bgr_text, utils.text_loc(), utils.text_font(), utils.text_size(), utils.RED, 1)
 
     # Display images
     # cv2.imshow('ROI', roi_canvas)
