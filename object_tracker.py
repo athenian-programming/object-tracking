@@ -19,6 +19,7 @@ import opencv_utils as utils
 from opencv_utils import BLUE
 from opencv_utils import GREEN
 from opencv_utils import RED
+from opencv_utils import is_raspi
 
 
 class ObjectTracker:
@@ -159,10 +160,26 @@ class ObjectTracker:
                         text += ' Area: {0}'.format(area)
                         text += ' {0}%'.format(self._percent)
 
-            if img_x == -1 and img_y == -1:
-                set_leds(0, 0, 50)
+            x_in_middle = mid_x - inc_x <= img_x <= mid_x + inc_x
+            y_in_middle = mid_y - inc_y <= img_y <= mid_y + inc_y
+            x_missing = img_x == -1
+            y_missing = img_y == -1
+
+            if x_missing:
+                set_left_leds(RED)
             else:
-                set_leds(50, 0, 0)
+                if x_in_middle:
+                    set_left_leds(GREEN)
+                else:
+                    set_left_leds(BLUE)
+
+            if y_missing:
+                set_right_leds(RED)
+            else:
+                if y_in_middle:
+                    set_right_leds(GREEN)
+                else:
+                    set_right_leds(BLUE)
 
             # Write location if it is different from previous value written
             if img_x != self._prev_x or img_y != self._prev_y:
@@ -172,8 +189,8 @@ class ObjectTracker:
 
             # Display images
             if self._display:
-                x_color = RED if mid_x - inc_x <= img_x <= mid_x + inc_x else GREEN if img_x == -1 else BLUE
-                y_color = RED if mid_y - inc_y <= img_y <= mid_y + inc_y else GREEN if img_x == -1 else BLUE
+                x_color = GREEN if x_in_middle else RED if x_missing else BLUE
+                y_color = GREEN if y_in_middle else RED if y_missing else BLUE
                 cv2.line(frame, (mid_x - inc_x, 0), (mid_x - inc_x, img_height), x_color, 1)
                 cv2.line(frame, (mid_x + inc_x, 0), (mid_x + inc_x, img_height), x_color, 1)
                 cv2.line(frame, (0, mid_y - inc_y), (img_width, mid_y - inc_y), y_color, 1)
@@ -203,21 +220,29 @@ class ObjectTracker:
 
             self._cnt += 1
 
+        if is_raspi():
+            clear()
         self._cam.close()
-        print("Exiting...")
 
     def _test(self):
         for i in range(0, 1000):
-            self._write_location_values(i, i + 1, i + 2, i + 3)
+            self._write_location_values(i, i + 1, i + 2, i + 3, i + 4)
             time.sleep(1)
         print("Exiting...")
         sys.exit(0)
 
 
-def set_leds(r, g, b):
-    if utils.is_raspi():
-        for i in range(0, 8):
-            set_pixel(i, r, g, b)
+def set_left_leds(color):
+    if is_raspi():
+        for i in range(0, 4):
+            set_pixel(i, color[2], color[1], color[0], brightness=0.05)
+        show()
+
+
+def set_right_leds(color):
+    if is_raspi():
+        for i in range(4, 8):
+            set_pixel(i, color[2], color[1], color[0], brightness=0.05)
         show()
 
 
@@ -277,8 +302,8 @@ if __name__ == "__main__":
     # import dothat.lcd as lcd
     # backlight.rgb(200, 0,0)
 
-    if utils.is_raspi():
-        from blinkt import set_pixel, show
+    if is_raspi():
+        from blinkt import set_pixel, show, clear
 
     tracker = ObjectTracker(bgr_color, width, percent, minimum, hsv_range, url, grpc_hostname, display)
 
@@ -292,4 +317,6 @@ if __name__ == "__main__":
     try:
         tracker.start()
     except KeyboardInterrupt as e:
-        print("Exiting...")
+        pass
+
+    print("Exiting...")

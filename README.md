@@ -93,3 +93,22 @@ $ python servo_controller.py --port ttyACM0 --grpc
 | -h, --help     | Summary of options                                 |         |
 
 
+## Relevant Links
+
+### Hardware
+* [Raspberry Pi Camera](https://www.adafruit.com/products/3099)
+* [Pan/Tilt Kit](https://www.adafruit.com/product/1967)
+* [Blinkt](https://www.adafruit.com/products/3195)
+
+### Software
+* [PyCharm IDE](https://www.jetbrains.com/pycharm/)
+* [Pyfirmata](https://github.com/tino/pyFirmata)
+* [Blinkt docs](http://docs.pimoroni.com/blinkt/)
+* [Flask](http://flask.pocoo.org)
+* [gRPC](http://www.grpc.io/docs/tutorials/basic/python.html)
+* [OpenCV Python Tutorial](http://docs.opencv.org/3.0-beta/doc/py_tutorials/py_tutorials.html)
+
+### System
+* [Installing OpenCV3 with Python 2.7 on Sierra](http://www.pyimagesearch.com/2016/11/28/macos-install-opencv-3-and-python-2-7/)
+* [OpenCV](https://github.com/opencv/opencv)
+* [XQuartz](https://www.xquartz.org)

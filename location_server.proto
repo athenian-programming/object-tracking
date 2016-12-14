@@ -6,6 +6,7 @@ service LocationServer {
 
     rpc RegisterClient (ClientInfo) returns (ServerInfo) {
     }
+
     rpc ReportLocation (stream Location) returns (Empty) {
     }
 

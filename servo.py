@@ -34,7 +34,6 @@ class Servo:
         while True:
             # Get latest value
             (img_pos, img_total, percent) = self._func()
-            middle_pct = (percent / 100.0) / 2
 
             # Skip if object is not seen
             if img_pos == -1 or img_total == -1:
@@ -43,6 +42,7 @@ class Servo:
                 continue
 
             midpoint = img_total / 2
+            middle_pct = (percent / 100.0) / 2
             middle_inc = int(img_total * middle_pct / 2)
 
             if img_pos < midpoint - middle_inc:
