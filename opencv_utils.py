@@ -27,6 +27,7 @@ def save_frame(frame):
     cv2.imwrite(file_name, frame)
     logging.info("Wrote image to {0}".format(file_name))
 
+
 def is_raspi():
     return platform.system() == "Linux"
 

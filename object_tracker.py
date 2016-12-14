@@ -156,6 +156,11 @@ class ObjectTracker:
                         text += ' Area: {0}'.format(area)
                         text += ' {0}%'.format(self._percent)
 
+            if img_x == -1 and img_y == -1:
+                set_leds(0, 0, 50)
+            else:
+                set_leds(50, 0, 0)
+
             # Write location if it is different from previous value written
             if img_x != self._prev_x or img_y != self._prev_y:
                 self._write_location_values(img_x, img_y, img_width, img_height, self._percent)
@@ -164,8 +169,8 @@ class ObjectTracker:
 
             # Display images
             if self._display:
-                x_color = utils.RED if mid_x - inc_x <= img_x <= mid_x + inc_x else utils.BLUE
-                y_color = utils.RED if mid_y - inc_y <= img_y <= mid_y + inc_y else utils.BLUE
+                x_color = utils.RED if mid_x - inc_x <= img_x <= mid_x + inc_x else utils.GREEN if img_x == -1 else utils.BLUE
+                y_color = utils.RED if mid_y - inc_y <= img_y <= mid_y + inc_y else utils.GREEN if img_x == -1 else utils.BLUE
                 cv2.line(frame, (mid_x - inc_x, 0), (mid_x - inc_x, img_height), x_color, 1)
                 cv2.line(frame, (mid_x + inc_x, 0), (mid_x + inc_x, img_height), x_color, 1)
                 cv2.line(frame, (0, mid_y - inc_y), (img_width, mid_y - inc_y), y_color, 1)
@@ -183,9 +188,8 @@ class ObjectTracker:
                 elif key == ord('+') or key == ord('='):
                     self._set_percent(self._percent + 1)
                 elif key == ord('s'):
-                    logging.info("Width x height: {0}x{1}".format(img_width, img_height))
-                    logging.info(
-                        "Middle horizontal/vert pixels: {0}/{1} {2}%".format(inc_x * 2, inc_y * 2, self._percent))
+                    print("Width x height: {0}x{1}".format(img_width, img_height))
+                    print("Middle horizontal/vert pixels: {0}/{1} {2}%".format(inc_x * 2, inc_y * 2, self._percent))
                 elif key == ord('p'):
                     utils.save_frame(frame)
                 elif key == ord("q"):
@@ -205,6 +209,13 @@ class ObjectTracker:
             time.sleep(1)
         print("Exiting...")
         sys.exit(0)
+
+
+def set_leds(r, g, b):
+    if utils.is_raspi():
+        for i in range(0, 8):
+            set_pixel(i, r, g, b)
+        show()
 
 
 if __name__ == "__main__":
@@ -262,6 +273,9 @@ if __name__ == "__main__":
     # import dothat.backlight as backlight
     # import dothat.lcd as lcd
     # backlight.rgb(200, 0,0)
+
+    if utils.is_raspi():
+        from blinkt import set_pixel, show
 
     tracker = ObjectTracker(bgr_color, width, percent, minimum, hsv_range, url, grpc_hostname, display)
 

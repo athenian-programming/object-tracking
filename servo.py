@@ -29,7 +29,6 @@ class Servo:
 
     def start(self):
         curr_pos = self.read_pin()
-        printed = False
         pix_per_deg = 6.5
 
         while True:
@@ -45,10 +44,6 @@ class Servo:
 
             midpoint = img_total / 2
             middle_inc = int(img_total * middle_pct / 2)
-
-            if not printed:
-                print("Middle window pos:{0} mid:{1} inc:{2}".format(img_pos, midpoint, middle_inc))
-                printed = True
 
             if img_pos < midpoint - middle_inc:
                 err = abs((midpoint - middle_inc) - img_pos)
