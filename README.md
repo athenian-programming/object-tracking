@@ -5,9 +5,13 @@
 
 color_picker.py is used to choose a target BGR value.
 
+### Usage 
+
 ```bash
 $ ./color_picker.py 
 ```
+
+### Display Keystrokes
 
 | Keystroke  | Action                                             |
 |:----------:|----------------------------------------------------|
@@ -29,13 +33,17 @@ servo_controller.py via gRPC or HTTP. The smaller the image width, the smaller
 the matching target area. Thus, decreasing the image width may require also 
 decreasing the minimum target pixel area.
 
+### Usage 
+
 ```bash
-$ python object_tracker.py 
+$ python object_tracker.py --bgr "[174, 56, 5]" --display --grpc localhost
 ```
 
-| CLI Options    | Description                                        | Default |
+### CLI Options
+
+| Option         | Description                                        | Default |
 |:---------------|----------------------------------------------------|---------|
-| -b, --bgr      | BGR target value, e.g., -b "[174, 56, 5]"          |         |
+| -b, --bgr      | BGR target value                                   |         |
 | -w, --width    | Image width                                        | 400     |
 | -e, --percent  | Middle percent                                     | 15      |
 | -m, --min      | Minimum target pixel area                          | 100     |
@@ -47,6 +55,8 @@ $ python object_tracker.py
 | -v, --verbose  | Include debugging info                             | false   |
 | -h, --help     | Summary of options                                 |         |
 
+
+### Display Keystrokes
 
 | Keystroke  | Action                                             |
 |:----------:|----------------------------------------------------|
@@ -62,11 +72,15 @@ $ python object_tracker.py
 The servo_controller.py script reads the location values provided by object_tracker.py
 and adjusts the pan/tilt servos accordingly.
 
+### Usage 
+
 ```bash
-$ python servo_controller.py 
+$ python servo_controller.py --port ttyACM0 --grpc
 ```
 
-| CLI Options    | Description                                        | Default |
+### CLI Options
+
+| Option         | Description                                        | Default |
 |:---------------|----------------------------------------------------|---------|
 | -g, --grpc     | Use gRPC server to read locations                  | false   |
 | -o, --http     | Use HTTP server to read locations                  | false   |

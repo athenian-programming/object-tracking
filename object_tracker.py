@@ -45,7 +45,7 @@ class ObjectTracker:
             try:
                 thread.start_new_thread(self._connect_to_grpc, (grpc_hostname,))
             except BaseException as e:
-                logging.error("Unable to start gRPC client at {0} [{1}]".format(hostname, e))
+                logging.error("Unable to start gRPC client at {0} [{1}]".format(http_hostname, e))
 
         self._cam = camera.Camera()
 
@@ -216,7 +216,8 @@ if __name__ == "__main__":
     parser.add_argument("-r", "--range", default=20, type=int, help="HSV range")
     parser.add_argument("-d", "--display", default=False, action="store_true", help="Display image [false]")
     parser.add_argument("-g", "--grpc", default="", help="Servo controller gRPC server hostname")
-    parser.add_argument("-o", "--http", default="", type=str, help="Servo controller HTTP hostname")
+    parser.add_argument("-o", "--http", default="", type=str,
+                        help="Servo controller HTTP hostname, e.g., --http localhost")
     parser.add_argument("-t", "--test", default=False, action="store_true", help="Test mode [false]")
     parser.add_argument('-v', '--verbose', default=logging.INFO, help="Include debugging info",
                         action="store_const", dest="loglevel", const=logging.DEBUG)
@@ -246,16 +247,16 @@ if __name__ == "__main__":
     logging.info("Display images: {0}".format(display))
 
     grpc_hostname = args["grpc"]
-    hostname = args["http"]
+    http_hostname = args["http"]
 
     url = None
 
     if grpc_hostname:
         grpc_hostname += ":50051"
         logging.info("Servo controller gRPC hostname: {0}".format(grpc_hostname))
-    elif hostname:
-        url = "http://" + hostname + "/set_values" if hostname != "" else ""
-        logging.info("Servo controller HTTP URL: {0}".format(hostname))
+    elif http_hostname:
+        url = "http://" + http_hostname + ":8080/set_values"
+        logging.info("Servo controller HTTP URL: {0}".format(http_hostname))
 
     # Raspi specific
     # import dothat.backlight as backlight
