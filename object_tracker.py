@@ -24,17 +24,19 @@ from opencv_utils import is_raspi
 
 class ObjectTracker:
     def __init__(self, bgr_color, width, percent, minimum, hsv_range, url, grpc_hostname, display=False):
-        self._url = url
+        self._width = width
+        self._orig_percent = percent
+        self._orig_width = width
         self._percent = percent
         self._minimum = minimum
+        self._display = display
+
         bgr_img = np.uint8([[bgr_color]])
         hsv_img = cv2.cvtColor(bgr_img, cv2.COLOR_BGR2HSV)
         hsv_value = hsv_img[0, 0, 0]
         self._lower = np.array([hsv_value - hsv_range, 100, 100])
         self._upper = np.array([hsv_value + hsv_range, 255, 255])
 
-        self._width = width
-        self._display = display
         self._prev_x = -1
         self._prev_y = -1
         self._cnt = 0
@@ -42,6 +44,8 @@ class ObjectTracker:
         self._lock = threading.Lock()
         self._data_ready = threading.Event()
         self._currval = None
+
+        self._url = url
 
         self._use_grpc = False
         if grpc_hostname:
@@ -106,6 +110,12 @@ class ObjectTracker:
             self._prev_x = -1
             self._prev_y = -1
 
+    def _set_width(self, width):
+        if 200 <= self._width <= 2000:
+            self._width = width
+            self._prev_x = -1
+            self._prev_y = -1
+
     # Do not run this in a background thread. cv2.waitKey has to run in main thread
     def start(self):
 
@@ -135,7 +145,7 @@ class ObjectTracker:
             gray = cv2.cvtColor(result, cv2.COLOR_BGR2GRAY)
             contours = cv2.findContours(gray, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)[1]
 
-            text = '#{0}'.format(self._cnt)
+            text = '#{0} ({1}, {2})'.format(self._cnt, img_width, img_height)
 
             img_x = -1
             img_y = -1
@@ -157,7 +167,7 @@ class ObjectTracker:
                         cv2.drawContours(frame, [contour], -1, GREEN, 2)
                         cv2.circle(frame, (img_x, img_y), 4, RED, -1)
                         text += ' ({0}, {1})'.format(img_x, img_y)
-                        text += ' Area: {0}'.format(area)
+                        text += ' {0}'.format(area)
                         text += ' {0}%'.format(self._percent)
 
             x_in_middle = mid_x - inc_x <= img_x <= mid_x + inc_x
@@ -166,20 +176,20 @@ class ObjectTracker:
             y_missing = img_y == -1
 
             if x_missing:
-                set_left_leds(RED)
+                _set_left_leds(RED)
             else:
                 if x_in_middle:
-                    set_left_leds(GREEN)
+                    _set_left_leds(GREEN)
                 else:
-                    set_left_leds(BLUE)
+                    _set_left_leds(BLUE)
 
             if y_missing:
-                set_right_leds(RED)
+                _set_right_leds(RED)
             else:
                 if y_in_middle:
-                    set_right_leds(GREEN)
+                    _set_right_leds(GREEN)
                 else:
-                    set_right_leds(BLUE)
+                    _set_right_leds(BLUE)
 
             # Write location if it is different from previous value written
             if img_x != self._prev_x or img_y != self._prev_y:
@@ -203,10 +213,17 @@ class ObjectTracker:
 
                 key = cv2.waitKey(30) & 0xFF
 
-                if key == ord('-') or key == ord('_'):
+                if key == ord('j'):
+                    self._set_width(self._width - 10)
+                elif key == ord('k'):
+                    self._set_width(self._width + 10)
+                elif key == ord('-') or key == ord('_'):
                     self._set_percent(self._percent - 1)
                 elif key == ord('+') or key == ord('='):
                     self._set_percent(self._percent + 1)
+                elif key == ord('r'):
+                    self._set_width(self._orig_width)
+                    self._set_percent(self._orig_percent)
                 elif key == ord('s'):
                     print("Width x height: {0}x{1}".format(img_width, img_height))
                     print("Middle horizontal/vert pixels: {0}/{1} {2}%".format(inc_x * 2, inc_y * 2, self._percent))
@@ -232,14 +249,14 @@ class ObjectTracker:
         sys.exit(0)
 
 
-def set_left_leds(color):
+def _set_left_leds(color):
     if is_raspi():
         for i in range(0, 4):
             set_pixel(i, color[2], color[1], color[0], brightness=0.05)
         show()
 
 
-def set_right_leds(color):
+def _set_right_leds(color):
     if is_raspi():
         for i in range(4, 8):
             set_pixel(i, color[2], color[1], color[0], brightness=0.05)

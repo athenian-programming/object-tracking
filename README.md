@@ -62,6 +62,9 @@ $ python object_tracker.py --bgr "[174, 56, 5]" --display --grpc localhost
 |:----------:|----------------------------------------------------|
 | -          | Decrease center area                               |
 | +          | Increase center area                               |
+| j          | Decrease image width                               |
+| k          | Increase image width                               |
+| r          | Reset center area and image width                  |
 | s          | Print center area dimensions to conole             |
 | p          | Save current frame to disk                         |
 | q          | Quit                                               |
