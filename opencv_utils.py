@@ -16,7 +16,7 @@ def find_max_contour(contours):
         for i, c in enumerate(contours):
             moments = cv2.moments(c)
             area = moments["m00"]
-            if area > max_val and area > 0:
+            if 0 <= max_val < area:
                 max_val = area
                 max_index = i
     return max_index
