@@ -1,4 +1,4 @@
-# OpenCV Object Tracking 
+# OpenCV Object Tracking and Pan/Tilt Servo Control
 
 
 ## Color Picker 

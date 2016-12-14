@@ -16,6 +16,9 @@ import numpy as np
 import camera
 import gen.location_server_pb2
 import opencv_utils as utils
+from opencv_utils import BLUE
+from opencv_utils import GREEN
+from opencv_utils import RED
 
 
 class ObjectTracker:
@@ -149,9 +152,9 @@ class ObjectTracker:
 
                     if self._display:
                         (x, y, w, h) = cv2.boundingRect(contour)
-                        cv2.rectangle(frame, (x, y), (x + w, y + h), utils.BLUE, 2)
-                        cv2.drawContours(frame, [contour], -1, utils.GREEN, 2)
-                        cv2.circle(frame, (img_x, img_y), 4, utils.RED, -1)
+                        cv2.rectangle(frame, (x, y), (x + w, y + h), BLUE, 2)
+                        cv2.drawContours(frame, [contour], -1, GREEN, 2)
+                        cv2.circle(frame, (img_x, img_y), 4, RED, -1)
                         text += ' ({0}, {1})'.format(img_x, img_y)
                         text += ' Area: {0}'.format(area)
                         text += ' {0}%'.format(self._percent)
@@ -169,13 +172,13 @@ class ObjectTracker:
 
             # Display images
             if self._display:
-                x_color = utils.RED if mid_x - inc_x <= img_x <= mid_x + inc_x else utils.GREEN if img_x == -1 else utils.BLUE
-                y_color = utils.RED if mid_y - inc_y <= img_y <= mid_y + inc_y else utils.GREEN if img_x == -1 else utils.BLUE
+                x_color = RED if mid_x - inc_x <= img_x <= mid_x + inc_x else GREEN if img_x == -1 else BLUE
+                y_color = RED if mid_y - inc_y <= img_y <= mid_y + inc_y else GREEN if img_x == -1 else BLUE
                 cv2.line(frame, (mid_x - inc_x, 0), (mid_x - inc_x, img_height), x_color, 1)
                 cv2.line(frame, (mid_x + inc_x, 0), (mid_x + inc_x, img_height), x_color, 1)
                 cv2.line(frame, (0, mid_y - inc_y), (img_width, mid_y - inc_y), y_color, 1)
                 cv2.line(frame, (0, mid_y + inc_y), (img_width, mid_y + inc_y), y_color, 1)
-                cv2.putText(frame, text, utils.text_loc(), utils.text_font(), utils.text_size(), utils.RED,
+                cv2.putText(frame, text, utils.text_loc(), utils.text_font(), utils.text_size(), RED,
                             1)
                 cv2.imshow("Image", frame)
                 # cv2.imshow("Mask", mask)

@@ -4,6 +4,8 @@ import numpy as np
 
 import camera
 import opencv_utils as utils
+from opencv_utils import GREEN
+from opencv_utils import RED
 
 
 class ColorPicker():
@@ -42,15 +44,15 @@ class ColorPicker():
             color_img[:, :] = avg_color
 
             # Draw a rectangle around the sample area
-            cv2.rectangle(frame, (roi_x, roi_y), (roi_x + self._roi_size, roi_y + self._roi_size), utils.GREEN, 1)
+            cv2.rectangle(frame, (roi_x, roi_y), (roi_x + self._roi_size, roi_y + self._roi_size), GREEN, 1)
 
             xy_text = 'Frame: {0} '.format(cnt) \
                       + 'ROI: {0}x{1} '.format(str(self._roi_size), str(self._roi_size)) \
                       + 'X,Y: ({0}, {1})'.format(roi_x, roi_y)
-            cv2.putText(frame, xy_text, utils.text_loc(), utils.text_font(), utils.text_size(), utils.RED, 1)
+            cv2.putText(frame, xy_text, utils.text_loc(), utils.text_font(), utils.text_size(), RED, 1)
 
             bgr_text = "BGR value: [{0}, {1}, {2}]".format(avg_color[0], avg_color[1], avg_color[2])
-            cv2.putText(color_img, bgr_text, utils.text_loc(), utils.text_font(), utils.text_size(), utils.RED, 1)
+            cv2.putText(color_img, bgr_text, utils.text_loc(), utils.text_font(), utils.text_size(), RED, 1)
 
             # Display images
             # cv2.imshow('ROI', roi_canvas)
