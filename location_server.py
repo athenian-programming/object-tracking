@@ -22,9 +22,9 @@ class LocationServer(gen.location_server_pb2.LocationServerServicer):
         return gen.location_server_pb2.ServerInfo(info='Server invoke count {0}'.format(self._invoke_cnt))
 
     def ReportLocation(self, requests, context):
-        for location in requests:
+        for loc in requests:
             try:
-                self._grpc_source.set_curr_loc((location.x, location.y, location.width, location.height))
+                self._grpc_source.set_current_loc((loc.x, loc.y, loc.width, loc.height, loc.percent))
             except BaseException as e:
                 logging.error("Unable to read gRPC data [{0}]".format(e))
         logging.info("Disconnected [{0}]".format(context.peer()))
@@ -44,4 +44,3 @@ class LocationServer(gen.location_server_pb2.LocationServerServicer):
                 time.sleep(60)
         except KeyboardInterrupt:
             grpc_server.stop(0)
-

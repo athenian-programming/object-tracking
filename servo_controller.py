@@ -16,7 +16,6 @@ if __name__ == "__main__":
     parser.add_argument("-o", "--http", default=False, action="store_true", help="Run HTTP server [false]")
     parser.add_argument("-t", "--test", default=False, action="store_true", help="Test mode [false]")
     parser.add_argument("-c", "--calib", default=False, action="store_true", help="Calibration mode [false]")
-    parser.add_argument("-e", "--percent", default=15, type=int, help="Middle percent [15]")
     parser.add_argument("-p", "--port", default="ttyACM0", type=str,
                         help="Arduino serial port [ttyACM0] (OSX is cu.usbmodemXXXX)")
     parser.add_argument("-x", "--xservo", default=5, type=int, help="X servo PWM pin [5]")
@@ -29,9 +28,6 @@ if __name__ == "__main__":
                         format="%(funcName)s():%(lineno)i: %(message)s %(levelname)s")
     # logging.basicConfig(filename='error.log', level=args['loglevel'],
     #                    format="%(funcName)s():%(lineno)i: %(message)s %(levelname)s")
-
-    percent = int(args["percent"])
-    logging.info("Middle percent: {0}".format(percent))
 
     if args["grpc"] or args["test"]:
         source = GrpcSource(50051)
@@ -50,7 +46,8 @@ if __name__ == "__main__":
         for i in range(0, 1000):
             x_vals = source.get_x()
             y_vals = source.get_y()
-            print("Received location {0}: {1}, {2} {3}x{4}".format(i, x_vals[0], y_vals[0], x_vals[1], y_vals[1]))
+            print("Received location {0}: {1}, {2} {3}x{4} {5}".format(i, x_vals[0], y_vals[0], x_vals[1], y_vals[1],
+                                                                       x_vals[2]))
         print("Exiting...")
         sys.exit(0)
 
@@ -64,8 +61,8 @@ if __name__ == "__main__":
         sys.exit(0)
 
     # Create servos
-    servo_x = servo.Servo(board, "X servo", "d:{0}:s".format(args["xservo"]), percent, lambda: source.get_x(), True)
-    servo_y = servo.Servo(board, "Y Servo", "d:{0}:s".format(args["yservo"]), percent, lambda: source.get_y(), False)
+    servo_x = servo.Servo(board, "X servo", "d:{0}:s".format(args["xservo"]), lambda: source.get_x(), True)
+    servo_y = servo.Servo(board, "Y Servo", "d:{0}:s".format(args["yservo"]), lambda: source.get_y(), False)
 
     if args["calib"]:
         servo.Servo.calibrate(source, servo_x, servo_y)

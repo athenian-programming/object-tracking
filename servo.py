@@ -3,10 +3,9 @@ import time
 
 
 class Servo:
-    def __init__(self, board, name, pin_args, percent, func, forward):
+    def __init__(self, board, name, pin_args, func, forward):
         self._name = name
         self._pin = board.get_pin(pin_args)
-        self._percent = percent
         self._func = func
         self._forward = forward
         self._jiggle()
@@ -29,14 +28,14 @@ class Servo:
             time.sleep(pause)
 
     def start(self):
-        middle_pct = (self._percent / 100.0) / 2
         curr_pos = self.read_pin()
         printed = False
         pix_per_deg = 6.5
 
         while True:
             # Get latest value
-            (img_pos, img_total) = self._func()
+            (img_pos, img_total, percent) = self._func()
+            middle_pct = (percent / 100.0) / 2
 
             # Skip if object is not seen
             if img_pos == -1 or img_total == -1:
@@ -77,7 +76,7 @@ class Servo:
                 logging.info("Pos: [{0} Delta: {1}".format(new_pos, delta))
 
             # Write servo values
-            self.write(new_pos, wait_time)
+            self.write_pin(new_pos, wait_time)
 
             curr_pos = new_pos
 

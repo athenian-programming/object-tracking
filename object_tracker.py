@@ -31,9 +31,9 @@ class ObjectTracker:
 
         self._width = width
         self._display = display
-        self._finished = False
+        self._prev_x = -1
+        self._prev_y = -1
         self._cnt = 0
-        self._cam = camera.Camera()
 
         self._lock = threading.Lock()
         self._data_ready = threading.Event()
@@ -46,6 +46,8 @@ class ObjectTracker:
                 thread.start_new_thread(self._connect_to_grpc, (grpc_hostname,))
             except BaseException as e:
                 logging.error("Unable to start gRPC client at {0} [{1}]".format(hostname, e))
+
+        self._cam = camera.Camera()
 
     def _write_location(self, val):
         with self._lock:
@@ -77,50 +79,45 @@ class ObjectTracker:
                 logging.error("Failed to connect to gRPC server at {0} - [{1}]".format(hostname, e))
                 time.sleep(1)
 
-    def _write_values(self, x, y, width, height):
+    def _write_location_values(self, x, y, width, height, percent):
         # Raspi specific
         # lcd.clear()
         # lcd.write('X, Y: {0}, {1}'.format(cX, cY))
         if self._url:
             try:
-                params = urllib.urlencode({'x': x, 'y': y, 'w': width, 'h': height})
+                params = urllib.urlencode({'x': x, 'y': y, 'w': width, 'h': height, 'p': percent})
                 urllib2.urlopen(self._url, params).read()
             except BaseException as e:
                 logging.warning("Unable to reach HTTP server {0} [{1}]".format(self._url, e))
         elif self._use_grpc:
-            loc = gen.location_server_pb2.Location(x=x, y=y, width=width, height=height)
+            loc = gen.location_server_pb2.Location(x=x, y=y, width=width, height=height, percent=percent)
             self._write_location(loc)
         else:
             # Print to console
-            print("{0}, {1} {2}x{3}".format(x, y, width, height))
+            print("{0}, {1} {2}x{3} {4}%".format(x, y, width, height, percent))
+
+    def _set_percent(self, percent):
+        if 2 <= self._percent <= 98:
+            self._percent = percent
+            self._prev_x = -1
+            self._prev_y = -1
 
     # Do not run this in a background thread. cv2.waitKey has to run in main thread
     def start(self):
-        img_width = None
-        img_height = None
-        prev_x = -1
-        prev_y = -1
-        mid_x = -1
-        mid_y = -1
-        inc_x = -1
-        inc_y = -1
-        middle_pct = (self._percent / 100.0) / 2
 
-        self._write_values(-1, -1, 0, 0)
+        self._write_location_values(-1, -1, 0, 0, 0)
 
-        while self._cam.is_open() and not self._finished:
+        while self._cam.is_open():
 
             frame = self._cam.read()
             frame = imutils.resize(frame, width=self._width)
 
-            if not img_height:
-                img_height, img_width = frame.shape[:2]
-                mid_x = img_width / 2
-                mid_y = img_height / 2
-                inc_x = int(mid_x * middle_pct)
-                inc_y = int(mid_y * middle_pct)
-                logging.info("Width x height: {0}x{1}".format(img_width, img_height))
-                logging.info("Center horizontal/vert: {0}/{1}".format(inc_x * 2, inc_y * 2))
+            middle_pct = (self._percent / 100.0) / 2
+            img_height, img_width = frame.shape[:2]
+            mid_x = img_width / 2
+            mid_y = img_height / 2
+            inc_x = int(mid_x * middle_pct)
+            inc_y = int(mid_y * middle_pct)
 
             # Convert from BGR to HSV colorspace
             hsv_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
@@ -157,12 +154,13 @@ class ObjectTracker:
                         cv2.circle(frame, (img_x, img_y), 4, utils.RED, -1)
                         text += ' ({0}, {1})'.format(img_x, img_y)
                         text += ' Area: {0}'.format(area)
+                        text += ' {0}%'.format(self._percent)
 
             # Write location if it is different from previous value written
-            if img_x != prev_x or img_y != prev_y:
-                self._write_values(img_x, img_y, img_width, img_height)
-                prev_x = img_x
-                prev_y = img_y
+            if img_x != self._prev_x or img_y != self._prev_y:
+                self._write_location_values(img_x, img_y, img_width, img_height, self._percent)
+                self._prev_x = img_x
+                self._prev_y = img_y
 
             # Display images
             if self._display:
@@ -180,35 +178,41 @@ class ObjectTracker:
 
                 key = cv2.waitKey(30) & 0xFF
 
-                if key == ord("q"):
-                    break
+                if key == ord('-') or key == ord('_'):
+                    self._set_percent(self._percent - 1)
+                elif key == ord('+') or key == ord('='):
+                    self._set_percent(self._percent + 1)
+                elif key == ord('s'):
+                    logging.info("Width x height: {0}x{1}".format(img_width, img_height))
+                    logging.info(
+                        "Middle horizontal/vert pixels: {0}/{1} {2}%".format(inc_x * 2, inc_y * 2, self._percent))
                 elif key == ord('p'):
                     utils.save_frame(frame)
+                elif key == ord("q"):
+                    break
             else:
                 # Nap if display is not on
                 time.sleep(.1)
 
             self._cnt += 1
 
-        self._finished = True
-
-    def close(self):
-        self._finished = True
         self._cam.close()
+        print("Exiting...")
 
-    def test(self):
+    def _test(self):
         for i in range(0, 1000):
-            self._write_values(i, i + 1, i + 2, i + 3)
+            self._write_location_values(i, i + 1, i + 2, i + 3)
             time.sleep(1)
         print("Exiting...")
         sys.exit(0)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-b", "--bgr", type=str, required=True, help="BGR target value, e.g., -b \"[174, 56, 5]\"")
     parser.add_argument("-w", "--width", default=400, type=int, help="Image width [400]")
     parser.add_argument("-e", "--percent", default=15, type=int, help="Middle percent [15]")
-    parser.add_argument("-m", "--min", default=100, type=int, help="Minimum pixel area [15]")
+    parser.add_argument("-m", "--min", default=100, type=int, help="Minimum pixel area [100]")
     parser.add_argument("-r", "--range", default=20, type=int, help="HSV range")
     parser.add_argument("-d", "--display", default=False, action="store_true", help="Display image [false]")
     parser.add_argument("-g", "--grpc", default="", help="Servo controller gRPC server hostname")
@@ -262,7 +266,7 @@ if __name__ == "__main__":
 
     if args["test"]:
         try:
-            thread.start_new_thread(tracker.test, ())
+            thread.start_new_thread(tracker._test, ())
         except BaseException as e:
             logging.error("Unable to run test thread [{0}]".format(e))
             sys.exit(1)

@@ -20,8 +20,9 @@ def connect(hostname):
 
 def _gen_locations():
     for i in range(0, 10):
-        loc = gen.location_server_pb2.Location(x=i, y=i + 1, width=i + 2, height=i + 3)
+        loc = gen.location_server_pb2.Location(x=i, y=i + 1, width=i + 2, height=i + 3, percent=i + 4)
         yield loc
+
 
 if __name__ == '__main__':
     while True:

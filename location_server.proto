@@ -24,6 +24,7 @@ message Location {
     int32 y = 2;
     int32 width = 3;
     int32 height = 4;
+    int32 percent = 5;
 }
 
 message Empty {

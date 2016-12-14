@@ -40,4 +40,4 @@ def text_font():
 
 
 def text_size():
-    return .70 if is_raspi() else .75
+    return .55 if is_raspi() else .75

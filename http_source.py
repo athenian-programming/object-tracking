@@ -16,10 +16,11 @@ class HttpSource(GenericSource):
         @self._flask.route("/set_values", methods=['POST'])
         def set_values():
             try:
-                self.set_curr_loc((int(request.form['x']),
-                                   int(request.form['y']),
-                                   int(request.form['w']),
-                                   int(request.form['h'])))
+                self.set_current_loc((int(request.form['x']),
+                                      int(request.form['y']),
+                                      int(request.form['w']),
+                                      int(request.form['h']),
+                                      int(request.form['p'])))
             except BaseException as e:
                 logging.error("Unable to read POST data {0} [{1}]".format(request.form, e))
             return "OK"

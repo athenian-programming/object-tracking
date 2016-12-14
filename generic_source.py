@@ -7,22 +7,24 @@ class GenericSource:
         self._y = -1
         self._width = -1
         self._height = -1
+        self._percent = -1
 
         self._x_lock = threading.Lock()
         self._y_lock = threading.Lock()
         self._x_ready = threading.Event()
         self._y_ready = threading.Event()
 
-
-    def set_curr_loc(self, new_loc):
+    def set_current_loc(self, new_loc):
         with self._x_lock:
             self._x = new_loc[0]
             self._width = new_loc[2]
+            self._percent = new_loc[4]
             self._x_ready.set()
 
         with self._x_lock:
             self._y = new_loc[1]
             self._height = new_loc[3]
+            self._percent = new_loc[4]
             self._y_ready.set()
 
     # Blocking
@@ -30,14 +32,14 @@ class GenericSource:
         self._x_ready.wait()
         with self._x_lock:
             self._x_ready.clear()
-            return self._x, self._width
+            return self._x, self._width, self._percent
 
     # Blocking
     def get_y(self):
         self._y_ready.wait()
         with self._y_lock:
             self._y_ready.clear()
-            return self._y, self._height
+            return self._y, self._height, self._percent
 
     # Non-blocking
     def get_pos(self, name):

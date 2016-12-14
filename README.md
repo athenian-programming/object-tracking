@@ -48,6 +48,15 @@ $ python object_tracker.py
 | -h, --help     | Summary of options                                 |         |
 
 
+| Keystroke  | Action                                             |
+|:----------:|----------------------------------------------------|
+| -          | Decrease center area                               |
+| +          | Increase center area                               |
+| s          | Print center area dimensions to conole             |
+| p          | Save current frame to disk                         |
+| q          | Quit                                               |
+
+
 ## Servo Controller
 
 The servo_controller.py script reads the location values provided by object_tracker.py
@@ -63,7 +72,6 @@ $ python servo_controller.py
 | -o, --http     | Use HTTP server to read locations                  | false   |
 | -t, --test     | Test mode                                          | false   |
 | -c, --calib    | Calibration mode                                   | false   |
-| -e, --percent  | Middle percent                                     | 15      |
 | -p, --port     | Arduino serial port                                | ttyACM0 |
 | -x, --xservo   | X servo PWM pin                                    | 5       |
 | -y, --xyservo  | Y servo PWM pin                                    | 6       |
