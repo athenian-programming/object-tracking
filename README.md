@@ -114,4 +114,21 @@ $ python servo_controller.py --port ttyACM0 --grpc
 ### System
 * [Installing OpenCV3 with Python 2.7 on Sierra](http://www.pyimagesearch.com/2016/11/28/macos-install-opencv-3-and-python-2-7/)
 * [OpenCV](https://github.com/opencv/opencv)
-* [XQuartz](https://www.xquartz.org)
+
+
+## Setup Details
+
+### Displaying Raspi camera images on OSX
+
+1) Set **DISPLAY** env var on the Raspi to use the OSX machine (in this case *pleiku*).
+```bash
+$ set DISPLAY pleiku:0
+```
+
+2) Run the [X](https://en.wikipedia.org/wiki/X_Window_System) server [XQuartz](https://www.xquartz.org) 
+on the OSX machine.
+
+3) Add the Raspi host name (in this case *raspi11*) to enable connections to the X server on the OSX machine.
+```bash
+$ xhost + raspi11
+```
