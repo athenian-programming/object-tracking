@@ -24,7 +24,7 @@ class LocationServer(gen.location_server_pb2.LocationServerServicer):
     def ReportLocation(self, requests, context):
         for loc in requests:
             try:
-                self._grpc_source.set_current_loc((loc.x, loc.y, loc.width, loc.height, loc.percent))
+                self._grpc_source.set_current_loc((loc.x, loc.y, loc.width, loc.height, loc.middle_inc))
             except BaseException as e:
                 logging.error("Unable to read gRPC data [{0}]".format(e))
         logging.info("Disconnected [{0}]".format(context.peer()))

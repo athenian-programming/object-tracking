@@ -18,9 +18,9 @@ class HttpSource(GenericSource):
             try:
                 self.set_current_loc((int(request.form['x']),
                                       int(request.form['y']),
-                                      int(request.form['w']),
-                                      int(request.form['h']),
-                                      int(request.form['p'])))
+                                      int(request.form['width']),
+                                      int(request.form['height']),
+                                      int(request.form['middle_inc'])))
             except BaseException as e:
                 logging.error("Unable to read POST data {0} [{1}]".format(request.form, e))
             return "OK"

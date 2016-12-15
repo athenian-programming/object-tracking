@@ -17,8 +17,8 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='location_server.proto',
   package='object_tracking',
   syntax='proto3',
-  serialized_pb=_b(
-    '\n\x15location_server.proto\x12\x0fobject_tracking\"\x1a\n\nClientInfo\x12\x0c\n\x04info\x18\x01 \x01(\t\"\x1a\n\nServerInfo\x12\x0c\n\x04info\x18\x01 \x01(\t\"P\n\x08Location\x12\t\n\x01x\x18\x01 \x01(\x05\x12\t\n\x01y\x18\x02 \x01(\x05\x12\r\n\x05width\x18\x03 \x01(\x05\x12\x0e\n\x06height\x18\x04 \x01(\x05\x12\x0f\n\x07percent\x18\x05 \x01(\x05\"\x07\n\x05\x45mpty2\xa7\x01\n\x0eLocationServer\x12L\n\x0eRegisterClient\x12\x1b.object_tracking.ClientInfo\x1a\x1b.object_tracking.ServerInfo\"\x00\x12G\n\x0eReportLocation\x12\x19.object_tracking.Location\x1a\x16.object_tracking.Empty\"\x00(\x01\x62\x06proto3')
+    serialized_pb=_b(
+        '\n\x15location_server.proto\x12\x0fobject_tracking\"\x1a\n\nClientInfo\x12\x0c\n\x04info\x18\x01 \x01(\t\"\x1a\n\nServerInfo\x12\x0c\n\x04info\x18\x01 \x01(\t\"S\n\x08Location\x12\t\n\x01x\x18\x01 \x01(\x05\x12\t\n\x01y\x18\x02 \x01(\x05\x12\r\n\x05width\x18\x03 \x01(\x05\x12\x0e\n\x06height\x18\x04 \x01(\x05\x12\x12\n\nmiddle_inc\x18\x05 \x01(\x05\"\x07\n\x05\x45mpty2\xa7\x01\n\x0eLocationServer\x12L\n\x0eRegisterClient\x12\x1b.object_tracking.ClientInfo\x1a\x1b.object_tracking.ServerInfo\"\x00\x12G\n\x0eReportLocation\x12\x19.object_tracking.Location\x1a\x16.object_tracking.Empty\"\x00(\x01\x62\x06proto3')
 )
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
@@ -120,7 +120,7 @@ _LOCATION = _descriptor.Descriptor(
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='percent', full_name='object_tracking.Location.percent', index=4,
+        name='middle_inc', full_name='object_tracking.Location.middle_inc', index=4,
       number=5, type=5, cpp_type=1, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
@@ -139,7 +139,7 @@ _LOCATION = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=98,
-  serialized_end=178,
+    serialized_end=181,
 )
 
 
@@ -162,8 +162,8 @@ _EMPTY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=180,
-  serialized_end=187,
+    serialized_start=183,
+    serialized_end=190,
 )
 
 DESCRIPTOR.message_types_by_name['ClientInfo'] = _CLIENTINFO
@@ -172,29 +172,29 @@ DESCRIPTOR.message_types_by_name['Location'] = _LOCATION
 DESCRIPTOR.message_types_by_name['Empty'] = _EMPTY
 
 ClientInfo = _reflection.GeneratedProtocolMessageType('ClientInfo', (_message.Message,), dict(
-  DESCRIPTOR=_CLIENTINFO,
-  __module__='location_server_pb2'
+    DESCRIPTOR=_CLIENTINFO,
+    __module__='location_server_pb2'
   # @@protoc_insertion_point(class_scope:object_tracking.ClientInfo)
 ))
 _sym_db.RegisterMessage(ClientInfo)
 
 ServerInfo = _reflection.GeneratedProtocolMessageType('ServerInfo', (_message.Message,), dict(
-  DESCRIPTOR=_SERVERINFO,
-  __module__='location_server_pb2'
+    DESCRIPTOR=_SERVERINFO,
+    __module__='location_server_pb2'
   # @@protoc_insertion_point(class_scope:object_tracking.ServerInfo)
 ))
 _sym_db.RegisterMessage(ServerInfo)
 
 Location = _reflection.GeneratedProtocolMessageType('Location', (_message.Message,), dict(
-  DESCRIPTOR=_LOCATION,
-  __module__='location_server_pb2'
+    DESCRIPTOR=_LOCATION,
+    __module__='location_server_pb2'
   # @@protoc_insertion_point(class_scope:object_tracking.Location)
 ))
 _sym_db.RegisterMessage(Location)
 
 Empty = _reflection.GeneratedProtocolMessageType('Empty', (_message.Message,), dict(
-  DESCRIPTOR=_EMPTY,
-  __module__='location_server_pb2'
+    DESCRIPTOR=_EMPTY,
+    __module__='location_server_pb2'
   # @@protoc_insertion_point(class_scope:object_tracking.Empty)
 ))
 _sym_db.RegisterMessage(Empty)
@@ -219,14 +219,14 @@ try:
         channel: A grpc.Channel.
       """
       self.RegisterClient = channel.unary_unary(
-        '/object_tracking.LocationServer/RegisterClient',
-        request_serializer=ClientInfo.SerializeToString,
-        response_deserializer=ServerInfo.FromString,
+          '/object_tracking.LocationServer/RegisterClient',
+          request_serializer=ClientInfo.SerializeToString,
+          response_deserializer=ServerInfo.FromString,
       )
       self.ReportLocation = channel.stream_unary(
-        '/object_tracking.LocationServer/ReportLocation',
-        request_serializer=Location.SerializeToString,
-        response_deserializer=Empty.FromString,
+          '/object_tracking.LocationServer/ReportLocation',
+          request_serializer=Location.SerializeToString,
+          response_deserializer=Empty.FromString,
       )
 
 
@@ -245,19 +245,19 @@ try:
 
   def add_LocationServerServicer_to_server(servicer, server):
     rpc_method_handlers = {
-      'RegisterClient': grpc.unary_unary_rpc_method_handler(
-        servicer.RegisterClient,
-        request_deserializer=ClientInfo.FromString,
-        response_serializer=ServerInfo.SerializeToString,
-      ),
-      'ReportLocation': grpc.stream_unary_rpc_method_handler(
-        servicer.ReportLocation,
-        request_deserializer=Location.FromString,
-        response_serializer=Empty.SerializeToString,
-      ),
+        'RegisterClient': grpc.unary_unary_rpc_method_handler(
+            servicer.RegisterClient,
+            request_deserializer=ClientInfo.FromString,
+            response_serializer=ServerInfo.SerializeToString,
+        ),
+        'ReportLocation': grpc.stream_unary_rpc_method_handler(
+            servicer.ReportLocation,
+            request_deserializer=Location.FromString,
+            response_serializer=Empty.SerializeToString,
+        ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-      'object_tracking.LocationServer', rpc_method_handlers)
+        'object_tracking.LocationServer', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
 
 
@@ -267,10 +267,8 @@ try:
     It is recommended to use the GA API (classes and functions in this
     file not marked beta) for all further purposes. This class was generated
     only to ease transition from grpcio<0.15.0 to grpcio>=0.15.0."""
-
     def RegisterClient(self, request, context):
       context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
-
     def ReportLocation(self, request_iterator, context):
       context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
 
@@ -281,15 +279,11 @@ try:
     It is recommended to use the GA API (classes and functions in this
     file not marked beta) for all further purposes. This class was generated
     only to ease transition from grpcio<0.15.0 to grpcio>=0.15.0."""
-
     def RegisterClient(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
       raise NotImplementedError()
-
     RegisterClient.future = None
-
     def ReportLocation(self, request_iterator, timeout, metadata=None, with_call=False, protocol_options=None):
       raise NotImplementedError()
-
     ReportLocation.future = None
 
 

@@ -1,1 +1,1 @@
-python2 object_tracker.py --display --bgr "[174, 56, 5]" --grpc pleiku
+python2 object_tracker.py --bgr "[174, 56, 5]" --grpc pleiku --display

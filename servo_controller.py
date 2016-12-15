@@ -30,22 +30,22 @@ if __name__ == "__main__":
     #                    format="%(funcName)s():%(lineno)i: %(message)s %(levelname)s")
 
     if args["grpc"] or args["test"]:
-        source = GrpcSource(50051)
+        loc_source = GrpcSource(50051)
     elif args["http"]:
-        source = HttpSource(8080)
+        loc_source = HttpSource(8080)
     else:
         print("Requires --http or --grpc option to be specified")
         sys.exit(1)
 
     try:
-        thread.start_new_thread(source.start, ())
+        thread.start_new_thread(loc_source.start, ())
     except BaseException as e:
         logging.error("Unable to start source server [{0}]".format(e))
 
     if args["test"]:
         for i in range(0, 1000):
-            x_vals = source.get_x()
-            y_vals = source.get_y()
+            x_vals = loc_source.get_x()
+            y_vals = loc_source.get_y()
             print("Received location {0}: {1}, {2} {3}x{4} {5}".format(i, x_vals[0], y_vals[0], x_vals[1], y_vals[1],
                                                                        x_vals[2]))
         print("Exiting...")
@@ -61,11 +61,11 @@ if __name__ == "__main__":
         sys.exit(0)
 
     # Create servos
-    servo_x = servo.Servo(board, "X servo", "d:{0}:s".format(args["xservo"]), lambda: source.get_x(), True)
-    servo_y = servo.Servo(board, "Y Servo", "d:{0}:s".format(args["yservo"]), lambda: source.get_y(), False)
+    servo_x = servo.Servo(board, "X servo", "d:{0}:s".format(args["xservo"]), lambda: loc_source.get_x(), True)
+    servo_y = servo.Servo(board, "Y Servo", "d:{0}:s".format(args["yservo"]), lambda: loc_source.get_y(), False)
 
     if args["calib"]:
-        servo.Servo.calibrate(source, servo_x, servo_y)
+        servo.Servo.calibrate(loc_source, servo_x, servo_y)
         print("Exiting...")
         board.exit()
     else:

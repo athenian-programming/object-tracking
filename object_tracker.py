@@ -87,22 +87,22 @@ class ObjectTracker:
                 logging.error("Failed to connect to gRPC server at {0} - [{1}]".format(hostname, e))
                 time.sleep(1)
 
-    def _write_location_values(self, x, y, width, height, percent):
+    def _write_location_values(self, x, y, width, height, middle_inc):
         # Raspi specific
         # lcd.clear()
         # lcd.write('X, Y: {0}, {1}'.format(cX, cY))
         if self._url:
             try:
-                params = urllib.urlencode({'x': x, 'y': y, 'w': width, 'h': height, 'p': percent})
+                params = urllib.urlencode({'x': x, 'y': y, 'width': width, 'height': height, 'middle_inc': middle_inc})
                 urllib2.urlopen(self._url, params).read()
             except BaseException as e:
                 logging.warning("Unable to reach HTTP server {0} [{1}]".format(self._url, e))
         elif self._use_grpc:
-            loc = gen.location_server_pb2.Location(x=x, y=y, width=width, height=height, percent=percent)
+            loc = gen.location_server_pb2.Location(x=x, y=y, width=width, height=height, middle_inc=middle_inc)
             self._write_location(loc)
         else:
             # Print to console
-            print("{0}, {1} {2}x{3} {4}%".format(x, y, width, height, percent))
+            print("{0}, {1} {2}x{3} {4}%".format(x, y, width, height, middle_inc))
 
     def _set_percent(self, percent):
         if 2 <= self._percent <= 98:
@@ -111,7 +111,7 @@ class ObjectTracker:
             self._prev_y = -1
 
     def _set_width(self, width):
-        if 200 <= self._width <= 2000:
+        if 200 <= self._width <= 4000:
             self._width = width
             self._prev_x = -1
             self._prev_y = -1
@@ -126,13 +126,6 @@ class ObjectTracker:
             frame = self._cam.read()
             frame = imutils.resize(frame, width=self._width)
 
-            middle_pct = (self._percent / 100.0) / 2
-            img_height, img_width = frame.shape[:2]
-            mid_x = img_width / 2
-            mid_y = img_height / 2
-            inc_x = int(mid_x * middle_pct)
-            inc_y = int(mid_y * middle_pct)
-
             # Convert from BGR to HSV colorspace
             hsv_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
@@ -142,15 +135,23 @@ class ObjectTracker:
             # Bitwise-AND mask and original image
             result = cv2.bitwise_and(frame, frame, mask=mask)
 
+            # Convert to grayscale
             gray = cv2.cvtColor(result, cv2.COLOR_BGR2GRAY)
+
+            # Find max contour
             contours = cv2.findContours(gray, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)[1]
+            max_contour = utils.find_max_contour(contours)
 
-            text = '#{0} ({1}, {2})'.format(self._cnt, img_width, img_height)
-
+            middle_pct = (self._percent / 100.0) / 2
+            img_height, img_width = frame.shape[:2]
+            mid_x = img_width / 2
+            mid_y = img_height / 2
+            # The middle margin calculation is based on % of width for horizontal and vertical boundry
+            middle_inc = int(mid_x * middle_pct)
             img_x = -1
             img_y = -1
 
-            max_contour = utils.find_max_contour(contours)
+            text = '#{0} ({1}, {2})'.format(self._cnt, img_width, img_height)
 
             if max_contour != -1:
                 contour = contours[max_contour]
@@ -162,7 +163,7 @@ class ObjectTracker:
                     img_y = int(moment["m01"] / area)
 
                     if self._display:
-                        (x, y, w, h) = cv2.boundingRect(contour)
+                        x, y, w, h = cv2.boundingRect(contour)
                         cv2.rectangle(frame, (x, y), (x + w, y + h), BLUE, 2)
                         cv2.drawContours(frame, [contour], -1, GREEN, 2)
                         cv2.circle(frame, (img_x, img_y), 4, RED, -1)
@@ -170,30 +171,17 @@ class ObjectTracker:
                         text += ' {0}'.format(area)
                         text += ' {0}%'.format(self._percent)
 
-            x_in_middle = mid_x - inc_x <= img_x <= mid_x + inc_x
-            y_in_middle = mid_y - inc_y <= img_y <= mid_y + inc_y
+            x_in_middle = mid_x - middle_inc <= img_x <= mid_x + middle_inc
+            y_in_middle = mid_y - middle_inc <= img_y <= mid_y + middle_inc
             x_missing = img_x == -1
             y_missing = img_y == -1
 
-            if x_missing:
-                _set_left_leds(RED)
-            else:
-                if x_in_middle:
-                    _set_left_leds(GREEN)
-                else:
-                    _set_left_leds(BLUE)
-
-            if y_missing:
-                _set_right_leds(RED)
-            else:
-                if y_in_middle:
-                    _set_right_leds(GREEN)
-                else:
-                    _set_right_leds(BLUE)
+            _set_left_leds(RED if x_missing else (GREEN if x_in_middle else BLUE))
+            _set_right_leds(RED if y_missing else (GREEN if y_in_middle else BLUE))
 
             # Write location if it is different from previous value written
             if img_x != self._prev_x or img_y != self._prev_y:
-                self._write_location_values(img_x, img_y, img_width, img_height, self._percent)
+                self._write_location_values(img_x, img_y, img_width, img_height, middle_inc)
                 self._prev_x = img_x
                 self._prev_y = img_y
 
@@ -201,10 +189,10 @@ class ObjectTracker:
             if self._display:
                 x_color = GREEN if x_in_middle else RED if x_missing else BLUE
                 y_color = GREEN if y_in_middle else RED if y_missing else BLUE
-                cv2.line(frame, (mid_x - inc_x, 0), (mid_x - inc_x, img_height), x_color, 1)
-                cv2.line(frame, (mid_x + inc_x, 0), (mid_x + inc_x, img_height), x_color, 1)
-                cv2.line(frame, (0, mid_y - inc_y), (img_width, mid_y - inc_y), y_color, 1)
-                cv2.line(frame, (0, mid_y + inc_y), (img_width, mid_y + inc_y), y_color, 1)
+                cv2.line(frame, (mid_x - middle_inc, 0), (mid_x - middle_inc, img_height), x_color, 1)
+                cv2.line(frame, (mid_x + middle_inc, 0), (mid_x + middle_inc, img_height), x_color, 1)
+                cv2.line(frame, (0, mid_y - middle_inc), (img_width, mid_y - middle_inc), y_color, 1)
+                cv2.line(frame, (0, mid_y + middle_inc), (img_width, mid_y + middle_inc), y_color, 1)
                 cv2.putText(frame, text, utils.text_loc(), utils.text_font(), utils.text_size(), RED,
                             1)
                 cv2.imshow("Image", frame)
@@ -226,7 +214,8 @@ class ObjectTracker:
                     self._set_percent(self._orig_percent)
                 elif key == ord('s'):
                     print("Width x height: {0}x{1}".format(img_width, img_height))
-                    print("Middle horizontal/vert pixels: {0}/{1} {2}%".format(inc_x * 2, inc_y * 2, self._percent))
+                    print(
+                        "Middle horizontal/vert pixels: {0}/{1} {2}%".format(middle_inc * 2, inc_y * 2, self._percent))
                 elif key == ord('p'):
                     utils.save_frame(frame)
                 elif key == ord("q"):
