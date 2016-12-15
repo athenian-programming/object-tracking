@@ -41,7 +41,7 @@ $ python object_tracker.py --bgr "[174, 56, 5]" --display --grpc localhost
 
 ### Sample Image
 
-![alt text](https://github.com/pambrose/opencv_object_tracking/blob/master/docs/target_img.tff "Object Tracking")
+![alt text](https://github.com/pambrose/opencv_object_tracking/blob/master/docs/target_img.tiff "Object Tracking")
 
 
 ### CLI Options
