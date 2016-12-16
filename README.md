@@ -71,7 +71,7 @@ $ python object_tracker.py --bgr "[174, 56, 5]" --display --grpc localhost
 | k          | Increase image width                               |
 | r          | Reset center area and image width                  |
 | s          | Print center area dimensions to conole             |
-| p          | Save current frame to disk                         |
+| p          | Save current image to disk                         |
 | q          | Quit                                               |
 
 
@@ -125,15 +125,22 @@ $ python servo_controller.py --port ttyACM0 --grpc
 
 ### Displaying Raspi camera images on OSX
 
-1) Set **DISPLAY** env var on the Raspi to use the OSX machine (in this case *pleiku*).
+1) Set **DISPLAY** env var to use the OSX machine (in this case *my-mac*). 
+On the Raspi type:
 ```bash
-$ set DISPLAY pleiku:0
+$
+$ set DISPLAY my-mac:0
+$
 ```
 
-2) Run the [X](https://en.wikipedia.org/wiki/X_Window_System) server [XQuartz](https://www.xquartz.org) 
+2) Start the [X](https://en.wikipedia.org/wiki/X_Window_System) server [XQuartz](https://www.xquartz.org) 
 on the OSX machine.
 
-3) Add the Raspi host name (in this case *raspi11*) to enable connections to the X server on the OSX machine.
+3) Add the Raspi host name to enable connections to the X server (in this case *my-raspi*). 
+On the OSX machine type:
 ```bash
-$ xhost + raspi11
+$
+$ xhost + my-raspi
+my-raspi being added to access control list
+$
 ```

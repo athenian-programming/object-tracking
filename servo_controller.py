@@ -1,3 +1,5 @@
+#!/usr/bin/env python2
+
 import argparse
 import logging
 import sys
@@ -24,10 +26,8 @@ if __name__ == "__main__":
                         action="store_const", dest="loglevel", const=logging.DEBUG)
     args = vars(parser.parse_args())
 
-    logging.basicConfig(stream=sys.stdout, level=args['loglevel'],
-                        format="%(funcName)s():%(lineno)i: %(message)s %(levelname)s")
-    # logging.basicConfig(filename='error.log', level=args['loglevel'],
-    #                    format="%(funcName)s():%(lineno)i: %(message)s %(levelname)s")
+    logging.basicConfig(stream=sys.stderr, level=args['loglevel'],
+                        format="%(asctime)s %(name)-10s %(funcName)-10s():%(lineno)i: %(levelname)-6s %(message)s")
 
     if args["grpc"] or args["test"]:
         loc_source = GrpcSource(50051)

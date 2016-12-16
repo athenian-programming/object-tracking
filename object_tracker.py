@@ -1,3 +1,5 @@
+#!/usr/bin/env python2
+
 import argparse
 import logging
 import socket
@@ -105,13 +107,13 @@ class ObjectTracker:
             print("{0}, {1} {2}x{3} {4}%".format(x, y, width, height, middle_inc))
 
     def _set_percent(self, percent):
-        if 2 <= self._percent <= 98:
+        if 2 <= percent <= 98:
             self._percent = percent
             self._prev_x = -1
             self._prev_y = -1
 
     def _set_width(self, width):
-        if 200 <= self._width <= 4000:
+        if 200 <= width <= 4000:
             self._width = width
             self._prev_x = -1
             self._prev_y = -1
@@ -123,17 +125,17 @@ class ObjectTracker:
 
         while self._cam.is_open():
 
-            frame = self._cam.read()
-            frame = imutils.resize(frame, width=self._width)
+            image = self._cam.read()
+            image = imutils.resize(image, width=self._width)
 
             # Convert from BGR to HSV colorspace
-            hsv_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+            hsv_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
             # Threshold the HSV image to get only target colors
-            mask = cv2.inRange(hsv_frame, self._lower, self._upper)
+            mask = cv2.inRange(hsv_image, self._lower, self._upper)
 
             # Bitwise-AND mask and original image
-            result = cv2.bitwise_and(frame, frame, mask=mask)
+            result = cv2.bitwise_and(image, image, mask=mask)
 
             # Convert to grayscale
             gray = cv2.cvtColor(result, cv2.COLOR_BGR2GRAY)
@@ -143,7 +145,7 @@ class ObjectTracker:
             max_contour = utils.find_max_contour(contours)
 
             middle_pct = (self._percent / 100.0) / 2
-            img_height, img_width = frame.shape[:2]
+            img_height, img_width = image.shape[:2]
             mid_x = img_width / 2
             mid_y = img_height / 2
             # The middle margin calculation is based on % of width for horizontal and vertical boundry
@@ -164,9 +166,9 @@ class ObjectTracker:
 
                     if self._display:
                         x, y, w, h = cv2.boundingRect(contour)
-                        cv2.rectangle(frame, (x, y), (x + w, y + h), BLUE, 2)
-                        cv2.drawContours(frame, [contour], -1, GREEN, 2)
-                        cv2.circle(frame, (img_x, img_y), 4, RED, -1)
+                        cv2.rectangle(image, (x, y), (x + w, y + h), BLUE, 2)
+                        cv2.drawContours(image, [contour], -1, GREEN, 2)
+                        cv2.circle(image, (img_x, img_y), 4, RED, -1)
                         text += ' ({0}, {1})'.format(img_x, img_y)
                         text += ' {0}'.format(area)
                         text += ' {0}%'.format(self._percent)
@@ -189,13 +191,13 @@ class ObjectTracker:
             if self._display:
                 x_color = GREEN if x_in_middle else RED if x_missing else BLUE
                 y_color = GREEN if y_in_middle else RED if y_missing else BLUE
-                cv2.line(frame, (mid_x - middle_inc, 0), (mid_x - middle_inc, img_height), x_color, 1)
-                cv2.line(frame, (mid_x + middle_inc, 0), (mid_x + middle_inc, img_height), x_color, 1)
-                cv2.line(frame, (0, mid_y - middle_inc), (img_width, mid_y - middle_inc), y_color, 1)
-                cv2.line(frame, (0, mid_y + middle_inc), (img_width, mid_y + middle_inc), y_color, 1)
-                cv2.putText(frame, text, utils.text_loc(), utils.text_font(), utils.text_size(), RED,
+                cv2.line(image, (mid_x - middle_inc, 0), (mid_x - middle_inc, img_height), x_color, 1)
+                cv2.line(image, (mid_x + middle_inc, 0), (mid_x + middle_inc, img_height), x_color, 1)
+                cv2.line(image, (0, mid_y - middle_inc), (img_width, mid_y - middle_inc), y_color, 1)
+                cv2.line(image, (0, mid_y + middle_inc), (img_width, mid_y + middle_inc), y_color, 1)
+                cv2.putText(image, text, utils.text_loc(), utils.text_font(), utils.text_size(), RED,
                             1)
-                cv2.imshow("Image", frame)
+                cv2.imshow("Image", image)
                 # cv2.imshow("Mask", mask)
                 # cv2.imshow("Res", result)
 
@@ -217,7 +219,7 @@ class ObjectTracker:
                     print(
                         "Middle horizontal/vert pixels: {0}/{1} {2}%".format(middle_inc * 2, inc_y * 2, self._percent))
                 elif key == ord('p'):
-                    utils.save_frame(frame)
+                    utils.save_frame(image)
                 elif key == ord("q"):
                     break
             else:
@@ -261,15 +263,14 @@ if __name__ == "__main__":
     parser.add_argument("-r", "--range", default=20, type=int, help="HSV range")
     parser.add_argument("-d", "--display", default=False, action="store_true", help="Display image [false]")
     parser.add_argument("-g", "--grpc", default="", help="Servo controller gRPC server hostname")
-    parser.add_argument("-o", "--http", default="", type=str,
-                        help="Servo controller HTTP hostname, e.g., --http localhost")
+    parser.add_argument("-o", "--http", default="", type=str, help="Servo controller HTTP hostname")
     parser.add_argument("-t", "--test", default=False, action="store_true", help="Test mode [false]")
     parser.add_argument('-v', '--verbose', default=logging.INFO, help="Include debugging info",
                         action="store_const", dest="loglevel", const=logging.DEBUG)
     args = vars(parser.parse_args())
 
-    logging.basicConfig(stream=sys.stdout, level=args['loglevel'],
-                        format="%(funcName)s():%(lineno)i: %(message)s %(levelname)s")
+    logging.basicConfig(stream=sys.stderr, level=args['loglevel'],
+                        format="%(asctime)s %(name)-10s %(funcName)-10s():%(lineno)i: %(levelname)-6s %(message)s")
 
     # Note this is a BGR value, not RGB!
     bgr_color = eval(args["bgr"])
