@@ -135,22 +135,20 @@ class ObjectTracker:
             text = '#{0} ({1}, {2})'.format(self._cnt, img_width, img_height)
             text += ' {0}%'.format(self._percent)
 
-            contour = self._contour_finder.get_contour(image)
-            if contour != None:
+            contour = self._contour_finder.get_max_contour(image, self._minimum)
+            if contour is not None:
                 moment = cv2.moments(contour)
                 area = int(moment["m00"])
+                img_x = int(moment["m10"] / area)
+                img_y = int(moment["m01"] / area)
 
-                if area >= self._minimum:
-                    img_x = int(moment["m10"] / area)
-                    img_y = int(moment["m01"] / area)
-
-                    if self._display:
-                        x, y, w, h = cv2.boundingRect(contour)
-                        cv2.rectangle(image, (x, y), (x + w, y + h), BLUE, 2)
-                        cv2.drawContours(image, [contour], -1, GREEN, 2)
-                        cv2.circle(image, (img_x, img_y), 4, RED, -1)
-                        text += ' ({0}, {1})'.format(img_x, img_y)
-                        text += ' {0}'.format(area)
+                if self._display:
+                    x, y, w, h = cv2.boundingRect(contour)
+                    cv2.rectangle(image, (x, y), (x + w, y + h), BLUE, 2)
+                    cv2.drawContours(image, [contour], -1, GREEN, 2)
+                    cv2.circle(image, (img_x, img_y), 4, RED, -1)
+                    text += ' ({0}, {1})'.format(img_x, img_y)
+                    text += ' {0}'.format(area)
 
             x_in_middle = mid_x - middle_inc <= img_x <= mid_x + middle_inc
             y_in_middle = mid_y - middle_inc <= img_y <= mid_y + middle_inc
