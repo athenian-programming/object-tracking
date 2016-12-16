@@ -9,19 +9,6 @@ GREEN = (0, 255, 0)
 BLUE = (255, 0, 0)
 
 
-def find_max_contour(contours):
-    max_index = -1
-    max_val = 0
-    if contours:
-        for i, c in enumerate(contours):
-            moments = cv2.moments(c)
-            area = moments["m00"]
-            if 0 <= max_val < area:
-                max_val = area
-                max_index = i
-    return max_index
-
-
 def save_frame(frame):
     file_name = "ct-{0}.png".format(datetime.datetime.now().strftime("%H-%M-%S"))
     cv2.imwrite(file_name, frame)

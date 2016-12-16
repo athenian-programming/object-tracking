@@ -13,11 +13,11 @@ import urllib2
 import cv2
 import grpc
 import imutils
-import numpy as np
 
 import camera
 import gen.location_server_pb2
 import opencv_utils as utils
+from contour_finder import ContourFinder
 from opencv_utils import BLUE
 from opencv_utils import GREEN
 from opencv_utils import RED
@@ -25,29 +25,23 @@ from opencv_utils import is_raspi
 
 
 class ObjectTracker:
-    def __init__(self, bgr_color, width, percent, minimum, hsv_range, url, grpc_hostname, display=False):
+    def __init__(self, bgr_color, width, percent, minimum, hsv_range, http_url, grpc_hostname, display=False):
         self._width = width
         self._orig_percent = percent
         self._orig_width = width
         self._percent = percent
         self._minimum = minimum
         self._display = display
-
-        bgr_img = np.uint8([[bgr_color]])
-        hsv_img = cv2.cvtColor(bgr_img, cv2.COLOR_BGR2HSV)
-        hsv_value = hsv_img[0, 0, 0]
-        self._lower = np.array([hsv_value - hsv_range, 100, 100])
-        self._upper = np.array([hsv_value + hsv_range, 255, 255])
+        self._http_url = http_url
 
         self._prev_x = -1
         self._prev_y = -1
         self._cnt = 0
-
         self._lock = threading.Lock()
         self._data_ready = threading.Event()
         self._currval = None
 
-        self._url = url
+        self._contour_finder = ContourFinder(bgr_color, hsv_range)
 
         self._use_grpc = False
         if grpc_hostname:
@@ -55,7 +49,7 @@ class ObjectTracker:
             try:
                 thread.start_new_thread(self._connect_to_grpc, (grpc_hostname,))
             except BaseException as e:
-                logging.error("Unable to start gRPC client at {0} [{1}]".format(http_hostname, e))
+                logging.error("Unable to start gRPC client at {0} [{1}]".format(http_url, e))
 
         self._cam = camera.Camera()
 
@@ -93,12 +87,12 @@ class ObjectTracker:
         # Raspi specific
         # lcd.clear()
         # lcd.write('X, Y: {0}, {1}'.format(cX, cY))
-        if self._url:
+        if self._http_url:
             try:
                 params = urllib.urlencode({'x': x, 'y': y, 'width': width, 'height': height, 'middle_inc': middle_inc})
-                urllib2.urlopen(self._url, params).read()
+                urllib2.urlopen(self._http_url, params).read()
             except BaseException as e:
-                logging.warning("Unable to reach HTTP server {0} [{1}]".format(self._url, e))
+                logging.warning("Unable to reach HTTP server {0} [{1}]".format(self._http_url, e))
         elif self._use_grpc:
             loc = gen.location_server_pb2.Location(x=x, y=y, width=width, height=height, middle_inc=middle_inc)
             self._write_location(loc)
@@ -128,35 +122,21 @@ class ObjectTracker:
             image = self._cam.read()
             image = imutils.resize(image, width=self._width)
 
-            # Convert from BGR to HSV colorspace
-            hsv_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-
-            # Threshold the HSV image to get only target colors
-            mask = cv2.inRange(hsv_image, self._lower, self._upper)
-
-            # Bitwise-AND mask and original image
-            result = cv2.bitwise_and(image, image, mask=mask)
-
-            # Convert to grayscale
-            gray = cv2.cvtColor(result, cv2.COLOR_BGR2GRAY)
-
-            # Find max contour
-            contours = cv2.findContours(gray, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)[1]
-            max_contour = utils.find_max_contour(contours)
-
             middle_pct = (self._percent / 100.0) / 2
             img_height, img_width = image.shape[:2]
+
             mid_x = img_width / 2
             mid_y = img_height / 2
-            # The middle margin calculation is based on % of width for horizontal and vertical boundry
-            middle_inc = int(mid_x * middle_pct)
             img_x = -1
             img_y = -1
+            # The middle margin calculation is based on % of width for horizontal and vertical boundry
+            middle_inc = int(mid_x * middle_pct)
 
             text = '#{0} ({1}, {2})'.format(self._cnt, img_width, img_height)
+            text += ' {0}%'.format(self._percent)
 
-            if max_contour != -1:
-                contour = contours[max_contour]
+            contour = self._contour_finder.get_contour(image)
+            if contour != None:
                 moment = cv2.moments(contour)
                 area = int(moment["m00"])
 
@@ -171,7 +151,6 @@ class ObjectTracker:
                         cv2.circle(image, (img_x, img_y), 4, RED, -1)
                         text += ' ({0}, {1})'.format(img_x, img_y)
                         text += ' {0}'.format(area)
-                        text += ' {0}%'.format(self._percent)
 
             x_in_middle = mid_x - middle_inc <= img_x <= mid_x + middle_inc
             y_in_middle = mid_y - middle_inc <= img_y <= mid_y + middle_inc
@@ -203,9 +182,9 @@ class ObjectTracker:
 
                 key = cv2.waitKey(30) & 0xFF
 
-                if key == ord('j'):
+                if key == ord('w'):
                     self._set_width(self._width - 10)
-                elif key == ord('k'):
+                elif key == ord('W'):
                     self._set_width(self._width + 10)
                 elif key == ord('-') or key == ord('_'):
                     self._set_percent(self._percent - 1)
@@ -214,10 +193,6 @@ class ObjectTracker:
                 elif key == ord('r'):
                     self._set_width(self._orig_width)
                     self._set_percent(self._orig_percent)
-                elif key == ord('s'):
-                    print("Width x height: {0}x{1}".format(img_width, img_height))
-                    print(
-                        "Middle horizontal/vert pixels: {0}/{1} {2}%".format(middle_inc * 2, inc_y * 2, self._percent))
                 elif key == ord('p'):
                     utils.save_frame(image)
                 elif key == ord("q"):
@@ -295,13 +270,12 @@ if __name__ == "__main__":
     grpc_hostname = args["grpc"]
     http_hostname = args["http"]
 
-    url = None
-
+    http_url = None
     if grpc_hostname:
         grpc_hostname += ":50051"
         logging.info("Servo controller gRPC hostname: {0}".format(grpc_hostname))
     elif http_hostname:
-        url = "http://" + http_hostname + ":8080/set_values"
+        http_url = "http://" + http_hostname + ":8080/set_values"
         logging.info("Servo controller HTTP URL: {0}".format(http_hostname))
 
     # Raspi specific
@@ -312,7 +286,7 @@ if __name__ == "__main__":
     if is_raspi():
         from blinkt import set_pixel, show, clear
 
-    tracker = ObjectTracker(bgr_color, width, percent, minimum, hsv_range, url, grpc_hostname, display)
+    tracker = ObjectTracker(bgr_color, width, percent, minimum, hsv_range, http_url, grpc_hostname, display)
 
     if args["test"]:
         try:
