@@ -192,7 +192,7 @@ class ObjectTracker:
                     self._set_width(self._orig_width)
                     self._set_percent(self._orig_percent)
                 elif key == ord('p'):
-                    utils.save_frame(image)
+                    utils.save_image(image)
                 elif key == ord("q"):
                     break
             else:
