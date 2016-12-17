@@ -7,8 +7,6 @@ import sys
 import thread
 import threading
 import time
-import urllib
-import urllib2
 
 import cv2
 import grpc
@@ -25,14 +23,13 @@ from opencv_utils import is_raspi
 
 
 class ObjectTracker:
-    def __init__(self, bgr_color, width, percent, minimum, hsv_range, http_url, grpc_hostname, display=False):
+    def __init__(self, bgr_color, width, percent, minimum, hsv_range, grpc_hostname, display=False):
         self._width = width
         self._orig_percent = percent
         self._orig_width = width
         self._percent = percent
         self._minimum = minimum
         self._display = display
-        self._http_url = http_url
 
         self._prev_x = -1
         self._prev_y = -1
@@ -49,7 +46,7 @@ class ObjectTracker:
             try:
                 thread.start_new_thread(self._connect_to_grpc, (grpc_hostname,))
             except BaseException as e:
-                logging.error("Unable to start gRPC client at {0} [{1}]".format(http_url, e))
+                logging.error("Unable to start gRPC client at {0} [{1}]".format(grpc_hostname, e))
 
         self._cam = camera.Camera()
 
@@ -87,13 +84,7 @@ class ObjectTracker:
         # Raspi specific
         # lcd.clear()
         # lcd.write('X, Y: {0}, {1}'.format(cX, cY))
-        if self._http_url:
-            try:
-                params = urllib.urlencode({'x': x, 'y': y, 'width': width, 'height': height, 'middle_inc': middle_inc})
-                urllib2.urlopen(self._http_url, params).read()
-            except BaseException as e:
-                logging.warning("Unable to reach HTTP server {0} [{1}]".format(self._http_url, e))
-        elif self._use_grpc:
+        if self._use_grpc:
             loc = gen.location_server_pb2.Location(x=x, y=y, width=width, height=height, middle_inc=middle_inc)
             self._write_location(loc)
         else:
@@ -205,7 +196,7 @@ class ObjectTracker:
             clear()
         self._cam.close()
 
-    def _test(self):
+    def test(self):
         for i in range(0, 1000):
             self._write_location_values(i, i + 1, i + 2, i + 3, i + 4)
             time.sleep(1)
@@ -236,7 +227,6 @@ if __name__ == "__main__":
     parser.add_argument("-r", "--range", default=20, type=int, help="HSV range")
     parser.add_argument("-d", "--display", default=False, action="store_true", help="Display image [false]")
     parser.add_argument("-g", "--grpc", default="", help="Servo controller gRPC server hostname")
-    parser.add_argument("-o", "--http", default="", type=str, help="Servo controller HTTP hostname")
     parser.add_argument("-t", "--test", default=False, action="store_true", help="Test mode [false]")
     parser.add_argument('-v', '--verbose', default=logging.INFO, help="Include debugging info",
                         action="store_const", dest="loglevel", const=logging.DEBUG)
@@ -266,15 +256,10 @@ if __name__ == "__main__":
     logging.info("Display images: {0}".format(display))
 
     grpc_hostname = args["grpc"]
-    http_hostname = args["http"]
 
-    http_url = None
     if grpc_hostname:
         grpc_hostname += ":50051"
         logging.info("Servo controller gRPC hostname: {0}".format(grpc_hostname))
-    elif http_hostname:
-        http_url = "http://" + http_hostname + ":8080/set_values"
-        logging.info("Servo controller HTTP URL: {0}".format(http_hostname))
 
     # Raspi specific
     # import dothat.backlight as backlight
@@ -284,11 +269,11 @@ if __name__ == "__main__":
     if is_raspi():
         from blinkt import set_pixel, show, clear
 
-    tracker = ObjectTracker(bgr_color, width, percent, minimum, hsv_range, http_url, grpc_hostname, display)
+    tracker = ObjectTracker(bgr_color, width, percent, minimum, hsv_range, grpc_hostname, display)
 
     if args["test"]:
         try:
-            thread.start_new_thread(tracker._test, ())
+            thread.start_new_thread(tracker.test, ())
         except BaseException as e:
             logging.error("Unable to run test thread [{0}]".format(e))
             sys.exit(1)

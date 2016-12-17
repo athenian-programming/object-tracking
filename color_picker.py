@@ -10,7 +10,7 @@ from opencv_utils import GREEN
 from opencv_utils import RED
 
 
-class ColorPicker():
+class ColorPicker:
     def __init__(self):
         self._roi_size = 24
         self._roi_inc = 6

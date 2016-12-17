@@ -1,1 +1,1 @@
-./servo_controller.py -p ttyACM0 --grpc
+./servo_controller.py -p ttyACM0
