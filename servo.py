@@ -6,7 +6,7 @@ class Servo:
     def __init__(self, board, name, pin_args, loc_source, forward):
         self._name = name
         self._pin = board.get_pin(pin_args)
-        self._loc_func = loc_source
+        self._loc_source = loc_source
         self._forward = forward
         self._jiggle()
 
@@ -32,8 +32,8 @@ class Servo:
         pix_per_deg = 6.5
 
         while True:
-            # Get latest value
-            img_pos, img_total, middle_inc = self._loc_func()
+            # Get latest location
+            img_pos, img_total, middle_inc = self._loc_source()
 
             # Skip if object is not seen
             if img_pos == -1 or img_total == -1:

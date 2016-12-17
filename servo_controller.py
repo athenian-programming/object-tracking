@@ -8,7 +8,7 @@ import time
 
 from pyfirmata import Arduino
 
-from  grpc_source import GrpcSource
+from  grpc_source import GrpcLocationSource
 from servo import Servo
 
 if __name__ == "__main__":
@@ -26,10 +26,10 @@ if __name__ == "__main__":
     logging.basicConfig(stream=sys.stderr, level=args['loglevel'],
                         format="%(asctime)s %(name)-10s %(funcName)-10s():%(lineno)i: %(levelname)-6s %(message)s")
 
-    loc_source = GrpcSource(50051)
+    loc_source = GrpcLocationSource(50051)
 
     try:
-        thread.start_new_thread(loc_source.start_grpc_source(), ())
+        thread.start_new_thread(loc_source.start_source(), ())
     except BaseException as e:
         logging.error("Unable to start source server [{0}]".format(e))
 

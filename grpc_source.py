@@ -6,8 +6,22 @@ import threading
 from location_server import LocationServer
 
 
-class GrpcSource:
+class GrpcGenericSource:
     def __init__(self, port):
+        self._location_server = LocationServer('[::]:' + str(port), self)
+
+    def start_source(self):
+        try:
+            thread.start_new_thread(LocationServer.start_location_server, (self._location_server,))
+            logging.info("Started gRPC location server")
+        except BaseException as e:
+            logging.error("Unable to start gRPC location server [{0}]".format(e))
+            sys.exit(1)
+
+
+class GrpcLocationSource(GrpcGenericSource):
+    def __init__(self, port):
+        GrpcGenericSource.__init__(port)
         self._x = -1
         self._y = -1
         self._width = -1
@@ -17,15 +31,6 @@ class GrpcSource:
         self._y_lock = threading.Lock()
         self._x_ready = threading.Event()
         self._y_ready = threading.Event()
-        self._location_server = LocationServer('[::]:' + str(port), self)
-
-    def start_grpc_source(self):
-        try:
-            thread.start_new_thread(LocationServer.start_location_server, (self._location_server,))
-            logging.info("Started gRPC location server")
-        except BaseException as e:
-            logging.error("Unable to start gRPC location server [{0}]".format(e))
-            sys.exit(1)
 
     def set_location(self, location):
         with self._x_lock:
@@ -34,7 +39,7 @@ class GrpcSource:
             self._middle_inc = location[4]
             self._x_ready.set()
 
-        with self._x_lock:
+        with self._y_lock:
             self._y = location[1]
             self._height = location[3]
             self._middle_inc = location[4]
@@ -61,3 +66,33 @@ class GrpcSource:
     # Non-blocking
     def get_size(self, name):
         return self._width if name == "x" else self._height
+
+
+class GrpcPositionSource(GrpcGenericSource):
+    def __init__(self, port):
+        GrpcGenericSource.__init__()
+        self._in_focus = False
+        self._mid_offset = -1
+        self._degrees = -1
+        self._mid_cross = -1
+        self._width = -1
+        self._middle_inc = -1
+        self._lock = threading.Lock()
+        self._ready = threading.Event()
+
+    def set_focus_line_position(self, position):
+        with self._lock:
+            self._in_focus = position[0]
+            self._mid_offset = position[1]
+            self._degrees = position[2]
+            self._mid_cross = position[3]
+            self._width = position[4]
+            self._middle_inc = position[5]
+            self._ready.set()
+
+    # Blocking
+    def get_focus_line_position(self):
+        self._ready.wait()
+        with self._lock:
+            self._ready.clear()
+            return self._in_focus, self._mid_offset, self._degrees, self._mid_cross, self._width, self._middle_inc

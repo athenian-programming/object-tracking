@@ -92,7 +92,6 @@ $ python servo_controller.py --port ttyACM0 --grpc
 | -x, --xservo   | X servo PWM pin                                    | 5       |
 | -y, --xyservo  | Y servo PWM pin                                    | 6       |
 | -c, --calib    | Calibration mode                                   | false   |
-| -t, --test     | Test mode                                          | false   |
 | -v, --verbose  | Include debugging info                             | false   |
 | -h, --help     | Summary of options                                 |         |
 

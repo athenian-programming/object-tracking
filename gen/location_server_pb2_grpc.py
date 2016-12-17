@@ -15,9 +15,14 @@ class LocationServerStub(object):
             request_serializer=location__server__pb2.ClientInfo.SerializeToString,
             response_deserializer=location__server__pb2.ServerInfo.FromString,
         )
-        self.ReportLocation = channel.stream_unary(
-            '/object_tracking.LocationServer/ReportLocation',
-            request_serializer=location__server__pb2.Location.SerializeToString,
+        self.ReportObjectLocations = channel.stream_unary(
+            '/object_tracking.LocationServer/ReportObjectLocations',
+            request_serializer=location__server__pb2.ObjectLocation.SerializeToString,
+            response_deserializer=location__server__pb2.Empty.FromString,
+        )
+        self.ReportFocusLinePositions = channel.stream_unary(
+            '/object_tracking.LocationServer/ReportFocusLinePositions',
+            request_serializer=location__server__pb2.FocusLinePosition.SerializeToString,
             response_deserializer=location__server__pb2.Empty.FromString,
         )
 
@@ -28,7 +33,12 @@ class LocationServerServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def ReportLocation(self, request_iterator, context):
+    def ReportObjectLocations(self, request_iterator, context):
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def ReportFocusLinePositions(self, request_iterator, context):
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
@@ -41,9 +51,14 @@ def add_LocationServerServicer_to_server(servicer, server):
             request_deserializer=location__server__pb2.ClientInfo.FromString,
             response_serializer=location__server__pb2.ServerInfo.SerializeToString,
         ),
-        'ReportLocation': grpc.stream_unary_rpc_method_handler(
-            servicer.ReportLocation,
-            request_deserializer=location__server__pb2.Location.FromString,
+        'ReportObjectLocations': grpc.stream_unary_rpc_method_handler(
+            servicer.ReportObjectLocations,
+            request_deserializer=location__server__pb2.ObjectLocation.FromString,
+            response_serializer=location__server__pb2.Empty.SerializeToString,
+        ),
+        'ReportFocusLinePositions': grpc.stream_unary_rpc_method_handler(
+            servicer.ReportFocusLinePositions,
+            request_deserializer=location__server__pb2.FocusLinePosition.FromString,
             response_serializer=location__server__pb2.Empty.SerializeToString,
         ),
     }

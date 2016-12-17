@@ -7,7 +7,10 @@ service LocationServer {
     rpc RegisterClient (ClientInfo) returns (ServerInfo) {
     }
 
-    rpc ReportLocation (stream Location) returns (Empty) {
+    rpc ReportObjectLocations (stream ObjectLocation) returns (Empty) {
+    }
+
+    rpc ReportFocusLinePositions (stream FocusLinePosition) returns (Empty) {
     }
 
 }
@@ -20,12 +23,21 @@ message ServerInfo {
     string info = 1;
 }
 
-message Location {
+message ObjectLocation {
     int32 x = 1;
     int32 y = 2;
     int32 width = 3;
     int32 height = 4;
     int32 middle_inc = 5;
+}
+
+message FocusLinePosition {
+    bool in_focus = 1;
+    int32 mid_offset = 2;
+    int32 degrees = 3;
+    int32 mid_line_cross = 4;
+    int32 width = 5;
+    int32 middle_inc = 6;
 }
 
 message Empty {
