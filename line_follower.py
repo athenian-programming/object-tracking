@@ -39,8 +39,7 @@ class ObjectTracker:
         self._display = display
         self._http_url = http_url
 
-        self._prev_focus_img_x = None
-        self._prev_degrees = None
+        self._prev_focus_img_x = -1
         self._cnt = 0
         self._lock = threading.Lock()
         self._data_ready = threading.Event()
@@ -62,18 +61,18 @@ class ObjectTracker:
                 self._data_ready.clear()
                 yield self._current_position
 
-    def _report_focus_line_positions(self, hostname):
-        channel = grpc.insecure_channel(hostname)
+    def _report_focus_line_positions(self, grpc_hostname):
+        channel = grpc.insecure_channel(grpc_hostname)
         grpc_stub = TelemetryServerStub(channel)
         while True:
             try:
                 client_info = ClientInfo(info='{0} client'.format(socket.gethostname()))
                 server_info = grpc_stub.RegisterClient(client_info)
-                logging.info("Connected to {0} at {1}".format(server_info.info, hostname))
+                logging.info("Connected to {0} at {1}".format(server_info.info, grpc_hostname))
                 grpc_stub.ReportFocusLinePositions(self._generate_focus_line_positions())
-                logging.info("Disconnected from {0} at {1}".format(server_info.info, hostname))
+                logging.info("Disconnected from {0} at {1}".format(server_info.info, grpc_hostname))
             except BaseException as e:
-                logging.error("Failed to connect to gRPC server at {0} - [{1}]".format(hostname, e))
+                logging.error("Failed to connect to gRPC server at {0} - [{1}]".format(grpc_hostname, e))
                 time.sleep(1)
 
     def _write_focus_line_position(self, in_focus, mid_offset, degrees, mid_line_cross, width, middle_inc):
@@ -102,13 +101,11 @@ class ObjectTracker:
         if 200 <= width <= 2000:
             self._width = width
             self._prev_focus_img_x = None
-            self._prev_degrees = None
 
     def _set_percent(self, percent):
         if 2 <= percent <= 98:
             self._percent = percent
             self._prev_focus_img_x = None
-            self._prev_degrees = None
 
     # Do not run this in a background thread. cv2.waitKey has to run in main thread
     def start(self):
@@ -253,7 +250,7 @@ class ObjectTracker:
             focus_x_missing = focus_img_x is None
 
             # Write position if it is different from previous value written
-            if focus_img_x != self._prev_focus_img_x or degrees != self._prev_degrees:
+            if focus_img_x != self._prev_focus_img_x:
                 self._write_focus_line_position(focus_img_x is not None,
                                                 focus_img_x - mid_x if focus_img_x is not None else 0,
                                                 degrees,
@@ -261,7 +258,6 @@ class ObjectTracker:
                                                 img_width,
                                                 mid_inc)
                 self._prev_focus_img_x = focus_img_x
-                self._prev_degrees = degrees
 
             if focus_x_missing:
                 _set_left_leds(RED)
@@ -348,6 +344,7 @@ def _set_right_leds(color):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
+    parser.add_argument("-g", "--grpc", default="", help="Servo controller gRPC server hostname")
     parser.add_argument("-b", "--bgr", type=str, required=True, help="BGR target value, e.g., -b \"[174, 56, 5]\"")
     parser.add_argument("-f", "--focus", default=10, type=int, help="Focus line %  [10]")
     parser.add_argument("-w", "--width", default=400, type=int, help="Image width [400]")
@@ -355,7 +352,6 @@ if __name__ == "__main__":
     parser.add_argument("-m", "--min", default=100, type=int, help="Minimum pixel area [100]")
     parser.add_argument("-r", "--range", default=20, type=int, help="HSV range")
     parser.add_argument("-d", "--display", default=False, action="store_true", help="Display image [false]")
-    parser.add_argument("-g", "--grpc", default="", help="Servo controller gRPC server hostname")
     parser.add_argument('-v', '--verbose', default=logging.INFO, help="Include debugging info",
                         action="store_const", dest="loglevel", const=logging.DEBUG)
     args = vars(parser.parse_args())
