@@ -65,8 +65,7 @@ class LocationClient(object):
                 client_info = ClientInfo(info='{0} client'.format(socket.gethostname()))
                 server_info = grpc_stub.RegisterClient(client_info)
                 logging.info("Connected to {0} at {1}".format(server_info.info, self._grpc_hostname))
-                locations = grpc_stub.GetObjectLocations(client_info)
-                for loc in locations:
+                for loc in grpc_stub.GetObjectLocations(client_info):
                     try:
                         self.set_location((loc.x, loc.y, loc.width, loc.height, loc.middle_inc))
                     except BaseException as e:

@@ -20,7 +20,7 @@ class LocationServer(ObjectLocationServerServicer):
         self._current_location = None
 
     def RegisterClient(self, request, context):
-        print("Connected {0} [{1}]".format(request.info, context.peer()))
+        logging.info("Connected {0} [{1}]".format(request.info, context.peer()))
         with self._lock:
             self._invoke_cnt += 1
         return ServerInfo(info='Server invoke count {0}'.format(self._invoke_cnt))
@@ -34,7 +34,7 @@ class LocationServer(ObjectLocationServerServicer):
                     self._data_ready.clear()
                     yield self._current_location
         finally:
-            logging.info("Disconnected from [{0}]".format(context.peer()))
+            logging.info("Discontinued GetObjectLocations stream to [{0}]".format(context.peer()))
 
     def publish_location(self, x, y, width, height, middle_inc):
         with self._lock:

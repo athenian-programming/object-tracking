@@ -19,7 +19,7 @@ class PositionServer(FocusLinePositionServerServicer):
         self._current_position = None
 
     def RegisterClient(self, request, context):
-        print("Connected {0} [{1}]".format(request.info, context.peer()))
+        logging.info("Connected {0} [{1}]".format(request.info, context.peer()))
         with self._lock:
             self._invoke_cnt += 1
         return ServerInfo(info='Server invoke count {0}'.format(self._invoke_cnt))
@@ -33,7 +33,7 @@ class PositionServer(FocusLinePositionServerServicer):
                     self._data_ready.clear()
                     yield self._current_position
         finally:
-            logging.info("Disconnected from [{0}]".format(context.peer()))
+            logging.info("Disconnected GetFocusLinePositions stream to [{0}]".format(context.peer()))
 
     def publish_focus_line_position(self, in_focus, mid_offset, degrees, mid_line_cross, width, middle_inc):
         with self._lock:

@@ -19,8 +19,7 @@ def read_locations(hostname):
     client_info = ClientInfo(info='{0} client'.format(socket.gethostname()))
     server_info = grpc_stub.RegisterClient(client_info)
 
-    locations = grpc_stub.GetObjectLocations(client_info)
-    for loc in locations:
+    for loc in grpc_stub.GetObjectLocations(client_info):
         print("Received location {0}".format(loc))
     print("Disconnected from gRPC server at {0}".format(hostname))
 
@@ -31,8 +30,7 @@ def read_positions(hostname):
     client_info = ClientInfo(info='{0} client'.format(socket.gethostname()))
     server_info = grpc_stub.RegisterClient(client_info)
 
-    positions = grpc_stub.GetFocusLinePositions(client_info)
-    for pos in positions:
+    for pos in grpc_stub.GetFocusLinePositions(client_info):
         print("Received position {0}".format(pos))
 
     print("Disconnected from gRPC server at {0}".format(hostname))

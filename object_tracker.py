@@ -216,4 +216,4 @@ if __name__ == "__main__":
     except KeyboardInterrupt as e:
         pass
 
-    print("Exiting...")
+    logging.info("Exiting...")

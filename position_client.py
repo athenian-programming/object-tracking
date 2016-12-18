@@ -46,8 +46,7 @@ class PositionClient(object):
                 client_info = ClientInfo(info='{0} client'.format(socket.gethostname()))
                 server_info = grpc_stub.RegisterClient(client_info)
                 logging.info("Connected to {0} at {1}".format(server_info.info, self._grpc_hostname))
-                positions = grpc_stub.GetFocusLinePositions(client_info)
-                for pos in positions:
+                for pos in grpc_stub.GetFocusLinePositions(client_info):
                     try:
                         self._set_focus_line_position((pos.in_focus,
                                                        pos.mid_offset,

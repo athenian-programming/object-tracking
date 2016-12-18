@@ -53,7 +53,7 @@ if __name__ == "__main__":
 
     if args["calib"]:
         Servo.calibrate(location_client, servo_x, servo_y)
-        print("Exiting...")
+        logging.info("Exiting...")
         board.exit()
         sys.exit(0)
 
