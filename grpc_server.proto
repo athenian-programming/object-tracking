@@ -2,15 +2,22 @@ syntax = "proto3";
 
 package opencv_object_tracking;
 
-service TelemetryServer {
+service ObjectLocationServer {
 
     rpc RegisterClient (ClientInfo) returns (ServerInfo) {
     }
 
-    rpc ReportObjectLocations (stream ObjectLocation) returns (Empty) {
+    rpc GetObjectLocations (ClientInfo) returns (stream ObjectLocation) {
     }
 
-    rpc ReportFocusLinePositions (stream FocusLinePosition) returns (Empty) {
+}
+
+service FocusLinePositionServer {
+
+    rpc RegisterClient (ClientInfo) returns (ServerInfo) {
+    }
+
+    rpc GetFocusLinePositions (ClientInfo) returns (stream FocusLinePosition) {
     }
 
 }
@@ -40,7 +47,4 @@ message FocusLinePosition {
     int32 middle_inc = 6;
 }
 
-message Empty {
-
-}
 

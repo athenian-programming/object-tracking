@@ -2,22 +2,18 @@
 
 import argparse
 import logging
-import socket
 import sys
 import thread
 import threading
 import time
 
 import cv2
-import grpc
 import imutils
 
 import camera
 import opencv_utils as utils
 from contour_finder import ContourFinder
-from  gen.telemetry_server_pb2 import ClientInfo
-from  gen.telemetry_server_pb2 import ObjectLocation
-from gen.telemetry_server_pb2 import TelemetryServerStub
+from location_server import LocationServer
 from opencv_utils import BLUE
 from opencv_utils import GREEN
 from opencv_utils import RED
@@ -25,7 +21,7 @@ from opencv_utils import is_raspi
 
 
 class ObjectTracker:
-    def __init__(self, bgr_color, width, percent, minimum, hsv_range, grpc_hostname, display=False):
+    def __init__(self, bgr_color, width, percent, minimum, hsv_range, grpc_port, display=False):
         self._width = width
         self._orig_percent = percent
         self._orig_width = width
@@ -37,46 +33,11 @@ class ObjectTracker:
         self._prev_y = -1
         self._cnt = 0
         self._lock = threading.Lock()
-        self._data_ready = threading.Event()
-        self._current_location = None
+        self._currval = None
 
         self._contour_finder = ContourFinder(bgr_color, hsv_range)
+        self._location_server = LocationServer(grpc_port)
         self._cam = camera.Camera()
-
-        self._use_grpc = False
-        if grpc_hostname:
-            self._use_grpc = True
-            thread.start_new_thread(self._report_locations, (grpc_hostname,))
-
-    def _generate_locations(self):
-        while True:
-            self._data_ready.wait()
-            with self._lock:
-                self._data_ready.clear()
-                yield self._current_location
-
-    def _report_locations(self, hostname):
-        channel = grpc.insecure_channel(grpc_hostname)
-        grpc_stub = TelemetryServerStub(channel)
-        while True:
-            try:
-                client_info = ClientInfo(info='{0} client'.format(socket.gethostname()))
-                server_info = grpc_stub.RegisterClient(client_info)
-                logging.info("Connected to {0} at {1}".format(server_info.info, hostname))
-                grpc_stub.ReportObjectLocations(self._generate_locations())
-                logging.info("Disconnected from {0} at {1}".format(server_info.info, hostname))
-            except BaseException as e:
-                logging.error("Failed to connect to gRPC server at {0}- [{1}]".format(hostname, e))
-                time.sleep(1)
-
-    def _write_location(self, x, y, width, height, middle_inc):
-        if self._use_grpc:
-            with self._lock:
-                self._current_location = ObjectLocation(x=x, y=y, width=width, height=height, middle_inc=middle_inc)
-                self._data_ready.set()
-        else:
-            # Print to console
-            print("{0}, {1} {2}x{3} {4}%".format(x, y, width, height, middle_inc))
 
     def _set_percent(self, percent):
         if 2 <= percent <= 98:
@@ -93,7 +54,14 @@ class ObjectTracker:
     # Do not run this in a background thread. cv2.waitKey has to run in main thread
     def start(self):
 
-        self._write_location(-1, -1, 0, 0, 0)
+        try:
+            thread.start_new_thread(self._location_server.start_location_server, ())
+            time.sleep(1)
+        except BaseException as e:
+            logging.error("Unable to start telemetry server [{0}]".format(e))
+            sys.exit(1)
+
+        self._location_server.publish_location(-1, -1, 0, 0, 0)
 
         while self._cam.is_open():
 
@@ -138,7 +106,7 @@ class ObjectTracker:
 
             # Write location if it is different from previous value written
             if img_x != self._prev_x or img_y != self._prev_y:
-                self._write_location(img_x, img_y, img_width, img_height, middle_inc)
+                self._location_server.publish_location(img_x, img_y, img_width, img_height, middle_inc)
                 self._prev_x = img_x
                 self._prev_y = img_y
 
@@ -205,7 +173,7 @@ if __name__ == "__main__":
     parser.add_argument("-e", "--percent", default=15, type=int, help="Middle percent [15]")
     parser.add_argument("-m", "--min", default=100, type=int, help="Minimum pixel area [100]")
     parser.add_argument("-r", "--range", default=20, type=int, help="HSV range")
-    parser.add_argument("-g", "--grpc", default="", help="Servo controller gRPC server hostname")
+    parser.add_argument("-p", "--port", default=50051, type=int, help="gRPC port [50051]")
     parser.add_argument("-d", "--display", default=False, action="store_true", help="Display image [false]")
     parser.add_argument('-v', '--verbose', default=logging.INFO, help="Include debugging info",
                         action="store_const", dest="loglevel", const=logging.DEBUG)
@@ -234,13 +202,6 @@ if __name__ == "__main__":
     display = args["display"]
     logging.info("Display images: {0}".format(display))
 
-    grpc_hostname = args["grpc"]
-
-    if grpc_hostname:
-        if (":" not in grpc_hostname):
-            grpc_hostname += ":50051"
-        logging.info("Servo controller gRPC hostname: {0}".format(grpc_hostname))
-
     # Raspi specific
     # import dothat.backlight as backlight
     # import dothat.lcd as lcd
@@ -250,7 +211,7 @@ if __name__ == "__main__":
         from blinkt import set_pixel, show, clear
 
     try:
-        tracker = ObjectTracker(bgr_color, width, percent, minimum, hsv_range, grpc_hostname, display)
+        tracker = ObjectTracker(bgr_color, width, percent, minimum, hsv_range, args["port"], display)
         tracker.start()
     except KeyboardInterrupt as e:
         pass

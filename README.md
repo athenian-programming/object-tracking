@@ -54,7 +54,7 @@ $ python object_tracker.py --bgr "[174, 56, 5]" --display --grpc localhost
 | -m, --min      | Minimum target pixel area                          | 100     |
 | -r, --range    | HSV Range                                          | 20      |
 | -d, --display  | Display image                                      | false   |
-| -g, --grpc     | Servo controller gRPC server hostname              |         |
+| -p, --port     | gRPC port                                          | 50051   |
 | -v, --verbose  | Include debugging info                             | false   |
 | -h, --help     | Summary of options                                 |         |
 
@@ -88,7 +88,7 @@ $ python servo_controller.py --port ttyACM0 --grpc
 | Option         | Description                                        | Default |
 |:---------------|----------------------------------------------------|---------|
 | -s, --serial   | Arduino serial port                                | ttyACM0 |
-| -p, --port     | gRPC port                                          | 50051   |
+| -g, --grpc     | Object Tracker gRPC server hostname                |         |
 | -x, --xservo   | X servo PWM pin                                    | 5       |
 | -y, --xyservo  | Y servo PWM pin                                    | 6       |
 | -c, --calib    | Calibration mode                                   | false   |

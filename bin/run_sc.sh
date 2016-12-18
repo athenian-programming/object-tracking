@@ -1,1 +1,1 @@
-./servo_controller.py -s ttyACM0
+./servo_controller.py --grpc pleiku -s ttyACM0

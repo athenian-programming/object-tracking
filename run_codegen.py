@@ -6,6 +6,6 @@ protoc.main(
         '-I.',
         '--python_out=./gen',
         '--grpc_python_out=./gen',
-        './telemetry_server.proto',
+        './grpc_server.proto',
     )
 )

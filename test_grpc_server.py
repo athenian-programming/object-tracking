@@ -3,42 +3,44 @@ import sys
 import thread
 import time
 
-from  grpc_source import LocationSource
-from  grpc_source import PositionSource
+from location_server import LocationServer
+from position_server import PositionServer
 
 
-def test_location_source(port):
-    source = LocationSource(port)
+def test_location_server(port):
+    server = LocationServer(port)
     try:
-        thread.start_new_thread(source.start_telemetry_server, ())
+        thread.start_new_thread(server.start_location_server, ())
     except BaseException as e:
         logging.error("Unable to start position server [{0}]".format(e))
 
-    print("Waiting for location values")
-    for i in range(0, 1000):
-        x_vals = source.get_x()
-        y_vals = source.get_y()
-        print("Received positions {0} {1}".format(i, x_vals, y_vals))
+    for i in range(0, 100):
+        server.publish_location(x=i, y=i + 1, width=i + 2, height=i + 3, middle_inc=i + 4)
+        time.sleep(1)
 
 
-def test_position_source(port):
-    source = PositionSource(port)
+def test_position_server(port):
+    server = PositionServer(port)
     try:
-        thread.start_new_thread(source.start_telemetry_server, ())
+        thread.start_new_thread(server.start_position_server, ())
     except BaseException as e:
         logging.error("Unable to start position server [{0}]".format(e))
 
-    print("Waiting for position values")
-    for i in range(0, 1000):
-        vals = source.get_focus_line_position()
-        print("Received locaiton {0} {1}".format(i, vals))
+    for i in range(0, 100):
+        server.publish_focus_line_position(in_focus=True if i % 2 == 0 else False,
+                                           mid_offset=i,
+                                           degrees=i + 1,
+                                           mid_line_cross=i + 2,
+                                           width=i + 3,
+                                           middle_inc=i + 4)
+        time.sleep(1)
 
 
 if __name__ == "__main__":
     logging.basicConfig(stream=sys.stderr, level=logging.INFO,
                         format="%(asctime)s %(name)-10s %(funcName)-10s():%(lineno)i: %(levelname)-6s %(message)s")
 
-    # thread.start_new_thread(test_location_source, (50052,))
-    thread.start_new_thread(test_position_source, (50051,))
+    thread.start_new_thread(test_location_server, (50052,))
+    thread.start_new_thread(test_position_server, (50053,))
     while True:
         time.sleep(60)

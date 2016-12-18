@@ -3,33 +3,28 @@
 import argparse
 import logging
 import math
-import socket
 import sys
 import thread
 import threading
 import time
 
 import cv2
-import grpc
 import imutils
 import numpy as np
 
 import camera
 import opencv_utils as utils
 from contour_finder import ContourFinder
-from  gen.telemetry_server_pb2 import ClientInfo
-from  gen.telemetry_server_pb2 import FocusLinePosition
-from gen.telemetry_server_pb2 import TelemetryServerStub
 from opencv_utils import BLUE
 from opencv_utils import GREEN
 from opencv_utils import RED
 from opencv_utils import YELLOW
 from opencv_utils import is_raspi
+from position_server import PositionServer
 
 
-class ObjectTracker:
-    def __init__(self, bgr_color, focus_line_pct, width, percent, minimum, hsv_range, http_url, grpc_hostname,
-                 display=False):
+class LineFollower:
+    def __init__(self, bgr_color, focus_line_pct, width, percent, minimum, hsv_range, grpc_port, display=False):
         self._focus_line_pct = focus_line_pct
         self._width = width
         self._orig_percent = percent
@@ -37,61 +32,15 @@ class ObjectTracker:
         self._percent = percent
         self._minimum = minimum
         self._display = display
-        self._http_url = http_url
 
         self._prev_focus_img_x = -1
         self._cnt = 0
         self._lock = threading.Lock()
-        self._data_ready = threading.Event()
         self._currval = None
 
         self._contour_finder = ContourFinder(bgr_color, hsv_range)
-
-        self._use_grpc = False
-        if grpc_hostname:
-            self._use_grpc = True
-            thread.start_new_thread(self._report_focus_line_positions, (grpc_hostname,))
-
+        self._position_server = PositionServer(grpc_port)
         self._cam = camera.Camera()
-
-    def _generate_focus_line_positions(self):
-        while True:
-            self._data_ready.wait()
-            with self._lock:
-                self._data_ready.clear()
-                yield self._current_position
-
-    def _report_focus_line_positions(self, grpc_hostname):
-        channel = grpc.insecure_channel(grpc_hostname)
-        grpc_stub = TelemetryServerStub(channel)
-        while True:
-            try:
-                client_info = ClientInfo(info='{0} client'.format(socket.gethostname()))
-                server_info = grpc_stub.RegisterClient(client_info)
-                logging.info("Connected to {0} at {1}".format(server_info.info, grpc_hostname))
-                grpc_stub.ReportFocusLinePositions(self._generate_focus_line_positions())
-                logging.info("Disconnected from {0} at {1}".format(server_info.info, grpc_hostname))
-            except BaseException as e:
-                logging.error("Failed to connect to gRPC server at {0} - [{1}]".format(grpc_hostname, e))
-                time.sleep(1)
-
-    def _write_focus_line_position(self, in_focus, mid_offset, degrees, mid_line_cross, width, middle_inc):
-        if self._use_grpc:
-            with self._lock:
-                self._current_position = FocusLinePosition(in_focus=in_focus,
-                                                           mid_offset=mid_offset,
-                                                           degrees=degrees,
-                                                           mid_line_cross=mid_line_cross,
-                                                           width=width,
-                                                           middle_inc=middle_inc)
-                self._data_ready.set()
-        else:
-            # Print to console
-            print("Offset: {0} Angle: {1} Mid line cross: {2} Width: {3} Mid margin: {4}".format(mid_offset,
-                                                                                                 degrees,
-                                                                                                 mid_line_cross,
-                                                                                                 width,
-                                                                                                 middle_inc))
 
     def _set_focus_line_pct(self, focus_line_pct):
         if 1 <= focus_line_pct <= 99:
@@ -110,7 +59,14 @@ class ObjectTracker:
     # Do not run this in a background thread. cv2.waitKey has to run in main thread
     def start(self):
 
-        self._write_focus_line_position(False, -1, -1, -1, -1, -1)
+        try:
+            thread.start_new_thread(self._position_server.start_position_server, ())
+            time.sleep(1)
+        except BaseException as e:
+            logging.error("Unable to start telemetry server [{0}]".format(e))
+            sys.exit(1)
+
+        self._position_server.publish_focus_line_position(False, -1, -1, -1, -1, -1)
 
         while self._cam.is_open():
 
@@ -251,12 +207,12 @@ class ObjectTracker:
 
             # Write position if it is different from previous value written
             if focus_img_x != self._prev_focus_img_x:
-                self._write_focus_line_position(focus_img_x is not None,
-                                                focus_img_x - mid_x if focus_img_x is not None else 0,
-                                                degrees,
-                                                mid_line_cross if mid_line_cross is not None else -1,
-                                                img_width,
-                                                mid_inc)
+                self._position_server.publish_focus_line_position(focus_img_x is not None,
+                                                                  focus_img_x - mid_x if focus_img_x is not None else 0,
+                                                                  degrees,
+                                                                  mid_line_cross if mid_line_cross is not None else -1,
+                                                                  img_width,
+                                                                  mid_inc)
                 self._prev_focus_img_x = focus_img_x
 
             if focus_x_missing:
@@ -344,7 +300,7 @@ def _set_right_leds(color):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-g", "--grpc", default="", help="Servo controller gRPC server hostname")
+    parser.add_argument("-p", "--port", default=50051, type=int, help="gRPC port [50051]")
     parser.add_argument("-b", "--bgr", type=str, required=True, help="BGR target value, e.g., -b \"[174, 56, 5]\"")
     parser.add_argument("-f", "--focus", default=10, type=int, help="Focus line %  [10]")
     parser.add_argument("-w", "--width", default=400, type=int, help="Image width [400]")
@@ -383,28 +339,18 @@ if __name__ == "__main__":
     display = args["display"]
     logging.info("Display images: {0}".format(display))
 
-    grpc_hostname = args["grpc"]
-
-    url = None
-
-    if grpc_hostname:
-        if (":" not in grpc_hostname):
-            grpc_hostname += ":50051"
-        logging.info("Servo controller gRPC hostname: {0}".format(grpc_hostname))
-
     if is_raspi():
         from blinkt import set_pixel, show, clear
 
     try:
-        tracker = ObjectTracker(bgr_color,
+        follower = LineFollower(bgr_color,
                                 focus_line_pct,
                                 width, percent,
                                 minimum,
                                 hsv_range,
-                                url,
-                                grpc_hostname,
+                                args["port"],
                                 display)
-        tracker.start()
+        follower.start()
     except KeyboardInterrupt as e:
         pass
 
