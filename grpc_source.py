@@ -3,25 +3,24 @@ import sys
 import thread
 import threading
 
-from location_server import LocationServer
+from telemetry_server import TelemetryServer
 
 
-class GrpcGenericSource:
+class GrpcSource(object):
     def __init__(self, port):
-        self._location_server = LocationServer('[::]:' + str(port), self)
+        self._telemetry_server = TelemetryServer('[::]:' + str(port), self)
 
-    def start_source(self):
+    def start_telemetry_server(self):
         try:
-            thread.start_new_thread(LocationServer.start_location_server, (self._location_server,))
-            logging.info("Started gRPC location server")
+            thread.start_new_thread(self._telemetry_server.start_server, ())
         except BaseException as e:
-            logging.error("Unable to start gRPC location server [{0}]".format(e))
+            logging.error("Unable to start telemetry server [{0}]".format(e))
             sys.exit(1)
 
 
-class GrpcLocationSource(GrpcGenericSource):
+class LocationSource(GrpcSource):
     def __init__(self, port):
-        GrpcGenericSource.__init__(port)
+        super(LocationSource, self).__init__(port)
         self._x = -1
         self._y = -1
         self._width = -1
@@ -68,9 +67,9 @@ class GrpcLocationSource(GrpcGenericSource):
         return self._width if name == "x" else self._height
 
 
-class GrpcPositionSource(GrpcGenericSource):
+class PositionSource(GrpcSource):
     def __init__(self, port):
-        GrpcGenericSource.__init__()
+        super(PositionSource, self).__init__(port)
         self._in_focus = False
         self._mid_offset = -1
         self._degrees = -1

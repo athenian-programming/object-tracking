@@ -9,14 +9,15 @@ import threading
 import time
 
 import cv2
+import grpc
 import imutils
 
 import camera
 import opencv_utils as utils
 from contour_finder import ContourFinder
-from  gen.location_server_pb2 import ClientInfo
-from  gen.location_server_pb2 import ObjectLocation
-from location_server import LocationServer
+from  gen.telemetry_server_pb2 import ClientInfo
+from  gen.telemetry_server_pb2 import ObjectLocation
+from gen.telemetry_server_pb2 import TelemetryServerStub
 from opencv_utils import BLUE
 from opencv_utils import GREEN
 from opencv_utils import RED
@@ -45,8 +46,7 @@ class ObjectTracker:
         self._use_grpc = False
         if grpc_hostname:
             self._use_grpc = True
-            grpc_stub = LocationServer.get_grpc_stub(grpc_hostname)
-            thread.start_new_thread(self._report_locations, (grpc_stub, grpc_hostname,))
+            thread.start_new_thread(self._report_locations, (grpc_hostname,))
 
     def _generate_locations(self):
         while True:
@@ -55,7 +55,9 @@ class ObjectTracker:
                 self._data_ready.clear()
                 yield self._current_location
 
-    def _report_locations(self, grpc_stub, hostname):
+    def _report_locations(self, hostname):
+        channel = grpc.insecure_channel(grpc_hostname)
+        grpc_stub = TelemetryServerStub(channel)
         while True:
             try:
                 client_info = ClientInfo(info='{0} client'.format(socket.gethostname()))
@@ -235,7 +237,8 @@ if __name__ == "__main__":
     grpc_hostname = args["grpc"]
 
     if grpc_hostname:
-        grpc_hostname += ":50051"
+        if (":" not in grpc_hostname):
+            grpc_hostname += ":50051"
         logging.info("Servo controller gRPC hostname: {0}".format(grpc_hostname))
 
     # Raspi specific

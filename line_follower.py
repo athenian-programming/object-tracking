@@ -10,15 +10,16 @@ import threading
 import time
 
 import cv2
+import grpc
 import imutils
 import numpy as np
 
 import camera
 import opencv_utils as utils
 from contour_finder import ContourFinder
-from  gen.location_server_pb2 import ClientInfo
-from  gen.location_server_pb2 import FocusLinePosition
-from location_server import LocationServer
+from  gen.telemetry_server_pb2 import ClientInfo
+from  gen.telemetry_server_pb2 import FocusLinePosition
+from gen.telemetry_server_pb2 import TelemetryServerStub
 from opencv_utils import BLUE
 from opencv_utils import GREEN
 from opencv_utils import RED
@@ -50,8 +51,7 @@ class ObjectTracker:
         self._use_grpc = False
         if grpc_hostname:
             self._use_grpc = True
-            grpc_stub = LocationServer.get_grpc_stub(grpc_hostname)
-            thread.start_new_thread(self._report_focus_line_positions, (grpc_stub, grpc_hostname,))
+            thread.start_new_thread(self._report_focus_line_positions, (grpc_hostname,))
 
         self._cam = camera.Camera()
 
@@ -62,13 +62,15 @@ class ObjectTracker:
                 self._data_ready.clear()
                 yield self._current_position
 
-    def _report_focus_line_positions(self, grpc_stub, hostname):
+    def _report_focus_line_positions(self, hostname):
+        channel = grpc.insecure_channel(hostname)
+        grpc_stub = TelemetryServerStub(channel)
         while True:
             try:
                 client_info = ClientInfo(info='{0} client'.format(socket.gethostname()))
                 server_info = grpc_stub.RegisterClient(client_info)
                 logging.info("Connected to {0} at {1}".format(server_info.info, hostname))
-                grpc_stub.ReportObjectLocations(self._generate_focus_line_positions())
+                grpc_stub.ReportFocusLinePositions(self._generate_focus_line_positions())
                 logging.info("Disconnected from {0} at {1}".format(server_info.info, hostname))
             except BaseException as e:
                 logging.error("Failed to connect to gRPC server at {0} - [{1}]".format(hostname, e))
@@ -354,7 +356,6 @@ if __name__ == "__main__":
     parser.add_argument("-r", "--range", default=20, type=int, help="HSV range")
     parser.add_argument("-d", "--display", default=False, action="store_true", help="Display image [false]")
     parser.add_argument("-g", "--grpc", default="", help="Servo controller gRPC server hostname")
-    parser.add_argument("-o", "--http", default="", type=str, help="Servo controller HTTP hostname")
     parser.add_argument('-v', '--verbose', default=logging.INFO, help="Include debugging info",
                         action="store_const", dest="loglevel", const=logging.DEBUG)
     args = vars(parser.parse_args())
@@ -387,27 +388,25 @@ if __name__ == "__main__":
     logging.info("Display images: {0}".format(display))
 
     grpc_hostname = args["grpc"]
-    http_hostname = args["http"]
 
     url = None
 
     if grpc_hostname:
-        grpc_hostname += ":50051"
+        if (":" not in grpc_hostname):
+            grpc_hostname += ":50051"
         logging.info("Servo controller gRPC hostname: {0}".format(grpc_hostname))
-    elif http_hostname:
-        url = "http://" + http_hostname + ":8080/set_values"
-        logging.info("Servo controller HTTP URL: {0}".format(http_hostname))
-
-    # Raspi specific
-    # import dothat.backlight as backlight
-    # import dothat.lcd as lcd
-    # backlight.rgb(200, 0,0)
 
     if is_raspi():
         from blinkt import set_pixel, show, clear
 
     try:
-        tracker = ObjectTracker(bgr_color, focus_line_pct, width, percent, minimum, hsv_range, url, grpc_hostname,
+        tracker = ObjectTracker(bgr_color,
+                                focus_line_pct,
+                                width, percent,
+                                minimum,
+                                hsv_range,
+                                url,
+                                grpc_hostname,
                                 display)
         tracker.start()
     except KeyboardInterrupt as e:
