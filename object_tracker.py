@@ -182,26 +182,6 @@ if __name__ == "__main__":
     logging.basicConfig(stream=sys.stderr, level=args['loglevel'],
                         format="%(asctime)s %(name)-10s %(funcName)-10s():%(lineno)i: %(levelname)-6s %(message)s")
 
-    # Note this is a BGR value, not RGB!
-    bgr_color = eval(args["bgr"])
-    logging.info("BGR color: {0}".format(bgr_color))
-
-    # Define range of colors in HSV
-    hsv_range = int(args["range"])
-    logging.info("HSV range: {0}".format(hsv_range))
-
-    width = int(args["width"])
-    logging.info("Image width: {0}".format(width))
-
-    percent = int(args["percent"])
-    logging.info("Middle percent: {0}".format(percent))
-
-    minimum = int(args["min"])
-    logging.info("Minimum tager pixel area: {0}".format(minimum))
-
-    display = args["display"]
-    logging.info("Display images: {0}".format(display))
-
     # Raspi specific
     # import dothat.backlight as backlight
     # import dothat.lcd as lcd
@@ -211,7 +191,13 @@ if __name__ == "__main__":
         from blinkt import set_pixel, show, clear
 
     try:
-        tracker = ObjectTracker(bgr_color, width, percent, minimum, hsv_range, args["port"], display)
+        tracker = ObjectTracker(eval(args["bgr"]),
+                                int(args["width"]),
+                                int(args["percent"]),
+                                int(args["min"]),
+                                int(args["range"]),
+                                args["port"],
+                                args["display"])
         tracker.start()
     except KeyboardInterrupt as e:
         pass

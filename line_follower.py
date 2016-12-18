@@ -315,41 +315,20 @@ if __name__ == "__main__":
     logging.basicConfig(stream=sys.stdout, level=args['loglevel'],
                         format="%(funcName)s():%(lineno)i: %(message)s %(levelname)s")
 
-    # Note this is a BGR value, not RGB!
-    bgr_color = eval(args["bgr"])
-    logging.info("BGR color: {0}".format(bgr_color))
-
-    # Horizontal focus line
-    focus_line_pct = args["focus"]
-    logging.info("Focus line %: {0}".format(focus_line_pct))
-
-    # Define range of colors in HSV
-    hsv_range = int(args["range"])
-    logging.info("HSV range: {0}".format(hsv_range))
-
-    width = int(args["width"])
-    logging.info("Image width: {0}".format(width))
-
-    percent = int(args["percent"])
-    logging.info("Middle percent: {0}".format(percent))
-
-    minimum = int(args["min"])
-    logging.info("Minimum tager pixel area: {0}".format(minimum))
-
-    display = args["display"]
-    logging.info("Display images: {0}".format(display))
+    logging.info("Display images: {0}".format(args["display"]))
 
     if is_raspi():
         from blinkt import set_pixel, show, clear
 
     try:
-        follower = LineFollower(bgr_color,
-                                focus_line_pct,
-                                width, percent,
-                                minimum,
-                                hsv_range,
+        follower = LineFollower(eval(args["bgr"]),
+                                args["focus"],
+                                int(args["width"]),
+                                int(args["percent"]),
+                                int(args["min"]),
+                                int(args["range"]),
                                 args["port"],
-                                display)
+                                args["display"])
         follower.start()
     except KeyboardInterrupt as e:
         pass

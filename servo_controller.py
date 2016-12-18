@@ -29,7 +29,6 @@ if __name__ == "__main__":
     grpc_hostname = args["grpc"]
     if (":" not in grpc_hostname):
         grpc_hostname += ":50051"
-    logging.info("Servo controller gRPC hostname: {0}".format(grpc_hostname))
 
     location_client = LocationClient(grpc_hostname)
 

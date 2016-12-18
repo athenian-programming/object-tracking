@@ -36,7 +36,7 @@ decreasing the minimum target pixel area.
 ### Usage 
 
 ```bash
-$ python object_tracker.py --bgr "[174, 56, 5]" --display --grpc localhost
+$ python object_tracker.py --bgr "[174, 56, 5]" --display 
 ```
 
 ### Sample Image
@@ -54,7 +54,7 @@ $ python object_tracker.py --bgr "[174, 56, 5]" --display --grpc localhost
 | -m, --min      | Minimum target pixel area                          | 100     |
 | -r, --range    | HSV Range                                          | 20      |
 | -d, --display  | Display image                                      | false   |
-| -p, --port     | gRPC port                                          | 50051   |
+| -p, --port     | gRPC server port                                   | 50051   |
 | -v, --verbose  | Include debugging info                             | false   |
 | -h, --help     | Summary of options                                 |         |
 
@@ -80,7 +80,7 @@ and adjusts the pan/tilt servos accordingly.
 ### Usage 
 
 ```bash
-$ python servo_controller.py --port ttyACM0 --grpc
+$ python servo_controller.py --port ttyACM0 --grpc localhost
 ```
 
 ### CLI Options
@@ -106,7 +106,7 @@ $ python servo_controller.py --port ttyACM0 --grpc
 ### Software
 * [PyCharm IDE](https://www.jetbrains.com/pycharm/)
 * [Pyfirmata](https://github.com/tino/pyFirmata)
-* [Blinkt docs](http://docs.pimoroni.com/blinkt/)
+* [Blinkt Docs](http://docs.pimoroni.com/blinkt/)
 * [Flask](http://flask.pocoo.org)
 * [gRPC](http://www.grpc.io/docs/tutorials/basic/python.html)
 * [OpenCV Python Tutorial](http://docs.opencv.org/3.0-beta/doc/py_tutorials/py_tutorials.html)
