@@ -74,7 +74,7 @@ class Servo:
             curr_pos = new_pos
 
     @staticmethod
-    def calibrate(source, servo_x, servo_y):
+    def calibrate(location_client, servo_x, servo_y):
         def center_servos(pause=0.0):
             servo_x.write(90, pause)
             servo_y.write(90, pause)
@@ -84,8 +84,8 @@ class Servo:
         while True:
             val = raw_input("{0} {1} ({2}, {3})> ".format(name.upper(),
                                                           servo.read_pin(),
-                                                          source.get_pos("x"),
-                                                          source.get_pos("y")))
+                                                          location_client.get_loc("x"),
+                                                          location_client.get_loc("y")))
             if val.lower() == "q":
                 return
             elif val == "c":
@@ -106,7 +106,7 @@ class Servo:
                 end_pos = -1
                 for i in range(0, 180, 1):
                     servo.write(i, .1)
-                    if source.get_pos(name) != -1:
+                    if location_client.get_loc(name) != -1:
                         start_pos = i
                         break
 
@@ -116,11 +116,11 @@ class Servo:
 
                 for i in range(start_pos, 180, 1):
                     servo.write(i, .1)
-                    if source.get_pos(name) == -1:
+                    if location_client.get_loc(name) == -1:
                         break
                     end_pos = i
 
-                total_pixels = source.get_size(name)
+                total_pixels = location_client.get_size(name)
                 total_pos = end_pos - start_pos
                 pix_deg = round(total_pixels / float(total_pos), 2)
                 servo.write(90)

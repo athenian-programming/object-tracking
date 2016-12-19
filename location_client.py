@@ -4,6 +4,7 @@ import threading
 import time
 
 import grpc
+
 from gen.grpc_server_pb2 import ClientInfo
 from gen.grpc_server_pb2 import ObjectLocationServerStub
 
@@ -50,7 +51,7 @@ class LocationClient(object):
             return self._y, self._height, self._middle_inc
 
     # Non-blocking
-    def get_pos(self, name):
+    def get_loc(self, name):
         return self._x if name == "x" else self._y
 
     # Non-blocking
