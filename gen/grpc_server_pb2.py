@@ -52,6 +52,7 @@ _CLIENTINFO = _descriptor.Descriptor(
     serialized_end=71,
 )
 
+
 _SERVERINFO = _descriptor.Descriptor(
     name='ServerInfo',
     full_name='opencv_object_tracking.ServerInfo',
@@ -81,6 +82,7 @@ _SERVERINFO = _descriptor.Descriptor(
     serialized_start=73,
     serialized_end=99,
 )
+
 
 _OBJECTLOCATION = _descriptor.Descriptor(
     name='ObjectLocation',
@@ -139,6 +141,7 @@ _OBJECTLOCATION = _descriptor.Descriptor(
     serialized_start=101,
     serialized_end=190,
 )
+
 
 _FOCUSLINEPOSITION = _descriptor.Descriptor(
     name='FocusLinePosition',
@@ -237,6 +240,7 @@ FocusLinePosition = _reflection.GeneratedProtocolMessageType('FocusLinePosition'
     # @@protoc_insertion_point(class_scope:opencv_object_tracking.FocusLinePosition)
 ))
 _sym_db.RegisterMessage(FocusLinePosition)
+
 
 try:
     # THESE ELEMENTS WILL BE DEPRECATED.

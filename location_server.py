@@ -2,9 +2,9 @@ import logging
 import threading
 import time
 
-import grpc
 from concurrent import futures
 
+import grpc
 from gen.grpc_server_pb2 import ObjectLocation
 from gen.grpc_server_pb2 import ObjectLocationServerServicer
 from gen.grpc_server_pb2 import ServerInfo
@@ -20,7 +20,7 @@ class LocationServer(ObjectLocationServerServicer):
         self._current_location = None
 
     def RegisterClient(self, request, context):
-        logging.info("Connected {0} [{1}]".format(request.info, context.peer()))
+        logging.info("Connected to client {0} [{1}]".format(context.peer(), request.info))
         with self._lock:
             self._invoke_cnt += 1
         return ServerInfo(info='Server invoke count {0}'.format(self._invoke_cnt))
@@ -34,9 +34,9 @@ class LocationServer(ObjectLocationServerServicer):
                     self._data_ready.clear()
                     yield self._current_location
         finally:
-            logging.info("Discontinued GetObjectLocations stream to [{0}]".format(context.peer()))
+            logging.info("Discontinued GetObjectLocations stream to client {0}".format(context.peer()))
 
-    def publish_location(self, x, y, width, height, middle_inc):
+    def write_location(self, x, y, width, height, middle_inc):
         with self._lock:
             self._current_location = ObjectLocation(x=x,
                                                     y=y,

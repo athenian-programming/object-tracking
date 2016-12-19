@@ -61,7 +61,7 @@ class ObjectTracker:
             logging.error("Unable to start telemetry server [{0}]".format(e))
             sys.exit(1)
 
-        self._location_server.publish_location(-1, -1, 0, 0, 0)
+        self._location_server.write_location(-1, -1, 0, 0, 0)
 
         while self._cam.is_open():
 
@@ -106,7 +106,7 @@ class ObjectTracker:
 
             # Write location if it is different from previous value written
             if img_x != self._prev_x or img_y != self._prev_y:
-                self._location_server.publish_location(img_x, img_y, img_width, img_height, middle_inc)
+                self._location_server.write_location(img_x, img_y, img_width, img_height, middle_inc)
                 self._prev_x = img_x
                 self._prev_y = img_y
 

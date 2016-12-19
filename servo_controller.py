@@ -26,11 +26,7 @@ if __name__ == "__main__":
     logging.basicConfig(stream=sys.stderr, level=args['loglevel'],
                         format="%(asctime)s %(name)-10s %(funcName)-10s():%(lineno)i: %(levelname)-6s %(message)s")
 
-    grpc_hostname = args["grpc"]
-    if (":" not in grpc_hostname):
-        grpc_hostname += ":50051"
-
-    location_client = LocationClient(grpc_hostname)
+    location_client = LocationClient(args["grpc"])
 
     try:
         thread.start_new_thread(location_client.read_locations, ())
@@ -70,4 +66,5 @@ if __name__ == "__main__":
         while True:
             time.sleep(60)
     except KeyboardInterrupt as e:
+        location_client.close()
         print("Exiting...")

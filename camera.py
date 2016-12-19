@@ -5,7 +5,7 @@ import cv2
 import opencv_utils as utils
 
 
-class Camera:
+class Camera(object):
     def __init__(self, src=0, use_picamera=True, resolution=(320, 240), framerate=32):
         if utils.is_raspi():
             from imutils.video import VideoStream

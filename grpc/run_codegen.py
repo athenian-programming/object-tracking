@@ -4,8 +4,8 @@ protoc.main(
     (
         '',
         '-I.',
-        '--python_out=./gen',
-        '--grpc_python_out=./gen',
+        '--python_out=../gen',
+        '--grpc_python_out=../gen',
         './grpc_server.proto',
     )
 )

@@ -23,7 +23,7 @@ from opencv_utils import is_raspi
 from position_server import PositionServer
 
 
-class LineFollower:
+class LineFollower(object):
     def __init__(self, bgr_color, focus_line_pct, width, percent, minimum, hsv_range, grpc_port, display=False):
         self._focus_line_pct = focus_line_pct
         self._width = width
@@ -66,7 +66,7 @@ class LineFollower:
             logging.error("Unable to start telemetry server [{0}]".format(e))
             sys.exit(1)
 
-        self._position_server.publish_focus_line_position(False, -1, -1, -1, -1, -1)
+        self._position_server.write_focus_line_position(False, -1, -1, -1, -1, -1)
 
         while self._cam.is_open():
 
@@ -207,12 +207,12 @@ class LineFollower:
 
             # Write position if it is different from previous value written
             if focus_img_x != self._prev_focus_img_x:
-                self._position_server.publish_focus_line_position(focus_img_x is not None,
+                self._position_server.write_focus_line_position(focus_img_x is not None,
                                                                   focus_img_x - mid_x if focus_img_x is not None else 0,
-                                                                  degrees,
-                                                                  mid_line_cross if mid_line_cross is not None else -1,
-                                                                  img_width,
-                                                                  mid_inc)
+                                                                degrees,
+                                                                mid_line_cross if mid_line_cross is not None else -1,
+                                                                img_width,
+                                                                mid_inc)
                 self._prev_focus_img_x = focus_img_x
 
             if focus_x_missing:

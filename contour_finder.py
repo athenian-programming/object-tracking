@@ -15,7 +15,7 @@ def find_max_contour(contours, minimum):
     return contours[max_index] if max_index != -1 else None
 
 
-class ContourFinder:
+class ContourFinder(object):
     def __init__(self, bgr_color, hsv_range):
         bgr_img = np.uint8([[bgr_color]])
         hsv_img = cv2.cvtColor(bgr_img, cv2.COLOR_BGR2HSV)
