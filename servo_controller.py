@@ -19,11 +19,11 @@ if __name__ == "__main__":
     parser.add_argument("-x", "--xservo", default=5, type=int, help="X servo PWM pin [5]")
     parser.add_argument("-y", "--yservo", default=6, type=int, help="Y servo PWM pin [6]")
     parser.add_argument("-c", "--calib", default=False, action="store_true", help="Calibration mode [false]")
-    parser.add_argument('-v', '--verbose', default=logging.INFO, help="Include debugging info",
+    parser.add_argument("-v", "--verbose", default=logging.INFO, help="Include debugging info",
                         action="store_const", dest="loglevel", const=logging.DEBUG)
     args = vars(parser.parse_args())
 
-    logging.basicConfig(stream=sys.stderr, level=args['loglevel'],
+    logging.basicConfig(stream=sys.stderr, level=args["loglevel"],
                         format="%(asctime)s %(name)-10s %(funcName)-10s():%(lineno)i: %(levelname)-6s %(message)s")
 
     location_client = LocationClient(args["grpc"])
@@ -68,4 +68,4 @@ if __name__ == "__main__":
     except KeyboardInterrupt as e:
         board.exit()
         location_client.close()
-        print("Exiting...")
+        logging.info("Exiting...")

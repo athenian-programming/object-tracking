@@ -60,27 +60,27 @@ class LocationClient(object):
 
     def read_locations(self):
         channel = grpc.insecure_channel(self._grpc_hostname)
-        grpc_stub = ObjectLocationServerStub(channel)
+        stub = ObjectLocationServerStub(channel)
         while not self._closed:
             try:
-                client_info = ClientInfo(info='{0} client'.format(socket.gethostname()))
-                server_info = grpc_stub.RegisterClient(client_info)
+                client_info = ClientInfo(info="{0} client".format(socket.gethostname()))
+                server_info = stub.RegisterClient(client_info)
             except BaseException as e:
                 logging.error("Failed to connect to gRPC server at {0} [{1}]".format(self._grpc_hostname, e))
                 time.sleep(1)
                 continue
 
             logging.info("Connected to gRPC server at {0} [{1}]".format(self._grpc_hostname, server_info.info))
+
             try:
-                for loc in grpc_stub.GetObjectLocations(client_info):
+                for loc in stub.GetObjectLocations(client_info):
                     self._set_location((loc.x,
                                         loc.y,
                                         loc.width,
                                         loc.height,
                                         loc.middle_inc))
             except BaseException:
-                logging.info("Disconnected from gRPC server at {0} [{1}]".format(self._grpc_hostname,
-                                                                                 server_info.info))
+                logging.info("Disconnected from gRPC server at {0} [{1}]".format(self._grpc_hostname, server_info.info))
 
     def close(self):
         self._closed = True

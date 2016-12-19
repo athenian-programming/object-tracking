@@ -4,6 +4,7 @@ import threading
 import time
 
 import grpc
+
 from gen.grpc_server_pb2 import ClientInfo
 from gen.grpc_server_pb2 import FocusLinePositionServerStub
 
@@ -40,11 +41,11 @@ class PositionClient(object):
 
     def read_positions(self):
         channel = grpc.insecure_channel(self._grpc_hostname)
-        grpc_stub = FocusLinePositionServerStub(channel)
+        stub = FocusLinePositionServerStub(channel)
         while not self._closed:
             try:
-                client_info = ClientInfo(info='{0} client'.format(socket.gethostname()))
-                server_info = grpc_stub.RegisterClient(client_info)
+                client_info = ClientInfo(info="{0} client".format(socket.gethostname()))
+                server_info = stub.RegisterClient(client_info)
             except BaseException as e:
                 logging.error("Failed to connect to gRPC server at {0} [{1}]".format(self._grpc_hostname, e))
                 time.sleep(1)
@@ -52,7 +53,7 @@ class PositionClient(object):
 
             logging.info("Connected to gRPC server at {0} [{1}]".format(self._grpc_hostname, server_info.info))
             try:
-                for pos in grpc_stub.GetFocusLinePositions(client_info):
+                for pos in stub.GetFocusLinePositions(client_info):
                     self._set_focus_line_position((pos.in_focus,
                                                    pos.mid_offset,
                                                    pos.degrees,

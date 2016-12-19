@@ -2,9 +2,9 @@ import logging
 import threading
 import time
 
+import grpc
 from concurrent import futures
 
-import grpc
 from gen.grpc_server_pb2 import ObjectLocation
 from gen.grpc_server_pb2 import ObjectLocationServerServicer
 from gen.grpc_server_pb2 import ServerInfo
@@ -13,7 +13,7 @@ from gen.grpc_server_pb2 import add_ObjectLocationServerServicer_to_server
 
 class LocationServer(ObjectLocationServerServicer):
     def __init__(self, port):
-        self._hostname = '[::]:' + str(port)
+        self._hostname = "[::]:" + str(port)
         self._invoke_cnt = 0
         self._lock = threading.Lock()
         self._data_ready = threading.Event()
@@ -23,7 +23,7 @@ class LocationServer(ObjectLocationServerServicer):
         logging.info("Connected to client {0} [{1}]".format(context.peer(), request.info))
         with self._lock:
             self._invoke_cnt += 1
-        return ServerInfo(info='Server invoke count {0}'.format(self._invoke_cnt))
+        return ServerInfo(info="Server invoke count {0}".format(self._invoke_cnt))
 
     def GetObjectLocations(self, request, context):
         try:

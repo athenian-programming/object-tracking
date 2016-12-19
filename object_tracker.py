@@ -28,6 +28,7 @@ class ObjectTracker:
         self._percent = percent
         self._minimum = minimum
         self._display = display
+        self._closed = False
 
         self._prev_x = -1
         self._prev_y = -1
@@ -63,7 +64,7 @@ class ObjectTracker:
 
         self._location_server.write_location(-1, -1, 0, 0, 0)
 
-        while self._cam.is_open():
+        while self._cam.is_open() and not self._closed:
 
             image = self._cam.read()
             image = imutils.resize(image, width=self._width)
@@ -78,8 +79,8 @@ class ObjectTracker:
             # The middle margin calculation is based on % of width for horizontal and vertical boundry
             middle_inc = int(mid_x * middle_pct)
 
-            text = '#{0} ({1}, {2})'.format(self._cnt, img_width, img_height)
-            text += ' {0}%'.format(self._percent)
+            text = "#{0} ({1}, {2})".format(self._cnt, img_width, img_height)
+            text += " {0}%".format(self._percent)
 
             contour = self._contour_finder.get_max_contour(image, self._minimum)
             if contour is not None:
@@ -93,8 +94,8 @@ class ObjectTracker:
                     cv2.rectangle(image, (x, y), (x + w, y + h), BLUE, 2)
                     cv2.drawContours(image, [contour], -1, GREEN, 2)
                     cv2.circle(image, (img_x, img_y), 4, RED, -1)
-                    text += ' ({0}, {1})'.format(img_x, img_y)
-                    text += ' {0}'.format(area)
+                    text += " ({0}, {1})".format(img_x, img_y)
+                    text += " {0}".format(area)
 
             x_in_middle = mid_x - middle_inc <= img_x <= mid_x + middle_inc
             y_in_middle = mid_y - middle_inc <= img_y <= mid_y + middle_inc
@@ -126,18 +127,18 @@ class ObjectTracker:
 
                 key = cv2.waitKey(30) & 0xFF
 
-                if key == ord('w'):
+                if key == ord("w"):
                     self._set_width(self._width - 10)
-                elif key == ord('W'):
+                elif key == ord("W"):
                     self._set_width(self._width + 10)
-                elif key == ord('-') or key == ord('_'):
+                elif key == ord("-") or key == ord("_"):
                     self._set_percent(self._percent - 1)
-                elif key == ord('+') or key == ord('='):
+                elif key == ord("+") or key == ord("="):
                     self._set_percent(self._percent + 1)
-                elif key == ord('r'):
+                elif key == ord("r"):
                     self._set_width(self._orig_width)
                     self._set_percent(self._orig_percent)
-                elif key == ord('p'):
+                elif key == ord("p"):
                     utils.save_image(image)
                 elif key == ord("q"):
                     break
@@ -150,6 +151,9 @@ class ObjectTracker:
         if is_raspi():
             clear()
         self._cam.close()
+
+    def close(self):
+        self._closed = True
 
 
 def _set_left_leds(color):
@@ -175,11 +179,11 @@ if __name__ == "__main__":
     parser.add_argument("-r", "--range", default=20, type=int, help="HSV range")
     parser.add_argument("-p", "--port", default=50051, type=int, help="gRPC port [50051]")
     parser.add_argument("-d", "--display", default=False, action="store_true", help="Display image [false]")
-    parser.add_argument('-v', '--verbose', default=logging.INFO, help="Include debugging info",
+    parser.add_argument("-v", "--verbose", default=logging.INFO, help="Include debugging info",
                         action="store_const", dest="loglevel", const=logging.DEBUG)
     args = vars(parser.parse_args())
 
-    logging.basicConfig(stream=sys.stderr, level=args['loglevel'],
+    logging.basicConfig(stream=sys.stderr, level=args["loglevel"],
                         format="%(asctime)s %(name)-10s %(funcName)-10s():%(lineno)i: %(levelname)-6s %(message)s")
 
     # Raspi specific
@@ -190,16 +194,18 @@ if __name__ == "__main__":
     if is_raspi():
         from blinkt import set_pixel, show, clear
 
+    tracker = ObjectTracker(eval(args["bgr"]),
+                            int(args["width"]),
+                            int(args["percent"]),
+                            int(args["min"]),
+                            int(args["range"]),
+                            args["port"],
+                            args["display"])
+
     try:
-        tracker = ObjectTracker(eval(args["bgr"]),
-                                int(args["width"]),
-                                int(args["percent"]),
-                                int(args["min"]),
-                                int(args["range"]),
-                                args["port"],
-                                args["display"])
         tracker.start()
     except KeyboardInterrupt as e:
+        tracker.close()
         pass
 
     logging.info("Exiting...")
