@@ -1,9 +1,6 @@
 import logging
 import time
 
-import opencv_utils as utils
-
-
 class Servo:
     def __init__(self, board, name, pin_args, loc_source, forward):
         self._name = name
@@ -78,26 +75,40 @@ class Servo:
     @staticmethod
     def calibrate(location_client, servo_x, servo_y):
         def center_servos(pause=0.0):
-            servo_x.write(90, pause)
-            servo_y.write(90, pause)
+            servo_x.write_pin(90, pause)
+            servo_y.write_pin(90, pause)
 
         name = "x"
         servo = servo_x
         while True:
-            if utils.is_python3():
+            # This is a hack to get around python3 not having raw_input
+            try:
+                input = raw_input
+            except NameError:
+                pass
+
+            try:
                 val = input("{0} {1} ({2}, {3})> ".format(name.upper(),
                                                           servo.read_pin(),
                                                           location_client.get_loc("x"),
                                                           location_client.get_loc("y")))
-            else:
-                val = raw_input("{0} {1} ({2}, {3})> ".format(name.upper(),
-                                                              servo.read_pin(),
-                                                              location_client.get_loc("x"),
-                                                              location_client.get_loc("y")))
-            if val.lower() == "q":
+            except KeyboardInterrupt:
                 return
+
+            if val == "?":
+                print("Valid commands:")
+                print("     x      : change to pan servo")
+                print("     y      : change to tilt servo")
+                print("     s      : run scan on current servo")
+                print("     c      : center current servo")
+                print("     C      : center both servos")
+                print("     +      : increase current servo position 1 degree")
+                print("     -      : decrease current servo position 1 degree")
+                print("     number : set current servo position number degree")
+                print("     ?      : print summary of commands")
+                print("     q      : quit")
             elif val == "c":
-                servo.write(90, .5)
+                servo.write_pin(90, .5)
             elif val == "C":
                 center_servos(.5)
             elif val.lower() == "x":
@@ -108,12 +119,12 @@ class Servo:
                 servo = servo_y
             elif val.lower() == "s":
                 center_servos(1)
-                servo.write(0, 2)
+                servo.write_pin(0, 2)
 
                 start_pos = -1
                 end_pos = -1
                 for i in range(0, 180, 1):
-                    servo.write(i, .1)
+                    servo.write_pin(i, .1)
                     if location_client.get_loc(name) != -1:
                         start_pos = i
                         break
@@ -123,7 +134,7 @@ class Servo:
                     continue
 
                 for i in range(start_pos, 180, 1):
-                    servo.write(i, .1)
+                    servo.write_pin(i, .1)
                     if location_client.get_loc(name) == -1:
                         break
                     end_pos = i
@@ -131,15 +142,17 @@ class Servo:
                 total_pixels = location_client.get_size(name)
                 total_pos = end_pos - start_pos
                 pix_deg = round(total_pixels / float(total_pos), 2)
-                servo.write(90)
+                servo.write_pin(90)
                 print("{0} degrees to cover {1} pixels [{2} pixels/degree]".format(total_pos, total_pixels, pix_deg))
             elif len(val) == 0:
                 pass
             elif val == "-" or val == "_":
-                servo.write(servo.read_pin() - 1, .5)
+                servo.write_pin(servo.read_pin() - 1, .5)
             elif val == "+" or val == "=":
-                servo.write(servo.read_pin() + 1, .5)
+                servo.write_pin(servo.read_pin() + 1, .5)
             elif val.isdigit():
-                servo.write(int(val), .5)
+                servo.write_pin(int(val), .5)
+            elif val.lower() == "q":
+                return
             else:
                 print("Invalid input")

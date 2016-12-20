@@ -3,7 +3,7 @@
 import argparse
 import logging
 import sys
-import threading
+from threading import Thread
 
 from pyfirmata import Arduino
 
@@ -25,13 +25,6 @@ if __name__ == "__main__":
     logging.basicConfig(stream=sys.stderr, level=args["loglevel"],
                         format="%(asctime)s %(name)-10s %(funcName)-10s():%(lineno)i: %(levelname)-6s %(message)s")
 
-    location_client = LocationClient(args["grpc"])
-
-    try:
-        threading.Thread(target=location_client.read_locations).start()
-    except BaseException as e:
-        logging.error("Unable to start location client [{0}]".format(e))
-
     # Setup firmata client
     port = "/dev/" + args["serial"]
     try:
@@ -40,6 +33,8 @@ if __name__ == "__main__":
     except OSError as e:
         logging.error("Failed to connect to Arduino at {0} - [{1}]".format(port, e))
         sys.exit(0)
+
+    location_client = LocationClient(args["grpc"])
 
     # Create servos
     servo_x = Servo(board, "X servo", "d:{0}:s".format(args["xservo"]), lambda: location_client.get_x(), True)
@@ -51,13 +46,18 @@ if __name__ == "__main__":
         board.exit()
         sys.exit(0)
 
-    servo_x_t = threading.Thread(target=servo_x.start)
+    try:
+        Thread(target=location_client.read_locations).start()
+    except BaseException as e:
+        logging.error("Unable to start location client [{0}]".format(e))
+
+    servo_x_t = Thread(target=servo_x.start)
     try:
         servo_x_t.start()
     except BaseException as e:
         logging.error("Unable to start servo controller for {0} [{1}]".format(servo_x.name(), e))
 
-    servo_y_t = threading.Thread(target=servo_y.start)
+    servo_y_t = Thread(target=servo_y.start)
     try:
         servo_y_t.start()
     except BaseException as e:

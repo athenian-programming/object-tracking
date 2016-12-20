@@ -34,12 +34,20 @@ class PositionClient(object):
 
     # Blocking
     def get_focus_line_position(self):
-        self._ready.wait()
-        with self._lock:
-            self._ready.clear()
-            return self._in_focus, self._mid_offset, self._degrees, self._mid_cross, self._width, self._middle_inc
+        while True:
+            self._ready.wait()
+            with self._lock:
+                if self._ready.is_set():
+                    self._ready.clear()
+                    return self._in_focus, \
+                           self._mid_offset, \
+                           self._degrees, \
+                           self._mid_cross, \
+                           self._width, \
+                           self._middle_inc
 
     def read_positions(self):
+        logging.info("Connecting to gRPC server at {0}".format(self._grpc_hostname))
         channel = grpc.insecure_channel(self._grpc_hostname)
         stub = FocusLinePositionServerStub(channel)
         while not self._closed:

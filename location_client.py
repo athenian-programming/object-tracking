@@ -11,7 +11,7 @@ from gen.grpc_server_pb2 import ObjectLocationServerStub
 
 class LocationClient(object):
     def __init__(self, grpc_hostname):
-        self._grpc_hostname = grpc_hostname if ":" in grpc_hostname  else grpc_hostname + ":50051"
+        self._grpc_hostname = grpc_hostname if ":" in grpc_hostname else grpc_hostname + ":50051"
         self._closed = False
         self._x = -1
         self._y = -1
@@ -38,17 +38,21 @@ class LocationClient(object):
 
     # Blocking
     def get_x(self):
-        self._x_ready.wait()
-        with self._x_lock:
-            self._x_ready.clear()
-            return self._x, self._width, self._middle_inc
+        while True:
+            self._x_ready.wait()
+            with self._x_lock:
+                if self._x_ready.is_set:
+                    self._x_ready.clear()
+                    return self._x, self._width, self._middle_inc
 
     # Blocking
     def get_y(self):
-        self._y_ready.wait()
-        with self._y_lock:
-            self._y_ready.clear()
-            return self._y, self._height, self._middle_inc
+        while True:
+            self._y_ready.wait()
+            with self._y_lock:
+                if self._y_ready.is_set:
+                    self._y_ready.clear()
+                    return self._y, self._height, self._middle_inc
 
     # Non-blocking
     def get_loc(self, name):
@@ -59,6 +63,7 @@ class LocationClient(object):
         return self._width if name == "x" else self._height
 
     def read_locations(self):
+        logging.info("Connecting to gRPC server at {0}".format(self._grpc_hostname))
         channel = grpc.insecure_channel(self._grpc_hostname)
         stub = ObjectLocationServerStub(channel)
         while not self._closed:

@@ -4,8 +4,9 @@ import argparse
 import logging
 import math
 import sys
-import threading
 import time
+from threading import Lock
+from threading import Thread
 
 import cv2
 import imutils
@@ -37,7 +38,7 @@ class LineFollower(object):
         self._prev_mid_line_cross = -1
 
         self._cnt = 0
-        self._lock = threading.Lock()
+        self._lock = Lock()
         self._currval = None
 
         self._contour_finder = ContourFinder(bgr_color, hsv_range)
@@ -63,7 +64,7 @@ class LineFollower(object):
     # Do not run this in a background thread. cv2.waitKey has to run in main thread
     def start(self):
         try:
-            threading.Thread(target=self._position_server.start_position_server).start()
+            Thread(target=self._position_server.start_position_server).start()
             time.sleep(1)
         except BaseException as e:
             logging.error("Unable to start position server [{0}]".format(e))

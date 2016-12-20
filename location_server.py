@@ -5,10 +5,16 @@ import time
 import grpc
 from concurrent import futures
 
+import opencv_utils as utils
 from gen.grpc_server_pb2 import ObjectLocation
 from gen.grpc_server_pb2 import ObjectLocationServerServicer
 from gen.grpc_server_pb2 import ServerInfo
 from gen.grpc_server_pb2 import add_ObjectLocationServerServicer_to_server
+
+if utils.is_python3():
+    from queue import Queue
+else:
+    from Queue import Queue
 
 
 class LocationServer(ObjectLocationServerServicer):
@@ -16,8 +22,7 @@ class LocationServer(ObjectLocationServerServicer):
         self._hostname = "[::]:" + str(port)
         self._invoke_cnt = 0
         self._lock = threading.Lock()
-        self._data_ready = threading.Event()
-        self._current_location = None
+        self._queue = Queue()
 
     def RegisterClient(self, request, context):
         logging.info("Connected to client {0} [{1}]".format(context.peer(), request.info))
@@ -29,21 +34,17 @@ class LocationServer(ObjectLocationServerServicer):
         try:
             client_info = request.info
             while True:
-                self._data_ready.wait()
-                with self._lock:
-                    self._data_ready.clear()
-                    yield self._current_location
+                yield self._queue.get()
         finally:
-            logging.info("Discontinued GetObjectLocations stream to client {0}".format(context.peer()))
+            logging.info("Discontinued GetObjectLocations stream for client {0}".format(context.peer()))
 
     def write_location(self, x, y, width, height, middle_inc):
-        with self._lock:
-            self._current_location = ObjectLocation(x=x,
-                                                    y=y,
-                                                    width=width,
-                                                    height=height,
-                                                    middle_inc=middle_inc)
-            self._data_ready.set()
+        loc = ObjectLocation(x=x,
+                             y=y,
+                             width=width,
+                             height=height,
+                             middle_inc=middle_inc)
+        self._queue.put(loc)
 
     def start_location_server(self):
         logging.info("Starting gRPC location server listening on {0}".format(self._hostname))
@@ -55,4 +56,5 @@ class LocationServer(ObjectLocationServerServicer):
             while True:
                 time.sleep(60)
         except KeyboardInterrupt:
+            grpc_server.stop(None)
             grpc_server.stop(0)

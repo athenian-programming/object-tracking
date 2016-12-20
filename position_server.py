@@ -5,18 +5,23 @@ import time
 import grpc
 from concurrent import futures
 
+import opencv_utils as utils
+from gen.grpc_server_pb2 import FocusLinePosition
 from gen.grpc_server_pb2 import FocusLinePositionServerServicer
-from gen.grpc_server_pb2 import ServerInfo, FocusLinePosition
+from gen.grpc_server_pb2 import ServerInfo
 from gen.grpc_server_pb2 import add_FocusLinePositionServerServicer_to_server
 
+if utils.is_python3():
+    from queue import Queue
+else:
+    from Queue import Queue
 
 class PositionServer(FocusLinePositionServerServicer):
     def __init__(self, port):
         self._hostname = "[::]:" + str(port)
         self._invoke_cnt = 0
         self._lock = threading.Lock()
-        self._data_ready = threading.Event()
-        self._current_position = None
+        self._queue = Queue()
 
     def RegisterClient(self, request, context):
         logging.info("Connected to client {0} [{1}]".format(context.peer(), request.info))
@@ -28,22 +33,18 @@ class PositionServer(FocusLinePositionServerServicer):
         try:
             client_info = request.info
             while True:
-                self._data_ready.wait()
-                with self._lock:
-                    self._data_ready.clear()
-                    yield self._current_position
+                yield self._queue.get()
         finally:
-            logging.info("Disconnected GetFocusLinePositions stream to client {0}".format(context.peer()))
+            logging.info("Disconnected GetFocusLinePositions stream for client {0}".format(context.peer()))
 
     def write_focus_line_position(self, in_focus, mid_offset, degrees, mid_line_cross, width, middle_inc):
-        with self._lock:
-            self._current_position = FocusLinePosition(in_focus=in_focus,
-                                                       mid_offset=mid_offset,
-                                                       degrees=degrees,
-                                                       mid_line_cross=mid_line_cross,
-                                                       width=width,
-                                                       middle_inc=middle_inc)
-            self._data_ready.set()
+        pos = FocusLinePosition(in_focus=in_focus,
+                                mid_offset=mid_offset,
+                                degrees=degrees,
+                                mid_line_cross=mid_line_cross,
+                                width=width,
+                                middle_inc=middle_inc)
+        self._queue.put(pos)
 
     def start_position_server(self):
         logging.info("Starting gRPC position server listening on {0}".format(self._hostname))
@@ -56,4 +57,3 @@ class PositionServer(FocusLinePositionServerServicer):
                 time.sleep(60)
         except KeyboardInterrupt:
             grpc_server.stop(0)
-

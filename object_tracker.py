@@ -3,8 +3,9 @@
 import argparse
 import logging
 import sys
-import threading
 import time
+from threading import Lock
+from threading import Thread
 
 import cv2
 import imutils
@@ -32,7 +33,7 @@ class ObjectTracker:
         self._prev_x = -1
         self._prev_y = -1
         self._cnt = 0
-        self._lock = threading.Lock()
+        self._lock = Lock()
         self._currval = None
 
         self._contour_finder = ContourFinder(bgr_color, hsv_range)
@@ -55,7 +56,7 @@ class ObjectTracker:
     def start(self):
 
         try:
-            threading.Thread(target=self._location_server.start_location_server).start()
+            Thread(target=self._location_server.start_location_server).start()
             time.sleep(1)
         except BaseException as e:
             logging.error("Unable to start telemetry server [{0}]".format(e))
