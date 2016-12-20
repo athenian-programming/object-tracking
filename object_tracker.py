@@ -28,7 +28,7 @@ class ObjectTracker:
         self._percent = percent
         self._minimum = minimum
         self._display = display
-        self._closed = False
+        self._stopped = False
 
         self._prev_x = -1
         self._prev_y = -1
@@ -64,7 +64,7 @@ class ObjectTracker:
 
         self._location_server.write_location(-1, -1, 0, 0, 0)
 
-        while self._cam.is_open() and not self._closed:
+        while self._cam.is_open() and not self._stopped:
 
             image = self._cam.read()
             image = imutils.resize(image, width=self._width)
@@ -141,7 +141,7 @@ class ObjectTracker:
                 elif key == ord("p"):
                     utils.save_image(image)
                 elif key == ord("q"):
-                    break
+                    self.stop()
             else:
                 # Nap if display is not on
                 time.sleep(.1)
@@ -152,8 +152,9 @@ class ObjectTracker:
             clear()
         self._cam.close()
 
-    def close(self):
-        self._closed = True
+    def stop(self):
+        self._stopped = True
+        self._location_server.stop()
 
 
 def _set_left_leds(color):
@@ -205,7 +206,7 @@ if __name__ == "__main__":
     try:
         tracker.start()
     except KeyboardInterrupt as e:
-        tracker.close()
+        tracker.stop()
         pass
 
     logging.info("Exiting...")

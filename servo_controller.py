@@ -68,5 +68,5 @@ if __name__ == "__main__":
         servo_y_t.join()
     except KeyboardInterrupt as e:
         board.exit()
-        location_client.close()
+        location_client.stop()
         logging.info("Exiting...")

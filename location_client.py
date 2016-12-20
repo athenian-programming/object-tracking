@@ -12,7 +12,7 @@ from gen.grpc_server_pb2 import ObjectLocationServerStub
 class LocationClient(object):
     def __init__(self, grpc_hostname):
         self._grpc_hostname = grpc_hostname if ":" in grpc_hostname else grpc_hostname + ":50051"
-        self._closed = False
+        self._stopped = False
         self._x = -1
         self._y = -1
         self._width = -1
@@ -63,10 +63,10 @@ class LocationClient(object):
         return self._width if name == "x" else self._height
 
     def read_locations(self):
-        logging.info("Connecting to gRPC server at {0}".format(self._grpc_hostname))
         channel = grpc.insecure_channel(self._grpc_hostname)
         stub = ObjectLocationServerStub(channel)
-        while not self._closed:
+        while not self._stopped:
+            logging.info("Connecting to gRPC server at {0}".format(self._grpc_hostname))
             try:
                 client_info = ClientInfo(info="{0} client".format(socket.gethostname()))
                 server_info = stub.RegisterClient(client_info)
@@ -87,5 +87,6 @@ class LocationClient(object):
             except BaseException:
                 logging.info("Disconnected from gRPC server at {0} [{1}]".format(self._grpc_hostname, server_info.info))
 
-    def close(self):
-        self._closed = True
+    def stop(self):
+        logging.info("Stopping location client")
+        self._stopped = True

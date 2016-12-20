@@ -12,7 +12,7 @@ from gen.grpc_server_pb2 import FocusLinePositionServerStub
 class PositionClient(object):
     def __init__(self, grpc_hostname):
         self._grpc_hostname = grpc_hostname if ":" in grpc_hostname else grpc_hostname + ":50051"
-        self._closed = False
+        self._stopped = False
         self._in_focus = False
         self._mid_offset = -1
         self._degrees = -1
@@ -47,10 +47,10 @@ class PositionClient(object):
                            self._middle_inc
 
     def read_positions(self):
-        logging.info("Connecting to gRPC server at {0}".format(self._grpc_hostname))
         channel = grpc.insecure_channel(self._grpc_hostname)
         stub = FocusLinePositionServerStub(channel)
-        while not self._closed:
+        while not self._stopped:
+            logging.info("Connecting to gRPC server at {0}".format(self._grpc_hostname))
             try:
                 client_info = ClientInfo(info="{0} client".format(socket.gethostname()))
                 server_info = stub.RegisterClient(client_info)
@@ -73,4 +73,5 @@ class PositionClient(object):
                                                                                  server_info.info))
 
     def close(self):
-        self._closed = True
+        logging.info("Stopping location client")
+        self._stopped = True

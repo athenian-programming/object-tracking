@@ -20,6 +20,8 @@ else:
 class LocationServer(ObjectLocationServerServicer):
     def __init__(self, port):
         self._hostname = "[::]:" + str(port)
+        self._grpc_server = None
+        self._stopped = False
         self._invoke_cnt = 0
         self._lock = threading.Lock()
         self._queue = Queue()
@@ -33,8 +35,10 @@ class LocationServer(ObjectLocationServerServicer):
     def GetObjectLocations(self, request, context):
         try:
             client_info = request.info
-            while True:
-                yield self._queue.get()
+            while not self._stopped:
+                val = self._queue.get()
+                if val is not None:
+                    yield val
         finally:
             logging.info("Discontinued GetObjectLocations stream for client {0}".format(context.peer()))
 
@@ -48,13 +52,18 @@ class LocationServer(ObjectLocationServerServicer):
 
     def start_location_server(self):
         logging.info("Starting gRPC location server listening on {0}".format(self._hostname))
-        grpc_server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-        add_ObjectLocationServerServicer_to_server(self, grpc_server)
-        grpc_server.add_insecure_port(self._hostname)
-        grpc_server.start()
+        self._grpc_server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
+        add_ObjectLocationServerServicer_to_server(self, self._grpc_server)
+        self._grpc_server.add_insecure_port(self._hostname)
+        self._grpc_server.start()
         try:
-            while True:
-                time.sleep(60)
+            while not self._stopped:
+                time.sleep(5)
         except KeyboardInterrupt:
-            grpc_server.stop(None)
-            grpc_server.stop(0)
+            self.stop()
+
+    def stop(self):
+        logging.info("Stopping location server")
+        self._stopped = True
+        self._queue.put(None)
+        self._grpc_server.stop(None)

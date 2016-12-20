@@ -271,7 +271,7 @@ class LineFollower(object):
                 elif key == ord("p"):
                     utils.save_image(image)
                 elif key == ord("q"):
-                    break
+                    self.stop()
             else:
                 # Nap if display is not on
                 time.sleep(.1)
@@ -282,8 +282,9 @@ class LineFollower(object):
             clear()
         self._cam.close()
 
-    def close(self):
+    def stop(self):
         self._closed = True
+        self._position_server.stop()
 
 
 def distance(point1, point2):
@@ -338,7 +339,7 @@ if __name__ == "__main__":
     try:
         follower.start()
     except KeyboardInterrupt as e:
-        follower.close()
+        follower.stop()
         pass
 
     logging.info("Exiting...")
