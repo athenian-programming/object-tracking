@@ -3,7 +3,6 @@
 import argparse
 import logging
 import sys
-import thread
 import threading
 import time
 
@@ -56,7 +55,7 @@ class ObjectTracker:
     def start(self):
 
         try:
-            thread.start_new_thread(self._location_server.start_location_server, ())
+            threading.Thread(target=self._location_server.start_location_server).start()
             time.sleep(1)
         except BaseException as e:
             logging.error("Unable to start telemetry server [{0}]".format(e))

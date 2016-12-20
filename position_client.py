@@ -11,7 +11,7 @@ from gen.grpc_server_pb2 import FocusLinePositionServerStub
 
 class PositionClient(object):
     def __init__(self, grpc_hostname):
-        self._grpc_hostname = grpc_hostname if ":" in grpc_hostname  else grpc_hostname + ":50051"
+        self._grpc_hostname = grpc_hostname if ":" in grpc_hostname else grpc_hostname + ":50051"
         self._closed = False
         self._in_focus = False
         self._mid_offset = -1

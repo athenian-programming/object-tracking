@@ -1,6 +1,8 @@
 import logging
 import time
 
+import opencv_utils as utils
+
 
 class Servo:
     def __init__(self, board, name, pin_args, loc_source, forward):
@@ -82,10 +84,16 @@ class Servo:
         name = "x"
         servo = servo_x
         while True:
-            val = raw_input("{0} {1} ({2}, {3})> ".format(name.upper(),
+            if utils.is_python3():
+                val = input("{0} {1} ({2}, {3})> ".format(name.upper(),
                                                           servo.read_pin(),
                                                           location_client.get_loc("x"),
                                                           location_client.get_loc("y")))
+            else:
+                val = raw_input("{0} {1} ({2}, {3})> ".format(name.upper(),
+                                                              servo.read_pin(),
+                                                              location_client.get_loc("x"),
+                                                              location_client.get_loc("y")))
             if val.lower() == "q":
                 return
             elif val == "c":

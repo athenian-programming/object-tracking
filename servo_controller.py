@@ -3,12 +3,11 @@
 import argparse
 import logging
 import sys
-import thread
-import time
+import threading
 
 from pyfirmata import Arduino
 
-from  location_client import LocationClient
+from location_client import LocationClient
 from servo import Servo
 
 if __name__ == "__main__":
@@ -29,7 +28,7 @@ if __name__ == "__main__":
     location_client = LocationClient(args["grpc"])
 
     try:
-        thread.start_new_thread(location_client.read_locations, ())
+        threading.Thread(target=location_client.read_locations).start()
     except BaseException as e:
         logging.error("Unable to start location client [{0}]".format(e))
 
@@ -52,19 +51,21 @@ if __name__ == "__main__":
         board.exit()
         sys.exit(0)
 
+    servo_x_t = threading.Thread(target=servo_x.start)
     try:
-        thread.start_new_thread(servo_x.start, ())
+        servo_x_t.start()
     except BaseException as e:
         logging.error("Unable to start servo controller for {0} [{1}]".format(servo_x.name(), e))
 
+    servo_y_t = threading.Thread(target=servo_y.start)
     try:
-        thread.start_new_thread(servo_y.start, ())
+        servo_y_t.start()
     except BaseException as e:
         logging.error("Unable to start servo controller for {0} [{1}]".format(servo_y.name(), e))
 
     try:
-        while True:
-            time.sleep(60)
+        servo_x_t.join()
+        servo_y_t.join()
     except KeyboardInterrupt as e:
         board.exit()
         location_client.close()

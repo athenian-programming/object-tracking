@@ -1,6 +1,7 @@
 import datetime
 import logging
 import platform
+import sys
 
 import cv2
 
@@ -30,3 +31,7 @@ def text_font():
 
 def text_size():
     return .55 if is_raspi() else .75
+
+
+def is_python3():
+    return sys.version_info[0] >= 3

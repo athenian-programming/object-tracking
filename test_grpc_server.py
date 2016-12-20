@@ -1,6 +1,6 @@
 import logging
 import sys
-import thread
+import threading
 import time
 
 from location_server import LocationServer
@@ -10,7 +10,7 @@ from position_server import PositionServer
 def test_location_server(port):
     server = LocationServer(port)
     try:
-        thread.start_new_thread(server.start_location_server, ())
+        threading.Thread(target=server.start_location_server).start()
     except BaseException as e:
         logging.error("Unable to start position server [{0}]".format(e))
 
@@ -22,7 +22,7 @@ def test_location_server(port):
 def test_position_server(port):
     server = PositionServer(port)
     try:
-        thread.start_new_thread(server.start_position_server, ())
+        threading.Thread(target=server.start_position_server).start()
     except BaseException as e:
         logging.error("Unable to start position server [{0}]".format(e))
 
@@ -40,7 +40,7 @@ if __name__ == "__main__":
     logging.basicConfig(stream=sys.stderr, level=logging.INFO,
                         format="%(asctime)s %(name)-10s %(funcName)-10s():%(lineno)i: %(levelname)-6s %(message)s")
 
-    thread.start_new_thread(test_location_server, (50052,))
-    thread.start_new_thread(test_position_server, (50053,))
+    threading.Thread(target=test_location_server, args=(50052,)).start()
+    threading.Thread(target=test_position_server, args=(50053,)).start()
     while True:
         time.sleep(60)

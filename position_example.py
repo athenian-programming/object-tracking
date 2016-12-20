@@ -1,5 +1,7 @@
+#!/usr/bin/env python2
+
 import argparse
-import thread
+import threading
 
 from position_client import PositionClient
 
@@ -11,7 +13,7 @@ if __name__ == "__main__":
     position_client = PositionClient(args["grpc"])
 
     try:
-        thread.start_new_thread(position_client.read_positions, ())
+        threading.Thread(target=position_client.read_positions).start()
     except BaseException as e:
         print("Unable to start position client [{0}]".format(e))
 

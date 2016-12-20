@@ -3,7 +3,7 @@ from __future__ import print_function
 import logging
 import socket
 import sys
-import thread
+import threading
 import time
 
 import grpc
@@ -40,8 +40,7 @@ if __name__ == "__main__":
     logging.basicConfig(stream=sys.stderr, level=logging.INFO,
                         format="%(asctime)s %(name)-10s %(funcName)-10s():%(lineno)i: %(levelname)-6s %(message)s")
 
-    thread.start_new_thread(read_locations, ("localhost:50052",))
-    thread.start_new_thread(read_positions, ("localhost:50053",))
-    # thread.start_new_thread(read_locations, ("localhost:50051",))
+    threading.Thread(target=read_locations, args=("localhost:50052",)).start()
+    threading.Thread(target=read_positions, args=("localhost:50053",)).start()
     while True:
         time.sleep(60)

@@ -4,7 +4,6 @@ import argparse
 import logging
 import math
 import sys
-import thread
 import threading
 import time
 
@@ -64,10 +63,10 @@ class LineFollower(object):
     # Do not run this in a background thread. cv2.waitKey has to run in main thread
     def start(self):
         try:
-            thread.start_new_thread(self._position_server.start_position_server, ())
+            threading.Thread(target=self._position_server.start_position_server).start()
             time.sleep(1)
         except BaseException as e:
-            logging.error("Unable to start telemetry server [{0}]".format(e))
+            logging.error("Unable to start position server [{0}]".format(e))
             sys.exit(1)
 
         self._position_server.write_focus_line_position(False, -1, -1, -1, -1, -1)
@@ -156,7 +155,7 @@ class LineFollower(object):
                     degrees = int(math.degrees(radians)) * -1
 
                 # Draw line for slope
-                if slope == None:
+                if slope is None:
                     # Vertical
                     y_intercept = None
                     if self._display:
@@ -179,7 +178,7 @@ class LineFollower(object):
                         (focus_line_y - y_intercept) / slope) if y_intercept is not None else img_x
 
                 # Calculate point where line intersects x midpoint
-                if slope == None:
+                if slope is None:
                     # Vertical line
                     if focus_line_intersect == mid_x:
                         mid_line_intersect = mid_y
@@ -310,7 +309,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-p", "--port", default=50051, type=int, help="gRPC port [50051]")
     parser.add_argument("-b", "--bgr", type=str, required=True, help="BGR target value, e.g., -b \"[174, 56, 5]\"")
-    parser.add_argument("-f", "--focus", default=10, type=int, help="Focus line %  [10]")
+    parser.add_argument("-f", "--focus", default=10, type=int, help="Focus line % from bottom [10]")
     parser.add_argument("-w", "--width", default=400, type=int, help="Image width [400]")
     parser.add_argument("-e", "--percent", default=15, type=int, help="Middle percent [15]")
     parser.add_argument("-m", "--min", default=100, type=int, help="Minimum pixel area [100]")
