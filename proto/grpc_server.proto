@@ -4,20 +4,20 @@ package opencv_object_tracking;
 
 service ObjectLocationServer {
 
-    rpc RegisterClient (ClientInfo) returns (ServerInfo) {
+    rpc registerClient (ClientInfo) returns (ServerInfo) {
     }
 
-    rpc GetObjectLocations (ClientInfo) returns (stream ObjectLocation) {
+    rpc getObjectLocations (ClientInfo) returns (stream ObjectLocation) {
     }
 
 }
 
 service FocusLinePositionServer {
 
-    rpc RegisterClient (ClientInfo) returns (ServerInfo) {
+    rpc registerClient (ClientInfo) returns (ServerInfo) {
     }
 
-    rpc GetFocusLinePositions (ClientInfo) returns (stream FocusLinePosition) {
+    rpc getFocusLinePositions (ClientInfo) returns (stream FocusLinePosition) {
     }
 
 }

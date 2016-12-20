@@ -17,9 +17,9 @@ def read_locations(hostname):
     channel = grpc.insecure_channel(hostname)
     stub = ObjectLocationServerStub(channel)
     client_info = ClientInfo(info="{0} client".format(socket.gethostname()))
-    server_info = stub.RegisterClient(client_info)
+    server_info = stub.registerClient(client_info)
 
-    for loc in stub.GetObjectLocations(client_info):
+    for loc in stub.getObjectLocations(client_info):
         print("Received location {0}".format(loc))
     print("Disconnected from gRPC server at {0}".format(hostname))
 
@@ -28,9 +28,9 @@ def read_positions(hostname):
     channel = grpc.insecure_channel(hostname)
     stub = FocusLinePositionServerStub(channel)
     client_info = ClientInfo(info="{0} client".format(socket.gethostname()))
-    server_info = stub.RegisterClient(client_info)
+    server_info = stub.registerClient(client_info)
 
-    for pos in stub.GetFocusLinePositions(client_info):
+    for pos in stub.getFocusLinePositions(client_info):
         print("Received position {0}".format(pos))
 
     print("Disconnected from gRPC server at {0}".format(hostname))

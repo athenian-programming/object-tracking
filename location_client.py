@@ -69,7 +69,7 @@ class LocationClient(object):
             logging.info("Connecting to gRPC server at {0}".format(self._grpc_hostname))
             try:
                 client_info = ClientInfo(info="{0} client".format(socket.gethostname()))
-                server_info = stub.RegisterClient(client_info)
+                server_info = stub.registerClient(client_info)
             except BaseException as e:
                 logging.error("Failed to connect to gRPC server at {0} [{1}]".format(self._grpc_hostname, e))
                 time.sleep(1)
@@ -78,7 +78,7 @@ class LocationClient(object):
             logging.info("Connected to gRPC server at {0} [{1}]".format(self._grpc_hostname, server_info.info))
 
             try:
-                for loc in stub.GetObjectLocations(client_info):
+                for loc in stub.getObjectLocations(client_info):
                     self._set_location((loc.x,
                                         loc.y,
                                         loc.width,

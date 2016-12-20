@@ -10,25 +10,25 @@ class ObjectLocationServerStub(object):
         Args:
           channel: A grpc.Channel.
         """
-        self.RegisterClient = channel.unary_unary(
-            '/opencv_object_tracking.ObjectLocationServer/RegisterClient',
+        self.registerClient = channel.unary_unary(
+            '/opencv_object_tracking.ObjectLocationServer/registerClient',
             request_serializer=grpc__server__pb2.ClientInfo.SerializeToString,
             response_deserializer=grpc__server__pb2.ServerInfo.FromString,
         )
-        self.GetObjectLocations = channel.unary_stream(
-            '/opencv_object_tracking.ObjectLocationServer/GetObjectLocations',
+        self.getObjectLocations = channel.unary_stream(
+            '/opencv_object_tracking.ObjectLocationServer/getObjectLocations',
             request_serializer=grpc__server__pb2.ClientInfo.SerializeToString,
             response_deserializer=grpc__server__pb2.ObjectLocation.FromString,
         )
 
 
 class ObjectLocationServerServicer(object):
-    def RegisterClient(self, request, context):
+    def registerClient(self, request, context):
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def GetObjectLocations(self, request, context):
+    def getObjectLocations(self, request, context):
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
@@ -36,13 +36,13 @@ class ObjectLocationServerServicer(object):
 
 def add_ObjectLocationServerServicer_to_server(servicer, server):
     rpc_method_handlers = {
-        'RegisterClient': grpc.unary_unary_rpc_method_handler(
-            servicer.RegisterClient,
+        'registerClient': grpc.unary_unary_rpc_method_handler(
+            servicer.registerClient,
             request_deserializer=grpc__server__pb2.ClientInfo.FromString,
             response_serializer=grpc__server__pb2.ServerInfo.SerializeToString,
         ),
-        'GetObjectLocations': grpc.unary_stream_rpc_method_handler(
-            servicer.GetObjectLocations,
+        'getObjectLocations': grpc.unary_stream_rpc_method_handler(
+            servicer.getObjectLocations,
             request_deserializer=grpc__server__pb2.ClientInfo.FromString,
             response_serializer=grpc__server__pb2.ObjectLocation.SerializeToString,
         ),
@@ -59,25 +59,25 @@ class FocusLinePositionServerStub(object):
         Args:
           channel: A grpc.Channel.
         """
-        self.RegisterClient = channel.unary_unary(
-            '/opencv_object_tracking.FocusLinePositionServer/RegisterClient',
+        self.registerClient = channel.unary_unary(
+            '/opencv_object_tracking.FocusLinePositionServer/registerClient',
             request_serializer=grpc__server__pb2.ClientInfo.SerializeToString,
             response_deserializer=grpc__server__pb2.ServerInfo.FromString,
         )
-        self.GetFocusLinePositions = channel.unary_stream(
-            '/opencv_object_tracking.FocusLinePositionServer/GetFocusLinePositions',
+        self.getFocusLinePositions = channel.unary_stream(
+            '/opencv_object_tracking.FocusLinePositionServer/getFocusLinePositions',
             request_serializer=grpc__server__pb2.ClientInfo.SerializeToString,
             response_deserializer=grpc__server__pb2.FocusLinePosition.FromString,
         )
 
 
 class FocusLinePositionServerServicer(object):
-    def RegisterClient(self, request, context):
+    def registerClient(self, request, context):
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def GetFocusLinePositions(self, request, context):
+    def getFocusLinePositions(self, request, context):
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
@@ -85,13 +85,13 @@ class FocusLinePositionServerServicer(object):
 
 def add_FocusLinePositionServerServicer_to_server(servicer, server):
     rpc_method_handlers = {
-        'RegisterClient': grpc.unary_unary_rpc_method_handler(
-            servicer.RegisterClient,
+        'registerClient': grpc.unary_unary_rpc_method_handler(
+            servicer.registerClient,
             request_deserializer=grpc__server__pb2.ClientInfo.FromString,
             response_serializer=grpc__server__pb2.ServerInfo.SerializeToString,
         ),
-        'GetFocusLinePositions': grpc.unary_stream_rpc_method_handler(
-            servicer.GetFocusLinePositions,
+        'getFocusLinePositions': grpc.unary_stream_rpc_method_handler(
+            servicer.getFocusLinePositions,
             request_deserializer=grpc__server__pb2.ClientInfo.FromString,
             response_serializer=grpc__server__pb2.FocusLinePosition.SerializeToString,
         ),

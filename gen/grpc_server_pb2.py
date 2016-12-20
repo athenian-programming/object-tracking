@@ -18,7 +18,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
     package='opencv_object_tracking',
     syntax='proto3',
     serialized_pb=_b(
-        '\n\x11grpc_server.proto\x12\x16opencv_object_tracking\"\x1a\n\nClientInfo\x12\x0c\n\x04info\x18\x01 \x01(\t\"\x1a\n\nServerInfo\x12\x0c\n\x04info\x18\x01 \x01(\t\"Y\n\x0eObjectLocation\x12\t\n\x01x\x18\x01 \x01(\x05\x12\t\n\x01y\x18\x02 \x01(\x05\x12\r\n\x05width\x18\x03 \x01(\x05\x12\x0e\n\x06height\x18\x04 \x01(\x05\x12\x12\n\nmiddle_inc\x18\x05 \x01(\x05\"\x85\x01\n\x11\x46ocusLinePosition\x12\x10\n\x08in_focus\x18\x01 \x01(\x08\x12\x12\n\nmid_offset\x18\x02 \x01(\x05\x12\x0f\n\x07\x64\x65grees\x18\x03 \x01(\x05\x12\x16\n\x0emid_line_cross\x18\x04 \x01(\x05\x12\r\n\x05width\x18\x05 \x01(\x05\x12\x12\n\nmiddle_inc\x18\x06 \x01(\x05\x32\xd8\x01\n\x14ObjectLocationServer\x12Z\n\x0eRegisterClient\x12\".opencv_object_tracking.ClientInfo\x1a\".opencv_object_tracking.ServerInfo\"\x00\x12\x64\n\x12GetObjectLocations\x12\".opencv_object_tracking.ClientInfo\x1a&.opencv_object_tracking.ObjectLocation\"\x00\x30\x01\x32\xe1\x01\n\x17\x46ocusLinePositionServer\x12Z\n\x0eRegisterClient\x12\".opencv_object_tracking.ClientInfo\x1a\".opencv_object_tracking.ServerInfo\"\x00\x12j\n\x15GetFocusLinePositions\x12\".opencv_object_tracking.ClientInfo\x1a).opencv_object_tracking.FocusLinePosition\"\x00\x30\x01\x62\x06proto3')
+        '\n\x11grpc_server.proto\x12\x16opencv_object_tracking\"\x1a\n\nClientInfo\x12\x0c\n\x04info\x18\x01 \x01(\t\"\x1a\n\nServerInfo\x12\x0c\n\x04info\x18\x01 \x01(\t\"Y\n\x0eObjectLocation\x12\t\n\x01x\x18\x01 \x01(\x05\x12\t\n\x01y\x18\x02 \x01(\x05\x12\r\n\x05width\x18\x03 \x01(\x05\x12\x0e\n\x06height\x18\x04 \x01(\x05\x12\x12\n\nmiddle_inc\x18\x05 \x01(\x05\"\x85\x01\n\x11\x46ocusLinePosition\x12\x10\n\x08in_focus\x18\x01 \x01(\x08\x12\x12\n\nmid_offset\x18\x02 \x01(\x05\x12\x0f\n\x07\x64\x65grees\x18\x03 \x01(\x05\x12\x16\n\x0emid_line_cross\x18\x04 \x01(\x05\x12\r\n\x05width\x18\x05 \x01(\x05\x12\x12\n\nmiddle_inc\x18\x06 \x01(\x05\x32\xd8\x01\n\x14ObjectLocationServer\x12Z\n\x0eregisterClient\x12\".opencv_object_tracking.ClientInfo\x1a\".opencv_object_tracking.ServerInfo\"\x00\x12\x64\n\x12getObjectLocations\x12\".opencv_object_tracking.ClientInfo\x1a&.opencv_object_tracking.ObjectLocation\"\x00\x30\x01\x32\xe1\x01\n\x17\x46ocusLinePositionServer\x12Z\n\x0eregisterClient\x12\".opencv_object_tracking.ClientInfo\x1a\".opencv_object_tracking.ServerInfo\"\x00\x12j\n\x15getFocusLinePositions\x12\".opencv_object_tracking.ClientInfo\x1a).opencv_object_tracking.FocusLinePosition\"\x00\x30\x01\x62\x06proto3')
 )
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
@@ -52,7 +52,6 @@ _CLIENTINFO = _descriptor.Descriptor(
     serialized_end=71,
 )
 
-
 _SERVERINFO = _descriptor.Descriptor(
     name='ServerInfo',
     full_name='opencv_object_tracking.ServerInfo',
@@ -82,7 +81,6 @@ _SERVERINFO = _descriptor.Descriptor(
     serialized_start=73,
     serialized_end=99,
 )
-
 
 _OBJECTLOCATION = _descriptor.Descriptor(
     name='ObjectLocation',
@@ -141,7 +139,6 @@ _OBJECTLOCATION = _descriptor.Descriptor(
     serialized_start=101,
     serialized_end=190,
 )
-
 
 _FOCUSLINEPOSITION = _descriptor.Descriptor(
     name='FocusLinePosition',
@@ -241,7 +238,6 @@ FocusLinePosition = _reflection.GeneratedProtocolMessageType('FocusLinePosition'
 ))
 _sym_db.RegisterMessage(FocusLinePosition)
 
-
 try:
     # THESE ELEMENTS WILL BE DEPRECATED.
     # Please use the generated *_pb2_grpc.py files instead.
@@ -260,13 +256,13 @@ try:
             Args:
               channel: A grpc.Channel.
             """
-            self.RegisterClient = channel.unary_unary(
-                '/opencv_object_tracking.ObjectLocationServer/RegisterClient',
+            self.registerClient = channel.unary_unary(
+                '/opencv_object_tracking.ObjectLocationServer/registerClient',
                 request_serializer=ClientInfo.SerializeToString,
                 response_deserializer=ServerInfo.FromString,
             )
-            self.GetObjectLocations = channel.unary_stream(
-                '/opencv_object_tracking.ObjectLocationServer/GetObjectLocations',
+            self.getObjectLocations = channel.unary_stream(
+                '/opencv_object_tracking.ObjectLocationServer/getObjectLocations',
                 request_serializer=ClientInfo.SerializeToString,
                 response_deserializer=ObjectLocation.FromString,
             )
@@ -274,12 +270,12 @@ try:
 
     class ObjectLocationServerServicer(object):
 
-        def RegisterClient(self, request, context):
+        def registerClient(self, request, context):
             context.set_code(grpc.StatusCode.UNIMPLEMENTED)
             context.set_details('Method not implemented!')
             raise NotImplementedError('Method not implemented!')
 
-        def GetObjectLocations(self, request, context):
+        def getObjectLocations(self, request, context):
             context.set_code(grpc.StatusCode.UNIMPLEMENTED)
             context.set_details('Method not implemented!')
             raise NotImplementedError('Method not implemented!')
@@ -287,13 +283,13 @@ try:
 
     def add_ObjectLocationServerServicer_to_server(servicer, server):
         rpc_method_handlers = {
-            'RegisterClient': grpc.unary_unary_rpc_method_handler(
-                servicer.RegisterClient,
+            'registerClient': grpc.unary_unary_rpc_method_handler(
+                servicer.registerClient,
                 request_deserializer=ClientInfo.FromString,
                 response_serializer=ServerInfo.SerializeToString,
             ),
-            'GetObjectLocations': grpc.unary_stream_rpc_method_handler(
-                servicer.GetObjectLocations,
+            'getObjectLocations': grpc.unary_stream_rpc_method_handler(
+                servicer.getObjectLocations,
                 request_deserializer=ClientInfo.FromString,
                 response_serializer=ObjectLocation.SerializeToString,
             ),
@@ -311,13 +307,13 @@ try:
             Args:
               channel: A grpc.Channel.
             """
-            self.RegisterClient = channel.unary_unary(
-                '/opencv_object_tracking.FocusLinePositionServer/RegisterClient',
+            self.registerClient = channel.unary_unary(
+                '/opencv_object_tracking.FocusLinePositionServer/registerClient',
                 request_serializer=ClientInfo.SerializeToString,
                 response_deserializer=ServerInfo.FromString,
             )
-            self.GetFocusLinePositions = channel.unary_stream(
-                '/opencv_object_tracking.FocusLinePositionServer/GetFocusLinePositions',
+            self.getFocusLinePositions = channel.unary_stream(
+                '/opencv_object_tracking.FocusLinePositionServer/getFocusLinePositions',
                 request_serializer=ClientInfo.SerializeToString,
                 response_deserializer=FocusLinePosition.FromString,
             )
@@ -325,12 +321,12 @@ try:
 
     class FocusLinePositionServerServicer(object):
 
-        def RegisterClient(self, request, context):
+        def registerClient(self, request, context):
             context.set_code(grpc.StatusCode.UNIMPLEMENTED)
             context.set_details('Method not implemented!')
             raise NotImplementedError('Method not implemented!')
 
-        def GetFocusLinePositions(self, request, context):
+        def getFocusLinePositions(self, request, context):
             context.set_code(grpc.StatusCode.UNIMPLEMENTED)
             context.set_details('Method not implemented!')
             raise NotImplementedError('Method not implemented!')
@@ -338,13 +334,13 @@ try:
 
     def add_FocusLinePositionServerServicer_to_server(servicer, server):
         rpc_method_handlers = {
-            'RegisterClient': grpc.unary_unary_rpc_method_handler(
-                servicer.RegisterClient,
+            'registerClient': grpc.unary_unary_rpc_method_handler(
+                servicer.registerClient,
                 request_deserializer=ClientInfo.FromString,
                 response_serializer=ServerInfo.SerializeToString,
             ),
-            'GetFocusLinePositions': grpc.unary_stream_rpc_method_handler(
-                servicer.GetFocusLinePositions,
+            'getFocusLinePositions': grpc.unary_stream_rpc_method_handler(
+                servicer.getFocusLinePositions,
                 request_deserializer=ClientInfo.FromString,
                 response_serializer=FocusLinePosition.SerializeToString,
             ),
@@ -361,10 +357,10 @@ try:
         file not marked beta) for all further purposes. This class was generated
         only to ease transition from grpcio<0.15.0 to grpcio>=0.15.0."""
 
-        def RegisterClient(self, request, context):
+        def registerClient(self, request, context):
             context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
 
-        def GetObjectLocations(self, request, context):
+        def getObjectLocations(self, request, context):
             context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
 
 
@@ -375,12 +371,12 @@ try:
         file not marked beta) for all further purposes. This class was generated
         only to ease transition from grpcio<0.15.0 to grpcio>=0.15.0."""
 
-        def RegisterClient(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
+        def registerClient(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
             raise NotImplementedError()
 
-        RegisterClient.future = None
+        registerClient.future = None
 
-        def GetObjectLocations(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
+        def getObjectLocations(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
             raise NotImplementedError()
 
 
@@ -392,18 +388,18 @@ try:
         file not marked beta) for all further purposes. This function was
         generated only to ease transition from grpcio<0.15.0 to grpcio>=0.15.0"""
         request_deserializers = {
-            ('opencv_object_tracking.ObjectLocationServer', 'GetObjectLocations'): ClientInfo.FromString,
-            ('opencv_object_tracking.ObjectLocationServer', 'RegisterClient'): ClientInfo.FromString,
+            ('opencv_object_tracking.ObjectLocationServer', 'getObjectLocations'): ClientInfo.FromString,
+            ('opencv_object_tracking.ObjectLocationServer', 'registerClient'): ClientInfo.FromString,
         }
         response_serializers = {
-            ('opencv_object_tracking.ObjectLocationServer', 'GetObjectLocations'): ObjectLocation.SerializeToString,
-            ('opencv_object_tracking.ObjectLocationServer', 'RegisterClient'): ServerInfo.SerializeToString,
+            ('opencv_object_tracking.ObjectLocationServer', 'getObjectLocations'): ObjectLocation.SerializeToString,
+            ('opencv_object_tracking.ObjectLocationServer', 'registerClient'): ServerInfo.SerializeToString,
         }
         method_implementations = {
-            ('opencv_object_tracking.ObjectLocationServer', 'GetObjectLocations'): face_utilities.unary_stream_inline(
-                servicer.GetObjectLocations),
-            ('opencv_object_tracking.ObjectLocationServer', 'RegisterClient'): face_utilities.unary_unary_inline(
-                servicer.RegisterClient),
+            ('opencv_object_tracking.ObjectLocationServer', 'getObjectLocations'): face_utilities.unary_stream_inline(
+                servicer.getObjectLocations),
+            ('opencv_object_tracking.ObjectLocationServer', 'registerClient'): face_utilities.unary_unary_inline(
+                servicer.registerClient),
         }
         server_options = beta_implementations.server_options(request_deserializers=request_deserializers,
                                                              response_serializers=response_serializers,
@@ -420,16 +416,16 @@ try:
         file not marked beta) for all further purposes. This function was
         generated only to ease transition from grpcio<0.15.0 to grpcio>=0.15.0"""
         request_serializers = {
-            ('opencv_object_tracking.ObjectLocationServer', 'GetObjectLocations'): ClientInfo.SerializeToString,
-            ('opencv_object_tracking.ObjectLocationServer', 'RegisterClient'): ClientInfo.SerializeToString,
+            ('opencv_object_tracking.ObjectLocationServer', 'getObjectLocations'): ClientInfo.SerializeToString,
+            ('opencv_object_tracking.ObjectLocationServer', 'registerClient'): ClientInfo.SerializeToString,
         }
         response_deserializers = {
-            ('opencv_object_tracking.ObjectLocationServer', 'GetObjectLocations'): ObjectLocation.FromString,
-            ('opencv_object_tracking.ObjectLocationServer', 'RegisterClient'): ServerInfo.FromString,
+            ('opencv_object_tracking.ObjectLocationServer', 'getObjectLocations'): ObjectLocation.FromString,
+            ('opencv_object_tracking.ObjectLocationServer', 'registerClient'): ServerInfo.FromString,
         }
         cardinalities = {
-            'GetObjectLocations': cardinality.Cardinality.UNARY_STREAM,
-            'RegisterClient': cardinality.Cardinality.UNARY_UNARY,
+            'getObjectLocations': cardinality.Cardinality.UNARY_STREAM,
+            'registerClient': cardinality.Cardinality.UNARY_UNARY,
         }
         stub_options = beta_implementations.stub_options(host=host, metadata_transformer=metadata_transformer,
                                                          request_serializers=request_serializers,
@@ -446,10 +442,10 @@ try:
         file not marked beta) for all further purposes. This class was generated
         only to ease transition from grpcio<0.15.0 to grpcio>=0.15.0."""
 
-        def RegisterClient(self, request, context):
+        def registerClient(self, request, context):
             context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
 
-        def GetFocusLinePositions(self, request, context):
+        def getFocusLinePositions(self, request, context):
             context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
 
 
@@ -460,12 +456,12 @@ try:
         file not marked beta) for all further purposes. This class was generated
         only to ease transition from grpcio<0.15.0 to grpcio>=0.15.0."""
 
-        def RegisterClient(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
+        def registerClient(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
             raise NotImplementedError()
 
-        RegisterClient.future = None
+        registerClient.future = None
 
-        def GetFocusLinePositions(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
+        def getFocusLinePositions(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
             raise NotImplementedError()
 
 
@@ -477,19 +473,19 @@ try:
         file not marked beta) for all further purposes. This function was
         generated only to ease transition from grpcio<0.15.0 to grpcio>=0.15.0"""
         request_deserializers = {
-            ('opencv_object_tracking.FocusLinePositionServer', 'GetFocusLinePositions'): ClientInfo.FromString,
-            ('opencv_object_tracking.FocusLinePositionServer', 'RegisterClient'): ClientInfo.FromString,
+            ('opencv_object_tracking.FocusLinePositionServer', 'getFocusLinePositions'): ClientInfo.FromString,
+            ('opencv_object_tracking.FocusLinePositionServer', 'registerClient'): ClientInfo.FromString,
         }
         response_serializers = {
             ('opencv_object_tracking.FocusLinePositionServer',
-             'GetFocusLinePositions'): FocusLinePosition.SerializeToString,
-            ('opencv_object_tracking.FocusLinePositionServer', 'RegisterClient'): ServerInfo.SerializeToString,
+             'getFocusLinePositions'): FocusLinePosition.SerializeToString,
+            ('opencv_object_tracking.FocusLinePositionServer', 'registerClient'): ServerInfo.SerializeToString,
         }
         method_implementations = {
             ('opencv_object_tracking.FocusLinePositionServer',
-             'GetFocusLinePositions'): face_utilities.unary_stream_inline(servicer.GetFocusLinePositions),
-            ('opencv_object_tracking.FocusLinePositionServer', 'RegisterClient'): face_utilities.unary_unary_inline(
-                servicer.RegisterClient),
+             'getFocusLinePositions'): face_utilities.unary_stream_inline(servicer.getFocusLinePositions),
+            ('opencv_object_tracking.FocusLinePositionServer', 'registerClient'): face_utilities.unary_unary_inline(
+                servicer.registerClient),
         }
         server_options = beta_implementations.server_options(request_deserializers=request_deserializers,
                                                              response_serializers=response_serializers,
@@ -507,16 +503,16 @@ try:
         file not marked beta) for all further purposes. This function was
         generated only to ease transition from grpcio<0.15.0 to grpcio>=0.15.0"""
         request_serializers = {
-            ('opencv_object_tracking.FocusLinePositionServer', 'GetFocusLinePositions'): ClientInfo.SerializeToString,
-            ('opencv_object_tracking.FocusLinePositionServer', 'RegisterClient'): ClientInfo.SerializeToString,
+            ('opencv_object_tracking.FocusLinePositionServer', 'getFocusLinePositions'): ClientInfo.SerializeToString,
+            ('opencv_object_tracking.FocusLinePositionServer', 'registerClient'): ClientInfo.SerializeToString,
         }
         response_deserializers = {
-            ('opencv_object_tracking.FocusLinePositionServer', 'GetFocusLinePositions'): FocusLinePosition.FromString,
-            ('opencv_object_tracking.FocusLinePositionServer', 'RegisterClient'): ServerInfo.FromString,
+            ('opencv_object_tracking.FocusLinePositionServer', 'getFocusLinePositions'): FocusLinePosition.FromString,
+            ('opencv_object_tracking.FocusLinePositionServer', 'registerClient'): ServerInfo.FromString,
         }
         cardinalities = {
-            'GetFocusLinePositions': cardinality.Cardinality.UNARY_STREAM,
-            'RegisterClient': cardinality.Cardinality.UNARY_UNARY,
+            'getFocusLinePositions': cardinality.Cardinality.UNARY_STREAM,
+            'registerClient': cardinality.Cardinality.UNARY_UNARY,
         }
         stub_options = beta_implementations.stub_options(host=host, metadata_transformer=metadata_transformer,
                                                          request_serializers=request_serializers,

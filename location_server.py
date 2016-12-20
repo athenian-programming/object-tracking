@@ -26,13 +26,13 @@ class LocationServer(ObjectLocationServerServicer):
         self._lock = threading.Lock()
         self._queue = Queue()
 
-    def RegisterClient(self, request, context):
+    def registerClient(self, request, context):
         logging.info("Connected to client {0} [{1}]".format(context.peer(), request.info))
         with self._lock:
             self._invoke_cnt += 1
         return ServerInfo(info="Server invoke count {0}".format(self._invoke_cnt))
 
-    def GetObjectLocations(self, request, context):
+    def getObjectLocations(self, request, context):
         try:
             client_info = request.info
             while not self._stopped:
