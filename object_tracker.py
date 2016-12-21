@@ -76,6 +76,7 @@ class ObjectTracker:
             mid_y = img_height / 2
             img_x = -1
             img_y = -1
+
             # The middle margin calculation is based on % of width for horizontal and vertical boundry
             middle_inc = int(mid_x * middle_pct)
 
@@ -119,8 +120,8 @@ class ObjectTracker:
                 cv2.line(image, (mid_x + middle_inc, 0), (mid_x + middle_inc, img_height), x_color, 1)
                 cv2.line(image, (0, mid_y - middle_inc), (img_width, mid_y - middle_inc), y_color, 1)
                 cv2.line(image, (0, mid_y + middle_inc), (img_width, mid_y + middle_inc), y_color, 1)
-                cv2.putText(image, text, utils.text_loc(), utils.text_font(), utils.text_size(), RED,
-                            1)
+                cv2.putText(image, text, utils.text_loc(), utils.text_font(), utils.text_size(), RED, 1)
+
                 cv2.imshow("Image", image)
                 # cv2.imshow("Mask", mask)
                 # cv2.imshow("Res", result)
@@ -144,7 +145,8 @@ class ObjectTracker:
                     self.stop()
             else:
                 # Nap if display is not on
-                time.sleep(.1)
+                # time.sleep(.01)
+                pass
 
             self._cnt += 1
 

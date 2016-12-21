@@ -38,19 +38,19 @@ class LocationClient(object):
 
     # Blocking
     def get_x(self):
-        while True:
+        while not self._stopped:
             self._x_ready.wait()
             with self._x_lock:
-                if self._x_ready.is_set:
+                if self._x_ready.is_set and not self._stopped:
                     self._x_ready.clear()
                     return self._x, self._width, self._middle_inc
 
     # Blocking
     def get_y(self):
-        while True:
+        while not self._stopped:
             self._y_ready.wait()
             with self._y_lock:
-                if self._y_ready.is_set:
+                if self._y_ready.is_set and not self._stopped:
                     self._y_ready.clear()
                     return self._y, self._height, self._middle_inc
 
@@ -90,3 +90,5 @@ class LocationClient(object):
     def stop(self):
         logging.info("Stopping location client")
         self._stopped = True
+        self._x_ready.set()
+        self._y_ready.set()

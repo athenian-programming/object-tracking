@@ -40,7 +40,7 @@ class LocationServer(ObjectLocationServerServicer):
                 if val is not None:
                     yield val
         finally:
-            logging.info("Discontinued GetObjectLocations stream for client {0}".format(context.peer()))
+            logging.info("Discontinued getObjectLocations() stream for client {0}".format(context.peer()))
 
     def write_location(self, x, y, width, height, middle_inc):
         loc = ObjectLocation(x=x,
@@ -58,7 +58,7 @@ class LocationServer(ObjectLocationServerServicer):
         self._grpc_server.start()
         try:
             while not self._stopped:
-                time.sleep(5)
+                time.sleep(2)
         except KeyboardInterrupt:
             self.stop()
 

@@ -37,36 +37,49 @@ if __name__ == "__main__":
     location_client = LocationClient(args["grpc"])
 
     # Create servos
-    servo_x = Servo(board, "X servo", "d:{0}:s".format(args["xservo"]), lambda: location_client.get_x(), True)
-    servo_y = Servo(board, "Y Servo", "d:{0}:s".format(args["yservo"]), lambda: location_client.get_y(), False)
-
-    if args["calib"]:
-        Servo.calibrate(location_client, servo_x, servo_y)
-        logging.info("Exiting...")
-        board.exit()
-        sys.exit(0)
+    servo_x = Servo(board,
+                    "X servo",
+                    "d:{0}:s".format(args["xservo"]),
+                    lambda: location_client.get_x(),
+                    True,
+                    secs_per_180=.5,
+                    pix_per_degree=10)
+    servo_y = Servo(board,
+                    "Y Servo",
+                    "d:{0}:s".format(args["yservo"]),
+                    lambda: location_client.get_y(),
+                    False,
+                    secs_per_180=.5,
+                    pix_per_degree=10)
 
     try:
         Thread(target=location_client.read_locations).start()
     except BaseException as e:
         logging.error("Unable to start location client [{0}]".format(e))
 
-    servo_x_t = Thread(target=servo_x.start)
-    try:
-        servo_x_t.start()
-    except BaseException as e:
-        logging.error("Unable to start servo controller for {0} [{1}]".format(servo_x.name(), e))
+    if args["calib"]:
+        Servo.calibrate(location_client, servo_x, servo_y)
+    else:
+        servo_x_t = Thread(target=servo_x.start)
+        servo_y_t = Thread(target=servo_y.start)
 
-    servo_y_t = Thread(target=servo_y.start)
-    try:
-        servo_y_t.start()
-    except BaseException as e:
-        logging.error("Unable to start servo controller for {0} [{1}]".format(servo_y.name(), e))
+        try:
+            servo_x_t.start()
+        except BaseException as e:
+            logging.error("Unable to start servo controller for {0} [{1}]".format(servo_x.name(), e))
 
-    try:
-        servo_x_t.join()
-        servo_y_t.join()
-    except KeyboardInterrupt as e:
-        board.exit()
-        location_client.stop()
-        logging.info("Exiting...")
+        try:
+            servo_y_t.start()
+        except BaseException as e:
+            logging.error("Unable to start servo controller for {0} [{1}]".format(servo_y.name(), e))
+
+        try:
+            servo_x_t.join()
+            servo_y_t.join()
+        except KeyboardInterrupt as e:
+            servo_x.stop()
+            servo_y.stop()
+
+    board.exit()
+    location_client.stop()
+    logging.info("Exiting...")

@@ -37,7 +37,7 @@ class PositionClient(object):
         while True:
             self._ready.wait()
             with self._lock:
-                if self._ready.is_set():
+                if self._ready.is_set() and not self._stopped:
                     self._ready.clear()
                     return self._in_focus, \
                            self._mid_offset, \
@@ -75,3 +75,4 @@ class PositionClient(object):
     def close(self):
         logging.info("Stopping location client")
         self._stopped = True
+        self._ready.set()

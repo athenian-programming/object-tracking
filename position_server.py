@@ -40,7 +40,7 @@ class PositionServer(FocusLinePositionServerServicer):
                 if val is not None:
                     yield val
         finally:
-            logging.info("Disconnected GetFocusLinePositions stream for client {0}".format(context.peer()))
+            logging.info("Disconnected getFocusLinePositions() stream for client {0}".format(context.peer()))
 
     def write_focus_line_position(self, in_focus, mid_offset, degrees, mid_line_cross, width, middle_inc):
         pos = FocusLinePosition(in_focus=in_focus,
@@ -59,7 +59,7 @@ class PositionServer(FocusLinePositionServerServicer):
         self._grpc_server.start()
         try:
             while not self._stopped:
-                time.sleep(5)
+                time.sleep(2)
         except KeyboardInterrupt:
             self.stop()
 
