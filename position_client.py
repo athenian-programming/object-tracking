@@ -72,7 +72,7 @@ class PositionClient(object):
                 logging.info("Disconnected from gRPC server at {0} [{1}]".format(self._grpc_hostname,
                                                                                  server_info.info))
 
-    def close(self):
-        logging.info("Stopping location client")
+    def stop(self):
+        logging.info("Stopping position client")
         self._stopped = True
         self._ready.set()
