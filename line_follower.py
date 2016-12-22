@@ -24,13 +24,23 @@ from position_server import PositionServer
 
 
 class LineFollower(object):
-    def __init__(self, bgr_color, focus_line_pct, width, percent, minimum, hsv_range, grpc_port, display=False):
+    def __init__(self,
+                 bgr_color,
+                 focus_line_pct,
+                 width,
+                 percent,
+                 minimum,
+                 hsv_range,
+                 grpc_port,
+                 report_midline,
+                 display):
         self._focus_line_pct = focus_line_pct
         self._width = width
         self._orig_percent = percent
         self._orig_width = width
         self._percent = percent
         self._minimum = minimum
+        self._report_midline = report_midline
         self._display = display
         self._closed = False
 
@@ -83,9 +93,9 @@ class LineFollower(object):
             mid_x = img_width / 2
             mid_y = img_height / 2
             mid_inc = int(mid_x * middle_pct)
-            focus_line_intersect = None
+            focus_line_inter = None
             focus_img_x = None
-            mid_line_intersect = None
+            mid_line_inter = None
             degrees = None
             mid_line_cross = None
 
@@ -158,15 +168,15 @@ class LineFollower(object):
                 # Draw line for slope
                 if slope is None:
                     # Vertical
-                    y_intercept = None
+                    y_inter = None
                     if self._display:
                         cv2.line(image, (img_x, 0), (img_x, img_height), BLUE, 2)
                 else:
                     # Non vertical
-                    y_intercept = int(img_y - (slope * img_x))
-                    other_y = int((img_width * slope) + y_intercept)
+                    y_inter = int(img_y - (slope * img_x))
+                    other_y = int((img_width * slope) + y_inter)
                     if self._display:
-                        cv2.line(image, (0, y_intercept), (img_width, other_y), BLUE, 2)
+                        cv2.line(image, (0, y_inter), (img_width, other_y), BLUE, 2)
 
                 if focus_img_x is not None:
                     text += " Pos: {0}".format(focus_img_x - mid_x)
@@ -175,20 +185,19 @@ class LineFollower(object):
 
                 # Calculate point where line intersects focus line
                 if slope != 0:
-                    focus_line_intersect = int(
-                        (focus_line_y - y_intercept) / slope) if y_intercept is not None else img_x
+                    focus_line_inter = int((focus_line_y - y_inter) / slope) if y_inter is not None else img_x
 
                 # Calculate point where line intersects x midpoint
                 if slope is None:
                     # Vertical line
-                    if focus_line_intersect == mid_x:
-                        mid_line_intersect = mid_y
+                    if focus_line_inter == mid_x:
+                        mid_line_inter = mid_y
                 else:
                     # Non-vertical line
-                    mid_line_intersect = int((slope * mid_x) + y_intercept)
+                    mid_line_inter = int((slope * mid_x) + y_inter)
 
-                if mid_line_intersect is not None:
-                    mid_line_cross = focus_line_y - mid_line_intersect
+                if mid_line_inter is not None:
+                    mid_line_cross = focus_line_y - mid_line_inter
                     mid_line_cross = mid_line_cross if mid_line_cross > 0 else -1
                     if mid_line_cross != -1:
                         text += " Mid cross: {0}".format(mid_line_cross)
@@ -210,7 +219,8 @@ class LineFollower(object):
             focus_x_missing = focus_img_x is None
 
             # Write position if it is different from previous value written
-            if focus_img_x != self._prev_focus_img_x or mid_line_cross != self._prev_mid_line_cross:
+            if focus_img_x != self._prev_focus_img_x or (
+                        self._report_midline and mid_line_cross != self._prev_mid_line_cross):
                 self._position_server.write_focus_line_position(focus_img_x is not None,
                                                                 focus_img_x - mid_x if focus_img_x is not None else 0,
                                                                 degrees,
@@ -232,16 +242,16 @@ class LineFollower(object):
                 cv2.line(image, (0, focus_line_y), (img_width, focus_line_y), GREEN, 2)
 
                 # Draw point where intersects focus line
-                if focus_line_intersect is not None:
-                    cv2.circle(image, (focus_line_intersect, focus_line_y), 6, RED, -1)
+                if focus_line_inter is not None:
+                    cv2.circle(image, (focus_line_inter, focus_line_y), 6, RED, -1)
 
                 # Draw center of focus image
                 if focus_img_x is not None:
                     cv2.circle(image, (focus_img_x, focus_line_y + 10), 6, YELLOW, -1)
 
                 # Draw point of midline insection
-                if mid_line_intersect is not None and mid_line_intersect <= focus_line_y:
-                    cv2.circle(image, (mid_x, mid_line_intersect), 6, RED, -1)
+                if mid_line_inter is not None and mid_line_inter <= focus_line_y:
+                    cv2.circle(image, (mid_x, mid_line_inter), 6, RED, -1)
 
                 x_color = GREEN if focus_in_middle else RED if focus_x_missing else BLUE
                 cv2.line(image, (mid_x - mid_inc, 0), (mid_x - mid_inc, img_height), x_color, 1)
@@ -316,6 +326,8 @@ if __name__ == "__main__":
     parser.add_argument("-e", "--percent", default=15, type=int, help="Middle percent [15]")
     parser.add_argument("-m", "--min", default=100, type=int, help="Minimum pixel area [100]")
     parser.add_argument("-r", "--range", default=20, type=int, help="HSV range")
+    parser.add_argument("-i", "--midline", default=False, action="store_true",
+                        help="Report data when changes in midline [false]")
     parser.add_argument("-d", "--display", default=False, action="store_true", help="Display image [false]")
     parser.add_argument("-v", "--verbose", default=logging.INFO, help="Include debugging info",
                         action="store_const", dest="loglevel", const=logging.DEBUG)
@@ -334,6 +346,7 @@ if __name__ == "__main__":
                             int(args["min"]),
                             int(args["range"]),
                             args["port"],
+                            args["midline"],
                             args["display"])
 
     try:

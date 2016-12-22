@@ -50,13 +50,13 @@ class PositionClient(object):
         channel = grpc.insecure_channel(self._grpc_hostname)
         stub = FocusLinePositionServerStub(channel)
         while not self._stopped:
-            logging.info("Connecting to gRPC server at {0}".format(self._grpc_hostname))
+            logging.info("Connecting to gRPC server at {0}...".format(self._grpc_hostname))
             try:
                 client_info = ClientInfo(info="{0} client".format(socket.gethostname()))
                 server_info = stub.registerClient(client_info)
             except BaseException as e:
                 logging.error("Failed to connect to gRPC server at {0} [{1}]".format(self._grpc_hostname, e))
-                time.sleep(1)
+                time.sleep(2)
                 continue
 
             logging.info("Connected to gRPC server at {0} [{1}]".format(self._grpc_hostname, server_info.info))
