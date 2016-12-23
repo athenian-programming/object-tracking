@@ -128,6 +128,7 @@ Required pip packages: grpcio
 ```bash
 $ pip install grpcio
 $ pip install future
+$ pip install imutils
 ```
 
 
