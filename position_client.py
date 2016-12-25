@@ -1,7 +1,8 @@
 import logging
 import socket
-import threading
 import time
+from threading import Event
+from threading import Lock
 
 import grpc
 
@@ -19,8 +20,8 @@ class PositionClient(object):
         self._mid_cross = -1
         self._width = -1
         self._middle_inc = -1
-        self._lock = threading.Lock()
-        self._ready = threading.Event()
+        self._lock = Lock()
+        self._ready = Event()
 
     def _set_focus_line_position(self, position):
         with self._lock:

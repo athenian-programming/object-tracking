@@ -1,14 +1,17 @@
 import logging
 import time
 
+from threading import Event
 
-class Servo:
+
+class Servo(object):
     def __init__(self, name, board, pin_args, secs_per_180=0.50, pix_per_degree=6.5):
         self._name = name
         self._pin = board.get_pin(pin_args)
         self._secs_per_180 = secs_per_180
         self._ppd = pix_per_degree
         self._stopped = False
+        self._ready_event = Event()
         self._jiggle()
 
     def _jiggle(self):
@@ -19,6 +22,10 @@ class Servo:
     @property
     def name(self):
         return self._name
+
+    @property
+    def readyEvent(self):
+        return self._ready_event
 
     def read_pin(self):
         return self._pin.read()
@@ -32,17 +39,14 @@ class Servo:
             self._pin.write(val)
             time.sleep(wait)
 
-    def start(self,
-              forward,
-              loc_source,
-              this_servo_ready,
-              other_servo_ready):
+    def start(self, forward, loc_source, other_ready_event):
 
         while not self._stopped:
             try:
-                this_servo_ready.wait()
-                this_servo_ready.clear()
-                # print(self._name + " is doing work")
+                self._ready_event.wait()
+                self._ready_event.clear()
+
+                # print(self._name + " is evaluating location")
 
                 # Get latest location
                 img_pos, img_total, middle_inc = loc_source()
@@ -56,15 +60,21 @@ class Servo:
                 curr_pos = self.read_pin()
 
                 if img_pos < midpoint - middle_inc:
-                    err = abs((midpoint - middle_inc) - img_pos)
+                    # err = abs((midpoint - middle_inc) - img_pos)
+                    err = abs(midpoint - img_pos)
                     adj = max(int(err / self._ppd), 1)
                     new_pos = curr_pos + adj if forward else curr_pos - adj
-                    print("{0} above moving to {1} from {2} adj {3}".format(self._name, new_pos, curr_pos, adj))
+                    print(
+                        "{0} off by {1} pixels going from {2} to {3} adj {4}".format(self._name, err, new_pos, curr_pos,
+                                                                                     adj))
                 elif img_pos > midpoint + middle_inc:
-                    err = img_pos - (midpoint + middle_inc)
+                    # err = img_pos - (midpoint + middle_inc)
+                    err = img_pos - midpoint
                     adj = max(int(err / self._ppd), 1)
                     new_pos = curr_pos - adj if forward else curr_pos + adj
-                    print("{0} above moving to {1} from {2} adj {3}".format(self._name, new_pos, curr_pos, adj))
+                    print(
+                        "{0} off by {1} pixels going from {2} to {3} adj {4}".format(self._name, err, new_pos, curr_pos,
+                                                                                     adj))
                 else:
                     # print "{0} in middle".format(self.name)
                     # new_pos = curr_pos
@@ -83,8 +93,11 @@ class Servo:
                 self.write_pin(new_pos, wait_time)
 
             finally:
-                other_servo_ready.set()
+                if other_ready_event is not None:
+                    other_ready_event.set()
+
+            time.sleep(.25)
 
     def stop(self):
+        logging.info("Stopping servo {0}".format(self.name()))
         self._stopped = True
-

@@ -1,20 +1,15 @@
 import logging
-import threading
 import time
+from threading import Event
+from threading import Lock
 
 import grpc
 from concurrent import futures
 
-import opencv_utils as utils
 from gen.grpc_server_pb2 import ObjectLocation
 from gen.grpc_server_pb2 import ObjectLocationServerServicer
 from gen.grpc_server_pb2 import ServerInfo
 from gen.grpc_server_pb2 import add_ObjectLocationServerServicer_to_server
-
-if utils.is_python3():
-    from queue import Queue
-else:
-    from Queue import Queue
 
 
 class LocationServer(ObjectLocationServerServicer):
@@ -23,12 +18,14 @@ class LocationServer(ObjectLocationServerServicer):
         self._grpc_server = None
         self._stopped = False
         self._invoke_cnt = 0
-        self._lock = threading.Lock()
-        self._queue = Queue()
+        self._cnt_lock = Lock()
+        self._lock = Lock()
+        self._ready = Event()
+        self._currval = None
 
     def registerClient(self, request, context):
         logging.info("Connected to client {0} [{1}]".format(context.peer(), request.info))
-        with self._lock:
+        with self._cnt_lock:
             self._invoke_cnt += 1
         return ServerInfo(info="Server invoke count {0}".format(self._invoke_cnt))
 
@@ -36,19 +33,24 @@ class LocationServer(ObjectLocationServerServicer):
         try:
             client_info = request.info
             while not self._stopped:
-                val = self._queue.get()
-                if val is not None:
-                    yield val
+                self._ready.wait()
+                with self._lock:
+                    if self._ready.is_set and not self._stopped:
+                        self._ready.clear()
+                        val = self._currval
+                        if val is not None:
+                            yield val
         finally:
             logging.info("Discontinued getObjectLocations() stream for client {0}".format(context.peer()))
 
     def write_location(self, x, y, width, height, middle_inc):
-        loc = ObjectLocation(x=x,
-                             y=y,
-                             width=width,
-                             height=height,
-                             middle_inc=middle_inc)
-        self._queue.put(loc)
+        if x == -1 or y == -1:
+            logging.info("Target not seen")
+
+        with self._lock:
+            if not self._stopped:
+                self._currval = ObjectLocation(x=x, y=y, width=width, height=height, middle_inc=middle_inc)
+                self._ready.set()
 
     def start_location_server(self):
         logging.info("Starting gRPC location server listening on {0}".format(self._hostname))
@@ -65,5 +67,7 @@ class LocationServer(ObjectLocationServerServicer):
     def stop(self):
         logging.info("Stopping location server")
         self._stopped = True
-        self._queue.put(None)
+        with self._lock:
+            self._currval = None
+            self._ready.set()
         self._grpc_server.stop(None)

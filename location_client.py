@@ -1,7 +1,8 @@
 import logging
 import socket
-import threading
 import time
+from threading import Event
+from threading import Lock
 
 import grpc
 
@@ -18,10 +19,10 @@ class LocationClient(object):
         self._width = -1
         self._height = -1
         self._middle_inc = -1
-        self._x_lock = threading.Lock()
-        self._y_lock = threading.Lock()
-        self._x_ready = threading.Event()
-        self._y_ready = threading.Event()
+        self._x_lock = Lock()
+        self._y_lock = Lock()
+        self._x_ready = Event()
+        self._y_ready = Event()
 
     def _set_location(self, location):
         with self._x_lock:
