@@ -55,6 +55,10 @@ class LocationClient(object):
                     self._y_ready.clear()
                     return self._y, self._height, self._middle_inc
 
+    # Blocking
+    def get_xy(self):
+        return (self.get_x(), self.get_y())
+
     # Non-blocking
     def get_loc(self, name):
         return self._x if name == "x" else self._y

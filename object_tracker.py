@@ -59,7 +59,7 @@ class ObjectTracker:
             Thread(target=self._location_server.start_location_server).start()
             time.sleep(1)
         except BaseException as e:
-            logging.error("Unable to start telemetry server [{0}]".format(e))
+            logging.error("Unable to start location server [{0}]".format(e))
             sys.exit(1)
 
         self._location_server.write_location(-1, -1, 0, 0, 0)

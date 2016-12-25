@@ -44,9 +44,6 @@ class LocationServer(ObjectLocationServerServicer):
             logging.info("Discontinued getObjectLocations() stream for client {0}".format(context.peer()))
 
     def write_location(self, x, y, width, height, middle_inc):
-        if x == -1 or y == -1:
-            logging.info("Target not seen")
-
         with self._lock:
             if not self._stopped:
                 self._currval = ObjectLocation(x=x, y=y, width=width, height=height, middle_inc=middle_inc)

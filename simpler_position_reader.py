@@ -5,7 +5,7 @@ import logging
 import sys
 from threading import Thread
 
-from position_client import PositionClient
+from client import PositionClient
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -15,13 +15,13 @@ if __name__ == "__main__":
     logging.basicConfig(stream=sys.stderr, level=logging.INFO,
                         format="%(asctime)s %(name)-10s %(funcName)-10s():%(lineno)i: %(levelname)-6s %(message)s")
 
-    position_client = PositionClient(args["grpc"])
+    client = PositionClient(args["grpc"])
 
-    Thread(target=position_client.read_positions).start()
+    Thread(target=client.read_positions).start()
 
     try:
         while True:
-            print("Got location: {0}".format(position_client.get_focus_line_position()))
+            print("Got position: {0}".format(client.get_focus_line_position()))
     except KeyboardInterrupt as e:
-        position_client.stop()
+        client.stop()
         print("Exiting...")
