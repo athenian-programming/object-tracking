@@ -126,7 +126,7 @@ class ObjectTracker:
                 # cv2.imshow("Mask", mask)
                 # cv2.imshow("Res", result)
 
-                key = cv2.waitKey(30) & 0xFF
+                key = cv2.waitKey(1) & 0xFF
 
                 if key == ord("w"):
                     self._set_width(self._width - 10)

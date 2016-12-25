@@ -5,7 +5,7 @@ import logging
 import sys
 from threading import Thread
 
-from client import PositionClient
+from position_client import PositionClient
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
