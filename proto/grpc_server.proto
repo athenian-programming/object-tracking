@@ -36,6 +36,7 @@ message ObjectLocation {
     int32 width = 3;
     int32 height = 4;
     int32 middle_inc = 5;
+    int32 id = 7;
 }
 
 message FocusLinePosition {

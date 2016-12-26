@@ -29,12 +29,14 @@ class LocationClient(object):
             self._x = location[0]
             self._width = location[2]
             self._middle_inc = location[4]
+            self._id = location[5]
             self._x_ready.set()
 
         with self._y_lock:
             self._y = location[1]
             self._height = location[3]
             self._middle_inc = location[4]
+            self._id = location[5]
             self._y_ready.set()
 
     # Blocking
@@ -42,18 +44,18 @@ class LocationClient(object):
         while not self._stopped:
             self._x_ready.wait()
             with self._x_lock:
-                if self._x_ready.is_set and not self._stopped:
+                if self._x_ready.is_set() and not self._stopped:
                     self._x_ready.clear()
-                    return self._x, self._width, self._middle_inc
+                    return self._x, self._width, self._middle_inc, self._ts, self._id
 
     # Blocking
     def get_y(self):
         while not self._stopped:
             self._y_ready.wait()
             with self._y_lock:
-                if self._y_ready.is_set and not self._stopped:
+                if self._y_ready.is_set() and not self._stopped:
                     self._y_ready.clear()
-                    return self._y, self._height, self._middle_inc
+                    return self._y, self._height, self._middle_inc, self._ts, self._id
 
     # Blocking
     def get_xy(self):
@@ -88,9 +90,12 @@ class LocationClient(object):
                                         loc.y,
                                         loc.width,
                                         loc.height,
-                                        loc.middle_inc))
+                                        loc.middle_inc,
+                                        loc.ts,
+                                        loc.id))
             except BaseException:
                 logging.info("Disconnected from gRPC server at {0} [{1}]".format(self._grpc_hostname, server_info.info))
+                time.sleep(2)
 
     def stop(self):
         logging.info("Stopping location client")

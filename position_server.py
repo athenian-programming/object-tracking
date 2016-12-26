@@ -35,7 +35,7 @@ class PositionServer(FocusLinePositionServerServicer):
             while not self._stopped:
                 self._ready.wait()
                 with self._lock:
-                    if self._ready.is_set and not self._stopped:
+                    if self._ready.is_set() and not self._stopped:
                         self._ready.clear()
                         val = self._currval
                         if val is not None:

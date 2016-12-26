@@ -18,7 +18,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
     package='opencv_object_tracking',
     syntax='proto3',
     serialized_pb=_b(
-        '\n\x11grpc_server.proto\x12\x16opencv_object_tracking\"\x1a\n\nClientInfo\x12\x0c\n\x04info\x18\x01 \x01(\t\"\x1a\n\nServerInfo\x12\x0c\n\x04info\x18\x01 \x01(\t\"Y\n\x0eObjectLocation\x12\t\n\x01x\x18\x01 \x01(\x05\x12\t\n\x01y\x18\x02 \x01(\x05\x12\r\n\x05width\x18\x03 \x01(\x05\x12\x0e\n\x06height\x18\x04 \x01(\x05\x12\x12\n\nmiddle_inc\x18\x05 \x01(\x05\"\x85\x01\n\x11\x46ocusLinePosition\x12\x10\n\x08in_focus\x18\x01 \x01(\x08\x12\x12\n\nmid_offset\x18\x02 \x01(\x05\x12\x0f\n\x07\x64\x65grees\x18\x03 \x01(\x05\x12\x16\n\x0emid_line_cross\x18\x04 \x01(\x05\x12\r\n\x05width\x18\x05 \x01(\x05\x12\x12\n\nmiddle_inc\x18\x06 \x01(\x05\x32\xd8\x01\n\x14ObjectLocationServer\x12Z\n\x0eregisterClient\x12\".opencv_object_tracking.ClientInfo\x1a\".opencv_object_tracking.ServerInfo\"\x00\x12\x64\n\x12getObjectLocations\x12\".opencv_object_tracking.ClientInfo\x1a&.opencv_object_tracking.ObjectLocation\"\x00\x30\x01\x32\xe1\x01\n\x17\x46ocusLinePositionServer\x12Z\n\x0eregisterClient\x12\".opencv_object_tracking.ClientInfo\x1a\".opencv_object_tracking.ServerInfo\"\x00\x12j\n\x15getFocusLinePositions\x12\".opencv_object_tracking.ClientInfo\x1a).opencv_object_tracking.FocusLinePosition\"\x00\x30\x01\x62\x06proto3')
+        '\n\x11grpc_server.proto\x12\x16opencv_object_tracking\"\x1a\n\nClientInfo\x12\x0c\n\x04info\x18\x01 \x01(\t\"\x1a\n\nServerInfo\x12\x0c\n\x04info\x18\x01 \x01(\t\"q\n\x0eObjectLocation\x12\t\n\x01x\x18\x01 \x01(\x05\x12\t\n\x01y\x18\x02 \x01(\x05\x12\r\n\x05width\x18\x03 \x01(\x05\x12\x0e\n\x06height\x18\x04 \x01(\x05\x12\x12\n\nmiddle_inc\x18\x05 \x01(\x05\x12\n\n\x02ts\x18\x06 \x01(\x01\x12\n\n\x02id\x18\x07 \x01(\x05\"\x85\x01\n\x11\x46ocusLinePosition\x12\x10\n\x08in_focus\x18\x01 \x01(\x08\x12\x12\n\nmid_offset\x18\x02 \x01(\x05\x12\x0f\n\x07\x64\x65grees\x18\x03 \x01(\x05\x12\x16\n\x0emid_line_cross\x18\x04 \x01(\x05\x12\r\n\x05width\x18\x05 \x01(\x05\x12\x12\n\nmiddle_inc\x18\x06 \x01(\x05\x32\xd8\x01\n\x14ObjectLocationServer\x12Z\n\x0eregisterClient\x12\".opencv_object_tracking.ClientInfo\x1a\".opencv_object_tracking.ServerInfo\"\x00\x12\x64\n\x12getObjectLocations\x12\".opencv_object_tracking.ClientInfo\x1a&.opencv_object_tracking.ObjectLocation\"\x00\x30\x01\x32\xe1\x01\n\x17\x46ocusLinePositionServer\x12Z\n\x0eregisterClient\x12\".opencv_object_tracking.ClientInfo\x1a\".opencv_object_tracking.ServerInfo\"\x00\x12j\n\x15getFocusLinePositions\x12\".opencv_object_tracking.ClientInfo\x1a).opencv_object_tracking.FocusLinePosition\"\x00\x30\x01\x62\x06proto3')
 )
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
@@ -52,6 +52,7 @@ _CLIENTINFO = _descriptor.Descriptor(
     serialized_end=71,
 )
 
+
 _SERVERINFO = _descriptor.Descriptor(
     name='ServerInfo',
     full_name='opencv_object_tracking.ServerInfo',
@@ -81,6 +82,7 @@ _SERVERINFO = _descriptor.Descriptor(
     serialized_start=73,
     serialized_end=99,
 )
+
 
 _OBJECTLOCATION = _descriptor.Descriptor(
     name='ObjectLocation',
@@ -124,6 +126,20 @@ _OBJECTLOCATION = _descriptor.Descriptor(
             message_type=None, enum_type=None, containing_type=None,
             is_extension=False, extension_scope=None,
             options=None),
+        _descriptor.FieldDescriptor(
+            name='ts', full_name='opencv_object_tracking.ObjectLocation.ts', index=5,
+            number=6, type=1, cpp_type=5, label=1,
+            has_default_value=False, default_value=float(0),
+            message_type=None, enum_type=None, containing_type=None,
+            is_extension=False, extension_scope=None,
+            options=None),
+        _descriptor.FieldDescriptor(
+            name='id', full_name='opencv_object_tracking.ObjectLocation.id', index=6,
+            number=7, type=5, cpp_type=1, label=1,
+            has_default_value=False, default_value=0,
+            message_type=None, enum_type=None, containing_type=None,
+            is_extension=False, extension_scope=None,
+            options=None),
     ],
     extensions=[
     ],
@@ -137,8 +153,9 @@ _OBJECTLOCATION = _descriptor.Descriptor(
     oneofs=[
     ],
     serialized_start=101,
-    serialized_end=190,
+    serialized_end=214,
 )
+
 
 _FOCUSLINEPOSITION = _descriptor.Descriptor(
     name='FocusLinePosition',
@@ -201,8 +218,8 @@ _FOCUSLINEPOSITION = _descriptor.Descriptor(
     extension_ranges=[],
     oneofs=[
     ],
-    serialized_start=193,
-    serialized_end=326,
+    serialized_start=217,
+    serialized_end=350,
 )
 
 DESCRIPTOR.message_types_by_name['ClientInfo'] = _CLIENTINFO
@@ -237,6 +254,7 @@ FocusLinePosition = _reflection.GeneratedProtocolMessageType('FocusLinePosition'
     # @@protoc_insertion_point(class_scope:opencv_object_tracking.FocusLinePosition)
 ))
 _sym_db.RegisterMessage(FocusLinePosition)
+
 
 try:
     # THESE ELEMENTS WILL BE DEPRECATED.

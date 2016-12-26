@@ -70,8 +70,8 @@ class PositionClient(object):
                                                    pos.width,
                                                    pos.middle_inc))
             except BaseException:
-                logging.info("Disconnected from gRPC server at {0} [{1}]".format(self._grpc_hostname,
-                                                                                 server_info.info))
+                logging.info("Disconnected from gRPC server at {0} [{1}]".format(self._grpc_hostname, server_info.info))
+                time.sleep(2)
 
     def stop(self):
         logging.info("Stopping position client")

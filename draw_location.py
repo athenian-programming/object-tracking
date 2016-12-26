@@ -58,6 +58,7 @@ class LocationSketch(object):
 
             prev_x = x
             prev_y = y
+            print("Got time: {0} id: {1}".format(x_val[3], x_val[4]))
 
 
 if __name__ == "__main__":
