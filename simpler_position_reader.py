@@ -21,7 +21,7 @@ if __name__ == "__main__":
 
     try:
         while True:
-            print("Got position: {0}".format(client.get_focus_line_position()))
-    except KeyboardInterrupt as e:
+            print("Got position: {0}".format(client.get_position()))
+    except KeyboardInterrupt:
         client.stop()
         print("Exiting...")

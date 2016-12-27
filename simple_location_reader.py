@@ -5,7 +5,7 @@ import logging
 import sys
 from threading import Thread
 
-from client import LocationClient
+from location_client import LocationClient
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -22,6 +22,6 @@ if __name__ == "__main__":
     try:
         while True:
             print("Got location: {0}".format(client.get_xy()))
-    except KeyboardInterrupt as e:
+    except KeyboardInterrupt:
         client.stop()
         print("Exiting...")

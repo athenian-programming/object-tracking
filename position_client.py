@@ -11,9 +11,10 @@ from gen.grpc_server_pb2 import FocusLinePositionServerStub
 
 
 class PositionClient(object):
-    def __init__(self, grpc_hostname):
-        self._grpc_hostname = grpc_hostname if ":" in grpc_hostname else grpc_hostname + ":50051"
+    def __init__(self, hostname):
+        self._hostname = hostname if ":" in hostname else hostname + ":50051"
         self._stopped = False
+        self._id = -1
         self._in_focus = False
         self._mid_offset = -1
         self._degrees = -1
@@ -23,18 +24,8 @@ class PositionClient(object):
         self._lock = Lock()
         self._ready = Event()
 
-    def _set_focus_line_position(self, position):
-        with self._lock:
-            self._in_focus = position[0]
-            self._mid_offset = position[1]
-            self._degrees = position[2]
-            self._mid_cross = position[3]
-            self._width = position[4]
-            self._middle_inc = position[5]
-            self._ready.set()
-
     # Blocking
-    def get_focus_line_position(self):
+    def get_position(self):
         while not self._stopped:
             self._ready.wait()
             with self._lock:
@@ -45,32 +36,36 @@ class PositionClient(object):
                             self._degrees,
                             self._mid_cross,
                             self._width,
-                            self._middle_inc)
+                            self._middle_inc,
+                            self._id)
 
     def read_positions(self):
-        channel = grpc.insecure_channel(self._grpc_hostname)
+        channel = grpc.insecure_channel(self._hostname)
         stub = FocusLinePositionServerStub(channel)
         while not self._stopped:
-            logging.info("Connecting to gRPC server at {0}...".format(self._grpc_hostname))
+            logging.info("Connecting to gRPC server at {0}...".format(self._hostname))
             try:
                 client_info = ClientInfo(info="{0} client".format(socket.gethostname()))
                 server_info = stub.registerClient(client_info)
             except BaseException as e:
-                logging.error("Failed to connect to gRPC server at {0} [{1}]".format(self._grpc_hostname, e))
+                logging.error("Failed to connect to gRPC server at {0} [{1}]".format(self._hostname, e))
                 time.sleep(2)
                 continue
 
-            logging.info("Connected to gRPC server at {0} [{1}]".format(self._grpc_hostname, server_info.info))
+            logging.info("Connected to gRPC server at {0} [{1}]".format(self._hostname, server_info.info))
             try:
                 for pos in stub.getFocusLinePositions(client_info):
-                    self._set_focus_line_position((pos.in_focus,
-                                                   pos.mid_offset,
-                                                   pos.degrees,
-                                                   pos.mid_line_cross,
-                                                   pos.width,
-                                                   pos.middle_inc))
-            except BaseException:
-                logging.info("Disconnected from gRPC server at {0} [{1}]".format(self._grpc_hostname, server_info.info))
+                    with self._lock:
+                        self._id = pos.id
+                        self._in_focus = pos.in_focus
+                        self._mid_offset = pos.mid_offset
+                        self._degrees = pos.degrees
+                        self._mid_cross = pos.mid_line_cross
+                        self._width = pos.width
+                        self._middle_inc = pos.middle_inc
+                    self._ready.set()
+            except BaseException as e:
+                logging.info("Disconnected from gRPC server at {0} [{1}]".format(self._hostname, e))
                 time.sleep(2)
 
     def stop(self):

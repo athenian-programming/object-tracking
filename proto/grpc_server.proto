@@ -31,21 +31,22 @@ message ServerInfo {
 }
 
 message ObjectLocation {
-    int32 x = 1;
-    int32 y = 2;
-    int32 width = 3;
-    int32 height = 4;
-    int32 middle_inc = 5;
-    int32 id = 7;
+    int32 id = 1;
+    int32 x = 2;
+    int32 y = 3;
+    int32 width = 4;
+    int32 height = 5;
+    int32 middle_inc = 6;
 }
 
 message FocusLinePosition {
-    bool in_focus = 1;
-    int32 mid_offset = 2;
-    int32 degrees = 3;
-    int32 mid_line_cross = 4;
-    int32 width = 5;
-    int32 middle_inc = 6;
+    int32 id = 1;
+    bool in_focus = 2;
+    int32 mid_offset = 3;
+    int32 degrees = 4;
+    int32 mid_line_cross = 5;
+    int32 width = 6;
+    int32 middle_inc = 7;
 }
 
 

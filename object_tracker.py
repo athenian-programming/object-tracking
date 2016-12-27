@@ -207,7 +207,7 @@ if __name__ == "__main__":
 
     try:
         tracker.start()
-    except KeyboardInterrupt as e:
+    except KeyboardInterrupt:
         tracker.stop()
         pass
 

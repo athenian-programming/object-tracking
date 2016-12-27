@@ -203,7 +203,7 @@ if __name__ == "__main__":
         else:
             servo_x_t.join()
             servo_y_t.join()
-    except KeyboardInterrupt as e:
+    except KeyboardInterrupt:
         pass
 
     servo_x.stop()

@@ -25,12 +25,12 @@ def test_position_server(port):
         logging.error("Unable to start position server [{0}]".format(e))
 
     for i in range(0, 100):
-        server.write_focus_line_position(in_focus=True if i % 2 == 0 else False,
-                                         mid_offset=i,
-                                         degrees=i + 1,
-                                         mid_line_cross=i + 2,
-                                         width=i + 3,
-                                         middle_inc=i + 4)
+        server.write_position(in_focus=True if i % 2 == 0 else False,
+                              mid_offset=i,
+                              degrees=i + 1,
+                              mid_line_cross=i + 2,
+                              width=i + 3,
+                              middle_inc=i + 4)
         time.sleep(1)
 
 

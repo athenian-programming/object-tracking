@@ -80,7 +80,7 @@ class LineFollower(object):
             logging.error("Unable to start position server [{0}]".format(e))
             sys.exit(1)
 
-        self._position_server.write_focus_line_position(False, -1, -1, -1, -1, -1)
+        self._position_server.write_position(False, -1, -1, -1, -1, -1)
 
         while self._cam.is_open() and not self._closed:
 
@@ -221,12 +221,12 @@ class LineFollower(object):
             # Write position if it is different from previous value written
             if focus_img_x != self._prev_focus_img_x or (
                         self._report_midline and mid_line_cross != self._prev_mid_line_cross):
-                self._position_server.write_focus_line_position(focus_img_x is not None,
-                                                                focus_img_x - mid_x if focus_img_x is not None else 0,
-                                                                degrees,
-                                                                mid_line_cross if mid_line_cross is not None else -1,
-                                                                img_width,
-                                                                mid_inc)
+                self._position_server.write_position(focus_img_x is not None,
+                                                     focus_img_x - mid_x if focus_img_x is not None else 0,
+                                                     degrees,
+                                                     mid_line_cross if mid_line_cross is not None else -1,
+                                                     img_width,
+                                                     mid_inc)
                 self._prev_focus_img_x = focus_img_x
                 self._prev_mid_line_cross = mid_line_cross
 
@@ -351,7 +351,7 @@ if __name__ == "__main__":
 
     try:
         follower.start()
-    except KeyboardInterrupt as e:
+    except KeyboardInterrupt:
         follower.stop()
         pass
 
