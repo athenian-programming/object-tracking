@@ -1,7 +1,8 @@
 import logging
-
 from threading import Event
 from threading import Lock
+
+from  dict_utils import itervalues
 
 
 class GenericServer(object):
@@ -18,8 +19,8 @@ class GenericServer(object):
     def _set_currval(self, val):
         with self._lock:
             self._currval = val
-            for key in self._clients:
-                self._clients[key].set()
+            for v in itervalues(self._clients):
+                v.set()
 
     def _currval_generator(self, name):
         try:

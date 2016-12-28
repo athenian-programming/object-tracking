@@ -339,20 +339,20 @@ if __name__ == "__main__":
     if is_raspi():
         from blinkt import set_pixel, show, clear
 
-    follower = LineFollower(eval(args["bgr"]),
-                            args["focus"],
-                            int(args["width"]),
-                            int(args["percent"]),
-                            int(args["min"]),
-                            int(args["range"]),
-                            args["port"],
-                            args["midline"],
-                            args["display"])
+    line_follower = LineFollower(eval(args["bgr"]),
+                                 args["focus"],
+                                 int(args["width"]),
+                                 int(args["percent"]),
+                                 int(args["min"]),
+                                 int(args["range"]),
+                                 args["port"],
+                                 args["midline"],
+                                 args["display"])
 
     try:
-        follower.start()
+        line_follower.start()
     except KeyboardInterrupt:
-        follower.stop()
+        line_follower.stop()
         pass
 
     logging.info("Exiting...")

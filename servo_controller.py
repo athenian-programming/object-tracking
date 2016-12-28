@@ -18,13 +18,14 @@ def calibrate(location_client, servo_x, servo_y):
 
     name = "x"
     servo = servo_x
-    while True:
-        # This is a hack to get around python3 not having raw_input
-        try:
-            input = raw_input
-        except NameError:
-            pass
 
+    # This is a hack to get around python3 not having raw_input
+    try:
+        input = raw_input
+    except NameError:
+        pass
+
+    while True:
         try:
             key = input("{0} {1} ({2}, {3})> ".format(name.upper(),
                                                       servo.read_pin(),
