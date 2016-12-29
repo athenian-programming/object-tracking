@@ -19,11 +19,9 @@ class Servo(object):
         self.write_pin(80)
         self.write_pin(90)
 
-    @property
     def name(self):
         return self._name
 
-    @property
     def readyEvent(self):
         return self._ready_event
 

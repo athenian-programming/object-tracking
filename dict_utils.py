@@ -1,3 +1,5 @@
+# As described at http://legacy.python.org/dev/peps/pep-0469/
+
 try:
     dict.iteritems
 except AttributeError:

@@ -1,6 +1,5 @@
 #!/usr/bin/env python2
 
-import Tkinter
 import argparse
 import logging
 import sys
@@ -8,7 +7,12 @@ from threading import Lock
 from threading import Thread
 
 from location_client import LocationClient
+from opencv_utils import is_python3
 
+if is_python3():
+    from tkinter import Tk, Canvas, Button, IntVar, LEFT, Checkbutton
+else:
+    from Tkinter import Tk, Canvas, Button, IntVar, LEFT, Checkbutton
 
 class LocationSketch(object):
     def __init__(self, canvas):
@@ -75,25 +79,25 @@ if __name__ == "__main__":
     init_w = 800
     init_h = 450
 
-    top = Tkinter.Tk()
+    top = Tk()
 
-    canvas = Tkinter.Canvas(top, bg="white", width=init_w, height=init_h)
+    canvas = Canvas(top, bg="white", width=init_w, height=init_h)
     canvas.pack()
 
     sketch = LocationSketch(canvas)
 
-    b = Tkinter.Button(top, text="Clear", command=sketch.clearCanvas)
-    b.pack(side=Tkinter.LEFT)
+    b = Button(top, text="Clear", command=sketch.clearCanvas)
+    b.pack(side=LEFT)
 
-    lb_var = Tkinter.IntVar()
+    lb_var = IntVar()
     lb_var.set(1)
-    lb = Tkinter.Checkbutton(top, text="Lines", variable=lb_var, command=sketch.toggle_drawLines)
-    lb.pack(side=Tkinter.LEFT)
+    lb = Checkbutton(top, text="Lines", variable=lb_var, command=sketch.toggle_drawLines)
+    lb.pack(side=LEFT)
 
-    pb_var = Tkinter.IntVar()
+    pb_var = IntVar()
     pb_var.set(1)
-    pb = Tkinter.Checkbutton(top, text="Points", variable=pb_var, command=sketch.toggle_drawPoints)
-    pb.pack(side=Tkinter.LEFT)
+    pb = Checkbutton(top, text="Points", variable=pb_var, command=sketch.toggle_drawPoints)
+    pb.pack(side=LEFT)
 
     Thread(target=sketch.plotVals, args=(init_w, init_h)).start()
 
