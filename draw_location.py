@@ -22,18 +22,18 @@ class LocationSketch(object):
         self._drawLines = True
         self._drawPoints = True
 
-    def toggle_drawLines(self):
+    def toggle_lines(self):
         with self._lock:
             self._drawLines = not self._drawLines
 
-    def toggle_drawPoints(self):
+    def toggle_points(self):
         with self._lock:
             self._drawPoints = not self._drawPoints
 
-    def clearCanvas(self):
+    def clear_canvas(self):
         self._canvas.delete("all")
 
-    def plotVals(self, w, h):
+    def plot_vals(self, w, h):
         prev_x = None
         prev_y = None
         curr_w = w
@@ -49,10 +49,10 @@ class LocationSketch(object):
 
             if x_val[1] != curr_w:
                 self._canvas.delete("all")
-                prev_x = None
-                prev_y = None
                 self._canvas.config(width=x_val[1], height=y_val[1])
                 curr_w = x_val[1]
+                prev_x = None
+                prev_y = None
                 continue
 
             if self._drawPoints:
@@ -87,19 +87,19 @@ if __name__ == "__main__":
 
     sketch = LocationSketch(canvas)
 
-    b = tk.Button(top, text="Clear", command=sketch.clearCanvas)
+    b = tk.Button(top, text="Clear", command=sketch.clear_canvas)
     b.pack(side=tk.LEFT)
 
     lb_var = tk.IntVar()
     lb_var.set(1)
-    lb = tk.Checkbutton(top, text="Lines", variable=lb_var, command=sketch.toggle_drawLines)
+    lb = tk.Checkbutton(top, text="Lines", variable=lb_var, command=sketch.toggle_lines)
     lb.pack(side=tk.LEFT)
 
     pb_var = tk.IntVar()
     pb_var.set(1)
-    pb = tk.Checkbutton(top, text="Points", variable=pb_var, command=sketch.toggle_drawPoints)
+    pb = tk.Checkbutton(top, text="Points", variable=pb_var, command=sketch.toggle_points)
     pb.pack(side=tk.LEFT)
 
-    Thread(target=sketch.plotVals, args=(init_w, init_h)).start()
+    Thread(target=sketch.plot_vals, args=(init_w, init_h)).start()
 
     top.mainloop()

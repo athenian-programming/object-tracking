@@ -39,7 +39,7 @@ class PositionClient(object):
                             self._middle_inc,
                             self._id)
 
-    def read_positions(self):
+    def read_positions(self, pause_secs=2.0):
         channel = grpc.insecure_channel(self._hostname)
         stub = FocusLinePositionServerStub(channel)
         while not self._stopped:
@@ -49,7 +49,7 @@ class PositionClient(object):
                 server_info = stub.registerClient(client_info)
             except BaseException as e:
                 logging.error("Failed to connect to gRPC server at {0} [{1}]".format(self._hostname, e))
-                time.sleep(2)
+                time.sleep(pause_secs)
                 continue
 
             logging.info("Connected to gRPC server at {0} [{1}]".format(self._hostname, server_info.info))
@@ -66,7 +66,7 @@ class PositionClient(object):
                     self._ready.set()
             except BaseException as e:
                 logging.info("Disconnected from gRPC server at {0} [{1}]".format(self._hostname, e))
-                time.sleep(2)
+                time.sleep(pause_secs)
 
     def stop(self):
         logging.info("Stopping position client")

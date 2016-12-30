@@ -54,7 +54,7 @@ class LocationClient(object):
     def get_size(self, name):
         return self._width if name == "x" else self._height
 
-    def read_locations(self):
+    def read_locations(self, pause_secs=2.0):
         channel = grpc.insecure_channel(self._hostname)
         stub = ObjectLocationServerStub(channel)
         while not self._stopped:
@@ -64,7 +64,7 @@ class LocationClient(object):
                 server_info = stub.registerClient(client_info)
             except BaseException as e:
                 logging.error("Failed to connect to gRPC server at {0} [{1}]".format(self._hostname, e))
-                time.sleep(2)
+                time.sleep(pause_secs)
                 continue
 
             logging.info("Connected to gRPC server at {0} [{1}]".format(self._hostname, server_info.info))
@@ -82,7 +82,7 @@ class LocationClient(object):
                     self._y_ready.set()
             except BaseException as e:
                 logging.info("Disconnected from gRPC server at {0} [{1}]".format(self._hostname, e))
-                time.sleep(2)
+                time.sleep(pause_secs)
 
     def stop(self):
         logging.info("Stopping location client")

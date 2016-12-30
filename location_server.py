@@ -45,6 +45,6 @@ class LocationServer(ObjectLocationServerServicer, GenericServer):
         self._grpc_server.start()
         try:
             while not self._stopped:
-                time.sleep(2)
+                time.sleep(1)
         except KeyboardInterrupt:
             self.stop()
