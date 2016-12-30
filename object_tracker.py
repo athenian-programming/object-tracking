@@ -12,6 +12,7 @@ import imutils
 
 import camera
 import opencv_utils as utils
+import ui_defaults as ui
 from contour_finder import ContourFinder
 from location_server import LocationServer
 from opencv_utils import BLUE
@@ -120,7 +121,7 @@ class ObjectTracker:
                 cv2.line(image, (mid_x + middle_inc, 0), (mid_x + middle_inc, img_height), x_color, 1)
                 cv2.line(image, (0, mid_y - middle_inc), (img_width, mid_y - middle_inc), y_color, 1)
                 cv2.line(image, (0, mid_y + middle_inc), (img_width, mid_y + middle_inc), y_color, 1)
-                cv2.putText(image, text, utils.text_loc(), utils.text_font(), utils.text_size(), RED, 1)
+                cv2.putText(image, text, ui.text_loc(), ui.text_font(), ui.text_size(), RED, 1)
 
                 cv2.imshow("Image", image)
                 # cv2.imshow("Mask", mask)

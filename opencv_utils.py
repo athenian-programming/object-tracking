@@ -21,17 +21,5 @@ def is_raspi():
     return platform.system() == "Linux"
 
 
-def text_loc():
-    return 10, 25
-
-
-def text_font():
-    return cv2.FONT_HERSHEY_SIMPLEX
-
-
-def text_size():
-    return .55 if is_raspi() else .75
-
-
 def is_python3():
     return sys.version_info[0] >= 3

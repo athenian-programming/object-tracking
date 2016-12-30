@@ -31,7 +31,7 @@ class LocationClient(object):
             with self._lock:
                 if self._x_ready.is_set() and not self._stopped:
                     self._x_ready.clear()
-                    return (self._x, self._width, self._middle_inc, self._id)
+                    return self._x, self._width, self._middle_inc, self._id
 
     # Blocking
     def get_y(self):
@@ -40,11 +40,11 @@ class LocationClient(object):
             with self._lock:
                 if self._y_ready.is_set() and not self._stopped:
                     self._y_ready.clear()
-                    return (self._y, self._height, self._middle_inc, self._id)
+                    return self._y, self._height, self._middle_inc, self._id
 
     # Blocking
     def get_xy(self):
-        return (self.get_x(), self.get_y())
+        return self.get_x(), self.get_y()
 
     # Non-blocking
     def get_loc(self, name):

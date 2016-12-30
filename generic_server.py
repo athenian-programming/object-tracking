@@ -2,7 +2,7 @@ import logging
 from threading import Event
 from threading import Lock
 
-from  dict_utils import itervalues
+from dict_utils import itervalues
 
 
 class GenericServer(object):
