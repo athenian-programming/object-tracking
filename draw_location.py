@@ -3,7 +3,6 @@
 import argparse
 import logging
 import sys
-from threading import Lock
 from threading import Thread
 
 from location_client import LocationClient
@@ -18,35 +17,31 @@ else:
 class LocationSketch(object):
     def __init__(self, canvas):
         self._canvas = canvas
-        self._lock = Lock()
         self._drawLines = True
         self._drawPoints = True
 
     def toggle_lines(self):
-        with self._lock:
-            self._drawLines = not self._drawLines
+        self._drawLines = not self._drawLines
 
     def toggle_points(self):
-        with self._lock:
-            self._drawPoints = not self._drawPoints
+        self._drawPoints = not self._drawPoints
 
     def clear_canvas(self):
         self._canvas.delete("all")
 
-    def plot_vals(self, w, h):
+    def plot_vals(self, location_client, w, h):
         prev_x = None
         prev_y = None
         curr_w = w
         while True:
             x_val, y_val = location_client.get_xy()
-            x = abs(x_val[1] - x_val[0])
-            y = y_val[0]
 
-            if x == -1 or y == -1:
+            if x_val[0] == -1 or y_val[0] == -1:
                 prev_x = None
                 prev_y = None
                 continue
 
+            # Check if width of image has changed
             if x_val[1] != curr_w:
                 self._canvas.delete("all")
                 self._canvas.config(width=x_val[1], height=y_val[1])
@@ -54,6 +49,9 @@ class LocationSketch(object):
                 prev_x = None
                 prev_y = None
                 continue
+
+            x = abs(x_val[1] - x_val[0])
+            y = y_val[0]
 
             if self._drawPoints:
                 self._canvas.create_oval(x - 1, y - 1, x + 1, y + 1)
@@ -74,7 +72,6 @@ if __name__ == "__main__":
                         format="%(asctime)s %(name)-10s %(funcName)-10s():%(lineno)i: %(levelname)-6s %(message)s")
 
     location_client = LocationClient(args["grpc"])
-
     Thread(target=location_client.read_locations).start()
 
     init_w = 800
@@ -100,6 +97,6 @@ if __name__ == "__main__":
     pb = tk.Checkbutton(top, text="Points", variable=pb_var, command=sketch.toggle_points)
     pb.pack(side=tk.LEFT)
 
-    Thread(target=sketch.plot_vals, args=(init_w, init_h)).start()
+    Thread(target=sketch.plot_vals, args=(location_client, init_w, init_h)).start()
 
     top.mainloop()
