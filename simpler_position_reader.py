@@ -15,13 +15,12 @@ if __name__ == "__main__":
     logging.basicConfig(stream=sys.stderr, level=logging.INFO,
                         format="%(asctime)s %(name)-10s %(funcName)-10s():%(lineno)i: %(levelname)-6s %(message)s")
 
-    client = PositionClient(args["grpc"])
-
-    Thread(target=client.read_positions).start()
+    positions = PositionClient(args["grpc"])
+    Thread(target=positions.read_positions).start()
 
     try:
         while True:
-            print("Got position: {0}".format(client.get_position()))
+            print("Got position: {0}".format(positions.get_position()))
     except KeyboardInterrupt:
-        client.stop()
+        positions.stop()
         print("Exiting...")

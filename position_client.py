@@ -31,13 +31,13 @@ class PositionClient(object):
             with self._lock:
                 if self._ready.is_set() and not self._stopped:
                     self._ready.clear()
-                    return (self._in_focus,
-                            self._mid_offset,
-                            self._degrees,
-                            self._mid_cross,
-                            self._width,
-                            self._middle_inc,
-                            self._id)
+                    return {"id": self._id,
+                            "in_focus": self._in_focus,
+                            "mid_offset": self._mid_offset,
+                            "degrees": self._degrees,
+                            "mid_cross": self._mid_cross,
+                            "width": self._width,
+                            "middle_inc": self._middle_inc}
 
     def read_positions(self, pause_secs=2.0):
         channel = grpc.insecure_channel(self._hostname)

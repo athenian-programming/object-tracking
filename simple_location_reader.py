@@ -15,13 +15,13 @@ if __name__ == "__main__":
     logging.basicConfig(stream=sys.stderr, level=logging.INFO,
                         format="%(asctime)s %(name)-10s %(funcName)-10s():%(lineno)i: %(levelname)-6s %(message)s")
 
-    client = LocationClient(args["grpc"])
+    locations = LocationClient(args["grpc"])
 
-    Thread(target=client.read_locations).start()
+    Thread(target=locations.read_locations).start()
 
     try:
         while True:
-            print("Got location: {0}".format(client.get_xy()))
+            print("Got location: {0}".format(locations.get_xy()))
     except KeyboardInterrupt:
-        client.stop()
+        locations.stop()
         print("Exiting...")

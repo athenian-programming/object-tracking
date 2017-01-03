@@ -11,7 +11,7 @@ from location_client import LocationClient
 from servo import Servo
 
 
-def calibrate(location_client, servo_x, servo_y):
+def calibrate(locations, servo_x, servo_y):
     def center_servos():
         servo_x.write_pin(90)
         servo_y.write_pin(90)
@@ -29,8 +29,8 @@ def calibrate(location_client, servo_x, servo_y):
         try:
             key = input("{0} {1} ({2}, {3})> ".format(name.upper(),
                                                       servo.read_pin(),
-                                                      location_client.get_loc("x"),
-                                                      location_client.get_loc("y")))
+                                                      locations.get_loc("x"),
+                                                      locations.get_loc("y")))
         except KeyboardInterrupt:
             return
 
@@ -64,11 +64,11 @@ def calibrate(location_client, servo_x, servo_y):
         elif key == "l":
             servo.write_pin(90)
             servo_pos = 90
-            img_start = location_client.get_loc(name)
+            img_start = locations.get_loc(name)
             img_last = -1
             for i in range(90, 0, -1):
                 servo.write_pin(i, pause)
-                img_pos = location_client.get_loc(name)
+                img_pos = locations.get_loc(name)
                 if img_pos == -1:
                     break
                 img_last = img_pos
@@ -83,11 +83,11 @@ def calibrate(location_client, servo_x, servo_y):
         elif key == "r":
             servo.write_pin(90)
             servo_pos = 90
-            img_start = location_client.get_loc(name)
+            img_start = locations.get_loc(name)
             img_last = -1
             for i in range(90, 180):
                 servo.write_pin(i, pause)
-                img_pos = location_client.get_loc(name)
+                img_pos = locations.get_loc(name)
                 if img_pos == -1:
                     break
                 img_last = img_pos
@@ -107,7 +107,7 @@ def calibrate(location_client, servo_x, servo_y):
             end_pos = -1
             for i in range(0, 180, 1):
                 servo.write_pin(i, pause)
-                if location_client.get_loc(name) != -1:
+                if locations.get_loc(name) != -1:
                     start_pos = i
                     print("Target starts at position {0}".format(start_pos))
                     break
@@ -118,13 +118,13 @@ def calibrate(location_client, servo_x, servo_y):
 
             for i in range(start_pos, 180, 1):
                 servo.write_pin(i, pause)
-                if location_client.get_loc(name) == -1:
+                if locations.get_loc(name) == -1:
                     break
                 end_pos = i
 
             print("Target ends at position {0}".format(end_pos))
 
-            total_pixels = location_client.get_size(name)
+            total_pixels = locations.get_size(name)
             total_pos = end_pos - start_pos
             if total_pos > 0:
                 pix_per_deg = round(total_pixels / float(total_pos), 2)
@@ -173,8 +173,8 @@ if __name__ == "__main__":
         logging.error("Failed to connect to Arduino at {0} - [{1}]".format(port, e))
         sys.exit(0)
 
-    location_client = LocationClient(args["grpc"])
-    Thread(target=location_client.read_locations).start()
+    locations = LocationClient(args["grpc"])
+    Thread(target=locations.read_locations).start()
 
     # Create servos
     servo_x = Servo("Pan", board, "d:{0}:s".format(args["xservo"]), secs_per_180=1.0, pix_per_degree=8)
@@ -182,17 +182,17 @@ if __name__ == "__main__":
 
     calib_t = None
     if args["calib"]:
-        calib_t = Thread(target=calibrate, args=(location_client, servo_x, servo_y))
+        calib_t = Thread(target=calibrate, args=(locations, servo_x, servo_y))
         calib_t.start()
     else:
         # Set servo X to go first
         servo_x.readyEvent.set()
 
     servo_x_t = Thread(target=servo_x.start, args=(True,
-                                                   lambda: location_client.get_x(),
+                                                   lambda: locations.get_x(),
                                                    servo_y.readyEvent if not args["calib"] else None))
     servo_y_t = Thread(target=servo_y.start, args=(False,
-                                                   lambda: location_client.get_y(),
+                                                   lambda: locations.get_y(),
                                                    servo_x.readyEvent if not args["calib"] else None))
 
     servo_x_t.start()
@@ -211,5 +211,5 @@ if __name__ == "__main__":
     servo_y.stop()
 
     board.exit()
-    location_client.stop()
+    locations.stop()
     logging.info("Exiting...")

@@ -29,16 +29,14 @@ class LocationSketch(object):
     def clear_canvas(self):
         self._canvas.delete("all")
 
-    def plot_vals(self, location_client, w, h):
-        prev_x = None
-        prev_y = None
+    def plot_vals(self, locations, w, h):
+        prev_x, prev_y = None, None
         curr_w = w
         while True:
-            x_val, y_val = location_client.get_xy()
+            x_val, y_val = locations.get_xy()
 
             if x_val[0] == -1 or y_val[0] == -1:
-                prev_x = None
-                prev_y = None
+                prev_x, prev_y = None, None
                 continue
 
             # Check if width of image has changed
@@ -46,8 +44,7 @@ class LocationSketch(object):
                 self._canvas.delete("all")
                 self._canvas.config(width=x_val[1], height=y_val[1])
                 curr_w = x_val[1]
-                prev_x = None
-                prev_y = None
+                prev_x, prev_y = None, None
                 continue
 
             x = abs(x_val[1] - x_val[0])
@@ -59,8 +56,7 @@ class LocationSketch(object):
             if self._drawLines and prev_x is not None:
                 self._canvas.create_line(prev_x, prev_y, x, y, fill="red")
 
-            prev_x = x
-            prev_y = y
+            prev_x, prev_y = x, y
 
 
 if __name__ == "__main__":
@@ -71,8 +67,8 @@ if __name__ == "__main__":
     logging.basicConfig(stream=sys.stderr, level=logging.INFO,
                         format="%(asctime)s %(name)-10s %(funcName)-10s():%(lineno)i: %(levelname)-6s %(message)s")
 
-    location_client = LocationClient(args["grpc"])
-    Thread(target=location_client.read_locations).start()
+    locations = LocationClient(args["grpc"])
+    Thread(target=locations.read_locations).start()
 
     init_w = 800
     init_h = 450
@@ -97,6 +93,6 @@ if __name__ == "__main__":
     pb = tk.Checkbutton(top, text="Points", variable=pb_var, command=sketch.toggle_points)
     pb.pack(side=tk.LEFT)
 
-    Thread(target=sketch.plot_vals, args=(location_client, init_w, init_h)).start()
+    Thread(target=sketch.plot_vals, args=(locations, init_w, init_h)).start()
 
     top.mainloop()
