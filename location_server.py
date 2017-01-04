@@ -9,7 +9,7 @@ from gen.grpc_server_pb2 import ObjectLocation
 from gen.grpc_server_pb2 import ObjectLocationServerServicer
 from gen.grpc_server_pb2 import ServerInfo
 from gen.grpc_server_pb2 import add_ObjectLocationServerServicer_to_server
-from generic_server import GenericServer
+from grpc_support import GenericServer
 
 
 class LocationServer(ObjectLocationServerServicer, GenericServer):

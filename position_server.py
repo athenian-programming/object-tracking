@@ -9,7 +9,7 @@ from gen.grpc_server_pb2 import FocusLinePosition
 from gen.grpc_server_pb2 import FocusLinePositionServerServicer
 from gen.grpc_server_pb2 import ServerInfo
 from gen.grpc_server_pb2 import add_FocusLinePositionServerServicer_to_server
-from generic_server import GenericServer
+from grpc_support import GenericServer
 
 
 class PositionServer(FocusLinePositionServerServicer, GenericServer):

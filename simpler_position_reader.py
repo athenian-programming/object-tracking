@@ -5,6 +5,7 @@ import logging
 import sys
 from threading import Thread
 
+from grpc_support import TimeoutException
 from position_client import PositionClient
 
 if __name__ == "__main__":
@@ -20,7 +21,10 @@ if __name__ == "__main__":
 
     try:
         while True:
-            print("Got position: {0}".format(positions.get_position()))
+            try:
+                print("Got position: {0}".format(positions.get_position(timeout=0.5)))
+            except TimeoutException:
+                print("No change in value")
     except KeyboardInterrupt:
         positions.stop()
         print("Exiting...")

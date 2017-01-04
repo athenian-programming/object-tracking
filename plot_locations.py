@@ -40,7 +40,7 @@ if __name__ == "__main__":
     s = py.Stream(stream_id)
     s.open()
 
-    logging.info("Opening plot.ly tab...")
+    logging.info("Opening plot.ly tab")
     time.sleep(5)
 
     try:

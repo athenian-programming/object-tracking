@@ -5,6 +5,13 @@ from threading import Lock
 from dict_utils import itervalues
 
 
+class GenericClient(object):
+    def __init__(self, hostname):
+        self._hostname = hostname if ":" in hostname else hostname + ":50051"
+        self._lock = Lock()
+        self._stopped = False
+
+
 class GenericServer(object):
     def __init__(self, port):
         self._hostname = "[::]:" + str(port)
@@ -49,3 +56,8 @@ class GenericServer(object):
         self._stopped = True
         self._set_currval(None)
         self._grpc_server.stop(0)
+
+
+class TimeoutException(Exception):
+    def __init__(self, *args, **kwargs):
+        pass

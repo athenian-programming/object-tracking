@@ -2,18 +2,19 @@ import logging
 import socket
 import time
 from threading import Event
-from threading import Lock
 
 import grpc
 
 from gen.grpc_server_pb2 import ClientInfo
 from gen.grpc_server_pb2 import FocusLinePositionServerStub
+from grpc_support import GenericClient
+from grpc_support import TimeoutException
 
 
-class PositionClient(object):
+class PositionClient(GenericClient):
     def __init__(self, hostname):
-        self._hostname = hostname if ":" in hostname else hostname + ":50051"
-        self._stopped = False
+        super(PositionClient, self).__init__(hostname)
+        self._ready = Event()
         self._id = -1
         self._in_focus = False
         self._mid_offset = -1
@@ -21,13 +22,12 @@ class PositionClient(object):
         self._mid_cross = -1
         self._width = -1
         self._middle_inc = -1
-        self._lock = Lock()
-        self._ready = Event()
 
     # Blocking
-    def get_position(self):
+    def get_position(self, timeout=None):
         while not self._stopped:
-            self._ready.wait()
+            if not self._ready.wait(timeout):
+                raise TimeoutException
             with self._lock:
                 if self._ready.is_set() and not self._stopped:
                     self._ready.clear()

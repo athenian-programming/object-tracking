@@ -9,6 +9,7 @@ import plotly.graph_objs as go
 import plotly.plotly as py
 import plotly.tools as tls
 
+from grpc_support import TimeoutException
 from position_client import PositionClient
 
 if __name__ == "__main__":
@@ -40,18 +41,28 @@ if __name__ == "__main__":
     s = py.Stream(stream_id)
     s.open()
 
-    logging.info("Opening plot.ly tab...")
+    logging.info("Opening plot.ly tab")
     time.sleep(5)
+
+    prev_pos = None
 
     try:
         while True:
-            pos = positions.get_position()
+            try:
+                pos = positions.get_position(timeout=0.5)
 
-            if not pos["in_focus"]:
-                continue
+                if not pos["in_focus"]:
+                    prev_pos = None
+                    continue
+
+                y = pos["mid_offset"]
+                prev_pos = y
+
+            # No change in value
+            except TimeoutException:
+                y = prev_pos
 
             x = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
-            y = pos["mid_offset"]
 
             s.write(dict(x=x, y=y))
             time.sleep(.10)

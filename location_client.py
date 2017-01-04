@@ -2,19 +2,18 @@ import logging
 import socket
 import time
 from threading import Event
-from threading import Lock
 
 import grpc
 
 from gen.grpc_server_pb2 import ClientInfo
 from gen.grpc_server_pb2 import ObjectLocationServerStub
+from grpc_support import GenericClient
+from grpc_support import TimeoutException
 
 
-class LocationClient(object):
+class LocationClient(GenericClient):
     def __init__(self, hostname):
-        self._hostname = hostname if ":" in hostname else hostname + ":50051"
-        self._stopped = False
-        self._lock = Lock()
+        super(LocationClient, self).__init__(hostname)
         self._x_ready = Event()
         self._y_ready = Event()
         self._id = -1
@@ -25,18 +24,20 @@ class LocationClient(object):
         self._middle_inc = -1
 
     # Blocking
-    def get_x(self):
+    def get_x(self, timeout=None):
         while not self._stopped:
-            self._x_ready.wait()
+            if not self._x_ready.wait():
+                raise TimeoutException
             with self._lock:
                 if self._x_ready.is_set() and not self._stopped:
                     self._x_ready.clear()
                     return self._x, self._width, self._middle_inc, self._id
 
     # Blocking
-    def get_y(self):
+    def get_y(self, timeout=None):
         while not self._stopped:
-            self._y_ready.wait()
+            if not self._y_ready.wait():
+                raise TimeoutException
             with self._lock:
                 if self._y_ready.is_set() and not self._stopped:
                     self._y_ready.clear()
