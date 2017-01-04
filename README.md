@@ -142,17 +142,27 @@ $ pip install imutils
 ### Software
 * [PyCharm IDE](https://www.jetbrains.com/pycharm/)
 * [Pyfirmata](https://github.com/tino/pyFirmata)
-* [Blinkt Docs](http://docs.pimoroni.com/blinkt/)
-* [Flask](http://flask.pocoo.org)
 * [gRPC](http://www.grpc.io/docs/tutorials/basic/python.html)
-* [OpenCV Python Tutorial](http://docs.opencv.org/3.0-beta/doc/py_tutorials/py_tutorials.html)
-
-### System
-* [Installing OpenCV3 with Python 2.7 on Sierra](http://www.pyimagesearch.com/2016/11/28/macos-install-opencv-3-and-python-2-7/)
 * [OpenCV](https://github.com/opencv/opencv)
+* [OpenCV Python Tutorial](http://docs.opencv.org/3.0-beta/doc/py_tutorials/py_tutorials.html)
+* [Blinkt Docs](http://docs.pimoroni.com/blinkt/)
 
 
 ## Setup Details
+
+### Installing gRPC for Python
+
+```bash
+$ pip install grpcio
+$ pip install grpc-tools 
+```
+
+### Installing OpenCV3
+
+```bash
+$ brew tap homebrew/science
+$ brew install opencv3 --with-contrib --with-python3 --with-java --with-examples 
+```
 
 ### Displaying Raspi camera images on OSX
 
