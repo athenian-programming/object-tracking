@@ -123,12 +123,13 @@ $ python line_follower.py --bgr "[174, 56, 5]" --display
 
 ### Client
 
-Required pip packages: grpcio
+Required pip packages: grpcio, future, imutils, pyFirmata
 
 ```bash
 $ pip install grpcio
 $ pip install future
 $ pip install imutils
+$ pip install pyFirmata
 ```
 
 
@@ -149,13 +150,6 @@ $ pip install imutils
 
 
 ## Setup Details
-
-### Installing gRPC for Python
-
-```bash
-$ pip install grpcio
-$ pip install grpc-tools 
-```
 
 ### Installing OpenCV3
 
