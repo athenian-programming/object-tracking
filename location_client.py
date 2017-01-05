@@ -14,34 +14,34 @@ from grpc_support import TimeoutException
 class LocationClient(GenericClient):
     def __init__(self, hostname):
         super(LocationClient, self).__init__(hostname)
-        self._x_ready = Event()
-        self._y_ready = Event()
-        self._id = -1
-        self._x = -1
-        self._y = -1
-        self._width = -1
-        self._height = -1
-        self._middle_inc = -1
+        self.__x_ready = Event()
+        self.__y_ready = Event()
+        self.__id = -1
+        self.__x = -1
+        self.__y = -1
+        self.__width = -1
+        self.__height = -1
+        self.__middle_inc = -1
 
     # Blocking
     def get_x(self, timeout=None):
         while not self._stopped:
-            if not self._x_ready.wait():
+            if not self.__x_ready.wait():
                 raise TimeoutException
             with self._lock:
-                if self._x_ready.is_set() and not self._stopped:
-                    self._x_ready.clear()
-                    return self._x, self._width, self._middle_inc, self._id
+                if self.__x_ready.is_set() and not self._stopped:
+                    self.__x_ready.clear()
+                    return self.__x, self.__width, self.__middle_inc, self.__id
 
     # Blocking
     def get_y(self, timeout=None):
         while not self._stopped:
-            if not self._y_ready.wait():
+            if not self.__y_ready.wait():
                 raise TimeoutException
             with self._lock:
-                if self._y_ready.is_set() and not self._stopped:
-                    self._y_ready.clear()
-                    return self._y, self._height, self._middle_inc, self._id
+                if self.__y_ready.is_set() and not self._stopped:
+                    self.__y_ready.clear()
+                    return self.__y, self.__height, self.__middle_inc, self.__id
 
     # Blocking
     def get_xy(self):
@@ -49,11 +49,11 @@ class LocationClient(GenericClient):
 
     # Non-blocking
     def get_loc(self, name):
-        return self._x if name == "x" else self._y
+        return self.__x if name == "x" else self.__y
 
     # Non-blocking
     def get_size(self, name):
-        return self._width if name == "x" else self._height
+        return self.__width if name == "x" else self.__height
 
     def read_locations(self, pause_secs=2.0):
         channel = grpc.insecure_channel(self._hostname)
@@ -73,14 +73,14 @@ class LocationClient(GenericClient):
             try:
                 for loc in stub.getObjectLocations(client_info):
                     with self._lock:
-                        self._id = loc.id
-                        self._x = loc.x
-                        self._y = loc.y
-                        self._width = loc.width
-                        self._height = loc.height
-                        self._middle_inc = loc.middle_inc
-                    self._x_ready.set()
-                    self._y_ready.set()
+                        self.__id = loc.id
+                        self.__x = loc.x
+                        self.__y = loc.y
+                        self.__width = loc.width
+                        self.__height = loc.height
+                        self.__middle_inc = loc.middle_inc
+                    self.__x_ready.set()
+                    self.__y_ready.set()
             except BaseException as e:
                 logging.info("Disconnected from gRPC server at {0} [{1}]".format(self._hostname, e))
                 time.sleep(pause_secs)
@@ -88,5 +88,5 @@ class LocationClient(GenericClient):
     def stop(self):
         logging.info("Stopping location client")
         self._stopped = True
-        self._x_ready.set()
-        self._y_ready.set()
+        self.__x_ready.set()
+        self.__y_ready.set()

@@ -1,6 +1,5 @@
 import logging
 import time
-from threading import Lock
 
 import grpc
 from concurrent import futures
@@ -15,7 +14,6 @@ from grpc_support import GenericServer
 class PositionServer(FocusLinePositionServerServicer, GenericServer):
     def __init__(self, port):
         super(PositionServer, self).__init__(port)
-        self._cnt_lock = Lock()
 
     def registerClient(self, request, context):
         logging.info("Connected to client {0} [{1}]".format(context.peer(), request.info))
@@ -25,17 +23,17 @@ class PositionServer(FocusLinePositionServerServicer, GenericServer):
 
     def getFocusLinePositions(self, request, context):
         client_info = request.info
-        return self._currval_generator(context.peer())
+        return self.currval_generator(context.peer())
 
     def write_position(self, in_focus, mid_offset, degrees, mid_line_cross, width, middle_inc):
         if not self._stopped:
-            self._set_currval(FocusLinePosition(id=self._id,
-                                                in_focus=in_focus,
-                                                mid_offset=mid_offset,
-                                                degrees=degrees,
-                                                mid_line_cross=mid_line_cross,
-                                                width=width,
-                                                middle_inc=middle_inc))
+            self.set_currval(FocusLinePosition(id=self._id,
+                                               in_focus=in_focus,
+                                               mid_offset=mid_offset,
+                                               degrees=degrees,
+                                               mid_line_cross=mid_line_cross,
+                                               width=width,
+                                               middle_inc=middle_inc))
             self._id += 1
 
     def start_position_server(self):

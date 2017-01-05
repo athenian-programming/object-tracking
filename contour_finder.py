@@ -20,15 +20,15 @@ class ContourFinder(object):
         bgr_img = np.uint8([[bgr_color]])
         hsv_img = cv2.cvtColor(bgr_img, cv2.COLOR_BGR2HSV)
         hsv_value = hsv_img[0, 0, 0]
-        self._lower = np.array([hsv_value - hsv_range, 100, 100])
-        self._upper = np.array([hsv_value + hsv_range, 255, 255])
+        self.__lower = np.array([hsv_value - hsv_range, 100, 100])
+        self.__upper = np.array([hsv_value + hsv_range, 255, 255])
 
     def get_max_contour(self, image, minimum):
         # Convert from BGR to HSV colorspace
         hsv_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
         # Threshold the HSV image to get only target colors
-        in_range_mask = cv2.inRange(hsv_image, self._lower, self._upper)
+        in_range_mask = cv2.inRange(hsv_image, self.__lower, self.__upper)
 
         # Bitwise-AND mask and original image
         in_range_result = cv2.bitwise_and(image, image, mask=in_range_mask)

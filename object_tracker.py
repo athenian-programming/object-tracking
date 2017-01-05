@@ -23,54 +23,54 @@ from opencv_utils import is_raspi
 
 class ObjectTracker:
     def __init__(self, bgr_color, width, percent, minimum, hsv_range, grpc_port, display=False):
-        self._width = width
-        self._orig_percent = percent
-        self._orig_width = width
-        self._percent = percent
-        self._minimum = minimum
-        self._display = display
-        self._stopped = False
+        self.__width = width
+        self.__orig_percent = percent
+        self.__orig_width = width
+        self.__percent = percent
+        self.__minimum = minimum
+        self.__display = display
+        self.__stopped = False
 
-        self._prev_x = -1
-        self._prev_y = -1
-        self._cnt = 0
-        self._lock = Lock()
-        self._currval = None
+        self.__prev_x = -1
+        self.__prev_y = -1
+        self.__cnt = 0
+        self.__lock = Lock()
+        self.__currval = None
 
-        self._contour_finder = ContourFinder(bgr_color, hsv_range)
-        self._location_server = LocationServer(grpc_port)
-        self._cam = camera.Camera()
+        self.__contour_finder = ContourFinder(bgr_color, hsv_range)
+        self.__location_server = LocationServer(grpc_port)
+        self.__cam = camera.Camera()
 
-    def _set_percent(self, percent):
+    def set_percent(self, percent):
         if 2 <= percent <= 98:
-            self._percent = percent
-            self._prev_x = -1
-            self._prev_y = -1
+            self.__percent = percent
+            self.__prev_x = -1
+            self.__prev_y = -1
 
-    def _set_width(self, width):
+    def set_width(self, width):
         if 200 <= width <= 4000:
-            self._width = width
-            self._prev_x = -1
-            self._prev_y = -1
+            self.__width = width
+            self.__prev_x = -1
+            self.__prev_y = -1
 
     # Do not run this in a background thread. cv2.waitKey has to run in main thread
     def start(self):
 
         try:
-            Thread(target=self._location_server.start_location_server).start()
+            Thread(target=self.__location_server.start_location_server).start()
             time.sleep(1)
         except BaseException as e:
             logging.error("Unable to start location server [{0}]".format(e))
             sys.exit(1)
 
-        self._location_server.write_location(-1, -1, 0, 0, 0)
+        self.__location_server.write_location(-1, -1, 0, 0, 0)
 
-        while self._cam.is_open() and not self._stopped:
+        while self.__cam.is_open() and not self.__stopped:
 
-            image = self._cam.read()
-            image = imutils.resize(image, width=self._width)
+            image = self.__cam.read()
+            image = imutils.resize(image, width=self.__width)
 
-            middle_pct = (self._percent / 100.0) / 2
+            middle_pct = (self.__percent / 100.0) / 2
             img_height, img_width = image.shape[:2]
 
             mid_x = img_width / 2
@@ -81,17 +81,17 @@ class ObjectTracker:
             # The middle margin calculation is based on % of width for horizontal and vertical boundry
             middle_inc = int(mid_x * middle_pct)
 
-            text = "#{0} ({1}, {2})".format(self._cnt, img_width, img_height)
-            text += " {0}%".format(self._percent)
+            text = "#{0} ({1}, {2})".format(self.__cnt, img_width, img_height)
+            text += " {0}%".format(self.__percent)
 
-            contour = self._contour_finder.get_max_contour(image, self._minimum)
+            contour = self.__contour_finder.get_max_contour(image, self.__minimum)
             if contour is not None:
                 moment = cv2.moments(contour)
                 area = int(moment["m00"])
                 img_x = int(moment["m10"] / area)
                 img_y = int(moment["m01"] / area)
 
-                if self._display:
+                if self.__display:
                     x, y, w, h = cv2.boundingRect(contour)
                     cv2.rectangle(image, (x, y), (x + w, y + h), BLUE, 2)
                     cv2.drawContours(image, [contour], -1, GREEN, 2)
@@ -104,17 +104,17 @@ class ObjectTracker:
             x_missing = img_x == -1
             y_missing = img_y == -1
 
-            _set_left_leds(RED if x_missing else (GREEN if x_in_middle else BLUE))
-            _set_right_leds(RED if y_missing else (GREEN if y_in_middle else BLUE))
+            set_left_leds(RED if x_missing else (GREEN if x_in_middle else BLUE))
+            set_right_leds(RED if y_missing else (GREEN if y_in_middle else BLUE))
 
             # Write location if it is different from previous value written
-            if img_x != self._prev_x or img_y != self._prev_y:
-                self._location_server.write_location(img_x, img_y, img_width, img_height, middle_inc)
-                self._prev_x = img_x
-                self._prev_y = img_y
+            if img_x != self.__prev_x or img_y != self.__prev_y:
+                self.__location_server.write_location(img_x, img_y, img_width, img_height, middle_inc)
+                self.__prev_x = img_x
+                self.__prev_y = img_y
 
             # Display images
-            if self._display:
+            if self.__display:
                 x_color = GREEN if x_in_middle else RED if x_missing else BLUE
                 y_color = GREEN if y_in_middle else RED if y_missing else BLUE
                 cv2.line(image, (mid_x - middle_inc, 0), (mid_x - middle_inc, img_height), x_color, 1)
@@ -130,16 +130,16 @@ class ObjectTracker:
                 key = cv2.waitKey(1) & 0xFF
 
                 if key == ord("w"):
-                    self._set_width(self._width - 10)
+                    self.set_width(self.__width - 10)
                 elif key == ord("W"):
-                    self._set_width(self._width + 10)
+                    self.set_width(self.__width + 10)
                 elif key == ord("-") or key == ord("_"):
-                    self._set_percent(self._percent - 1)
+                    self.set_percent(self.__percent - 1)
                 elif key == ord("+") or key == ord("="):
-                    self._set_percent(self._percent + 1)
+                    self.set_percent(self.__percent + 1)
                 elif key == ord("r"):
-                    self._set_width(self._orig_width)
-                    self._set_percent(self._orig_percent)
+                    self.set_width(self.__orig_width)
+                    self.set_percent(self.__orig_percent)
                 elif key == ord("p"):
                     utils.save_image(image)
                 elif key == ord("q"):
@@ -149,25 +149,25 @@ class ObjectTracker:
                 # time.sleep(.01)
                 pass
 
-            self._cnt += 1
+            self.__cnt += 1
 
         if is_raspi():
             clear()
-        self._cam.close()
+        self.__cam.close()
 
     def stop(self):
-        self._stopped = True
-        self._location_server.stop()
+        self.__stopped = True
+        self.__location_server.stop()
 
 
-def _set_left_leds(color):
+def set_left_leds(color):
     if is_raspi():
         for i in range(0, 4):
             set_pixel(i, color[2], color[1], color[0], brightness=0.05)
         show()
 
 
-def _set_right_leds(color):
+def set_right_leds(color):
     if is_raspi():
         for i in range(4, 8):
             set_pixel(i, color[2], color[1], color[0], brightness=0.05)

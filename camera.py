@@ -10,22 +10,22 @@ class Camera(object):
         if is_raspi():
             from imutils.video import VideoStream
             # initialize the video stream and allow the cammera sensor to warmup
-            self._vs = VideoStream(src=src, usePiCamera=use_picamera, resolution=resolution,
-                                   framerate=framerate).start()
+            self.__vs = VideoStream(src=src, usePiCamera=use_picamera, resolution=resolution,
+                                    framerate=framerate).start()
             time.sleep(2.0)
         else:
-            self._vp = cv2.VideoCapture(0)
+            self.__vp = cv2.VideoCapture(0)
 
     def is_open(self):
-        return True if is_raspi() else self._vp.isOpened()
+        return True if is_raspi() else self.__vp.isOpened()
 
     def read(self):
-        return self._vs.read() if is_raspi() else self._vp.read()[1]
+        return self.__vs.read() if is_raspi() else self.__vp.read()[1]
 
     def close(self):
         if is_raspi():
-            self._vs.stop()
+            self.__vs.stop()
         else:
-            self._vp.release()
+            self.__vp.release()
 
         cv2.destroyAllWindows()

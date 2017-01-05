@@ -151,7 +151,7 @@ $ pip install pyFirmata
 
 ## Setup Details
 
-### Installing OpenCV3
+### Installing OpenCV
 
 ```bash
 $ brew tap homebrew/science

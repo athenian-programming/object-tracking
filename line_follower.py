@@ -35,62 +35,62 @@ class LineFollower(object):
                  grpc_port,
                  report_midline,
                  display):
-        self._focus_line_pct = focus_line_pct
-        self._width = width
-        self._orig_percent = percent
-        self._orig_width = width
-        self._percent = percent
-        self._minimum = minimum
-        self._report_midline = report_midline
-        self._display = display
-        self._closed = False
+        self.__focus_line_pct = focus_line_pct
+        self.__width = width
+        self.__orig_percent = percent
+        self.__orig_width = width
+        self.__percent = percent
+        self.__minimum = minimum
+        self.__report_midline = report_midline
+        self.__display = display
+        self.__closed = False
 
-        self._prev_focus_img_x = -1
-        self._prev_mid_line_cross = -1
+        self.__prev_focus_img_x = -1
+        self.__prev_mid_line_cross = -1
 
-        self._cnt = 0
-        self._lock = Lock()
-        self._currval = None
+        self.__cnt = 0
+        self.__lock = Lock()
+        self.__currval = None
 
-        self._contour_finder = ContourFinder(bgr_color, hsv_range)
-        self._position_server = PositionServer(grpc_port)
-        self._cam = camera.Camera()
+        self.__contour_finder = ContourFinder(bgr_color, hsv_range)
+        self.__position_server = PositionServer(grpc_port)
+        self.__cam = camera.Camera()
 
-    def _set_focus_line_pct(self, focus_line_pct):
+    def set_focus_line_pct(self, focus_line_pct):
         if 1 <= focus_line_pct <= 99:
-            self._focus_line_pct = focus_line_pct
+            self.__focus_line_pct = focus_line_pct
 
-    def _set_width(self, width):
+    def set_width(self, width):
         if 200 <= width <= 2000:
-            self._width = width
-            self._prev_focus_img_x = None
-            self._prev_mid_line_cross = None
+            self.__width = width
+            self.__prev_focus_img_x = None
+            self.__prev_mid_line_cross = None
 
-    def _set_percent(self, percent):
+    def set_percent(self, percent):
         if 2 <= percent <= 98:
-            self._percent = percent
-            self._prev_focus_img_x = None
-            self._prev_mid_line_cross = None
+            self.__percent = percent
+            self.__prev_focus_img_x = None
+            self.__prev_mid_line_cross = None
 
     # Do not run this in a background thread. cv2.waitKey has to run in main thread
     def start(self):
         try:
-            Thread(target=self._position_server.start_position_server).start()
+            Thread(target=self.__position_server.start_position_server).start()
             time.sleep(1)
         except BaseException as e:
             logging.error("Unable to start position server [{0}]".format(e))
             sys.exit(1)
 
-        self._position_server.write_position(False, -1, -1, -1, -1, -1)
+        self.__position_server.write_position(False, -1, -1, -1, -1, -1)
 
-        while self._cam.is_open() and not self._closed:
+        while self.__cam.is_open() and not self.__closed:
 
-            image = self._cam.read()
-            image = imutils.resize(image, width=self._width)
+            image = self.__cam.read()
+            image = imutils.resize(image, width=self.__width)
 
             img_height, img_width = image.shape[:2]
 
-            middle_pct = (self._percent / 100.0) / 2
+            middle_pct = (self.__percent / 100.0) / 2
             mid_x = img_width / 2
             mid_y = img_height / 2
             mid_inc = int(mid_x * middle_pct)
@@ -100,23 +100,23 @@ class LineFollower(object):
             degrees = None
             mid_line_cross = None
 
-            focus_line_y = int(img_height - (img_height * (self._focus_line_pct / 100.0)))
+            focus_line_y = int(img_height - (img_height * (self.__focus_line_pct / 100.0)))
 
             focus_mask = np.zeros(image.shape[:2], dtype="uint8")
             cv2.rectangle(focus_mask, (0, focus_line_y - 5), (img_width, focus_line_y + 5), 255, -1)
             focus_image = cv2.bitwise_and(image, image, mask=focus_mask)
 
-            focus_contour = self._contour_finder.get_max_contour(focus_image, 100)
+            focus_contour = self.__contour_finder.get_max_contour(focus_image, 100)
             if focus_contour is not None:
                 focus_moment = cv2.moments(focus_contour)
                 focus_area = int(focus_moment["m00"])
                 focus_img_x = int(focus_moment["m10"] / focus_area)
                 # focus_img_y = int(focus_moment["m01"] / focus_area)
 
-            text = "#{0} ({1}, {2})".format(self._cnt, img_width, img_height)
-            text += " {0}%".format(self._percent)
+            text = "#{0} ({1}, {2})".format(self.__cnt, img_width, img_height)
+            text += " {0}%".format(self.__percent)
 
-            contour = self._contour_finder.get_max_contour(image, self._minimum)
+            contour = self.__contour_finder.get_max_contour(image, self.__minimum)
             if contour is not None:
                 moment = cv2.moments(contour)
                 area = int(moment["m00"])
@@ -132,7 +132,7 @@ class LineFollower(object):
                 rect = cv2.minAreaRect(contour)
                 box = cv2.boxPoints(rect)
 
-                # if self._display:
+                # if self.__display:
                 #    cv2.drawContours(image, [np.int0(box)], 0, RED, 2)
 
                 point_lr = box[0]
@@ -170,13 +170,13 @@ class LineFollower(object):
                 if slope is None:
                     # Vertical
                     y_inter = None
-                    if self._display:
+                    if self.__display:
                         cv2.line(image, (img_x, 0), (img_x, img_height), BLUE, 2)
                 else:
                     # Non vertical
                     y_inter = int(img_y - (slope * img_x))
                     other_y = int((img_width * slope) + y_inter)
-                    if self._display:
+                    if self.__display:
                         cv2.line(image, (0, y_inter), (img_width, other_y), BLUE, 2)
 
                 if focus_img_x is not None:
@@ -220,25 +220,25 @@ class LineFollower(object):
             focus_x_missing = focus_img_x is None
 
             # Write position if it is different from previous value written
-            if focus_img_x != self._prev_focus_img_x or (
-                        self._report_midline and mid_line_cross != self._prev_mid_line_cross):
-                self._position_server.write_position(focus_img_x is not None,
+            if focus_img_x != self.__prev_focus_img_x or (
+                        self.__report_midline and mid_line_cross != self.__prev_mid_line_cross):
+                self.__position_server.write_position(focus_img_x is not None,
                                                      focus_img_x - mid_x if focus_img_x is not None else 0,
-                                                     degrees,
-                                                     mid_line_cross if mid_line_cross is not None else -1,
-                                                     img_width,
-                                                     mid_inc)
-                self._prev_focus_img_x = focus_img_x
-                self._prev_mid_line_cross = mid_line_cross
+                                                      degrees,
+                                                      mid_line_cross if mid_line_cross is not None else -1,
+                                                      img_width,
+                                                      mid_inc)
+                self.__prev_focus_img_x = focus_img_x
+                self.__prev_mid_line_cross = mid_line_cross
 
             if focus_x_missing:
-                _set_left_leds(RED)
-                _set_right_leds(RED)
+                set_left_leds(RED)
+                set_right_leds(RED)
             else:
-                _set_left_leds(GREEN if focus_in_middle else BLUE)
-                _set_right_leds(GREEN if focus_in_middle else BLUE)
+                set_left_leds(GREEN if focus_in_middle else BLUE)
+                set_right_leds(GREEN if focus_in_middle else BLUE)
 
-            if self._display:
+            if self.__display:
                 # Draw focus line
                 cv2.line(image, (0, focus_line_y), (img_width, focus_line_y), GREEN, 2)
 
@@ -265,20 +265,20 @@ class LineFollower(object):
                 key = cv2.waitKey(30) & 0xFF
 
                 if key == ord("w"):
-                    self._set_width(self._width - 10)
+                    self.set_width(self.__width - 10)
                 elif key == ord("W"):
-                    self._set_width(self._width + 10)
+                    self.set_width(self.__width + 10)
                 elif key == ord("-") or key == ord("_"):
-                    self._set_percent(self._percent - 1)
+                    self.set_percent(self.__percent - 1)
                 elif key == ord("+") or key == ord("="):
-                    self._set_percent(self._percent + 1)
+                    self.set_percent(self.__percent + 1)
                 elif key == ord("j"):
-                    self._set_focus_line_pct(self._focus_line_pct - 1)
+                    self.set_focus_line_pct(self.__focus_line_pct - 1)
                 elif key == ord("k"):
-                    self._set_focus_line_pct(self._focus_line_pct + 1)
+                    self.set_focus_line_pct(self.__focus_line_pct + 1)
                 elif key == ord("r"):
-                    self._set_width(self._orig_width)
-                    self._set_percent(self._orig_percent)
+                    self.set_width(self.__orig_width)
+                    self.set_percent(self.__orig_percent)
                 elif key == ord("p"):
                     utils.save_image(image)
                 elif key == ord("q"):
@@ -287,15 +287,15 @@ class LineFollower(object):
                 # Nap if display is not on
                 time.sleep(.1)
 
-            self._cnt += 1
+            self.__cnt += 1
 
         if is_raspi():
             clear()
-        self._cam.close()
+        self.__cam.close()
 
     def stop(self):
-        self._closed = True
-        self._position_server.stop()
+        self.__closed = True
+        self.__position_server.stop()
 
 
 def distance(point1, point2):
@@ -304,14 +304,14 @@ def distance(point1, point2):
     return int(math.sqrt(xsqr + ysqr))
 
 
-def _set_left_leds(color):
+def set_left_leds(color):
     if is_raspi():
         for i in range(0, 4):
             set_pixel(i, color[2], color[1], color[0], brightness=0.05)
         show()
 
 
-def _set_right_leds(color):
+def set_right_leds(color):
     if is_raspi():
         for i in range(4, 8):
             set_pixel(i, color[2], color[1], color[0], brightness=0.05)

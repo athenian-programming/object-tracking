@@ -14,30 +14,30 @@ from grpc_support import TimeoutException
 class PositionClient(GenericClient):
     def __init__(self, hostname):
         super(PositionClient, self).__init__(hostname)
-        self._ready = Event()
-        self._id = -1
-        self._in_focus = False
-        self._mid_offset = -1
-        self._degrees = -1
-        self._mid_cross = -1
-        self._width = -1
-        self._middle_inc = -1
+        self.__ready = Event()
+        self.__id = -1
+        self.__in_focus = False
+        self.__mid_offset = -1
+        self.__degrees = -1
+        self.__mid_cross = -1
+        self.__width = -1
+        self.__middle_inc = -1
 
     # Blocking
     def get_position(self, timeout=None):
         while not self._stopped:
-            if not self._ready.wait(timeout):
+            if not self.__ready.wait(timeout):
                 raise TimeoutException
             with self._lock:
-                if self._ready.is_set() and not self._stopped:
-                    self._ready.clear()
-                    return {"id": self._id,
-                            "in_focus": self._in_focus,
-                            "mid_offset": self._mid_offset,
-                            "degrees": self._degrees,
-                            "mid_cross": self._mid_cross,
-                            "width": self._width,
-                            "middle_inc": self._middle_inc}
+                if self.__ready.is_set() and not self._stopped:
+                    self.__ready.clear()
+                    return {"id": self.__id,
+                            "in_focus": self.__in_focus,
+                            "mid_offset": self.__mid_offset,
+                            "degrees": self.__degrees,
+                            "mid_cross": self.__mid_cross,
+                            "width": self.__width,
+                            "middle_inc": self.__middle_inc}
 
     def read_positions(self, pause_secs=2.0):
         channel = grpc.insecure_channel(self._hostname)
@@ -56,14 +56,14 @@ class PositionClient(GenericClient):
             try:
                 for pos in stub.getFocusLinePositions(client_info):
                     with self._lock:
-                        self._id = pos.id
-                        self._in_focus = pos.in_focus
-                        self._mid_offset = pos.mid_offset
-                        self._degrees = pos.degrees
-                        self._mid_cross = pos.mid_line_cross
-                        self._width = pos.width
-                        self._middle_inc = pos.middle_inc
-                    self._ready.set()
+                        self.__id = pos.id
+                        self.__in_focus = pos.in_focus
+                        self.__mid_offset = pos.mid_offset
+                        self.__degrees = pos.degrees
+                        self.__mid_cross = pos.mid_line_cross
+                        self.__width = pos.width
+                        self.__middle_inc = pos.middle_inc
+                    self.__ready.set()
             except BaseException as e:
                 logging.info("Disconnected from gRPC server at {0} [{1}]".format(self._hostname, e))
                 time.sleep(pause_secs)
@@ -71,4 +71,4 @@ class PositionClient(GenericClient):
     def stop(self):
         logging.info("Stopping position client")
         self._stopped = True
-        self._ready.set()
+        self.__ready.set()

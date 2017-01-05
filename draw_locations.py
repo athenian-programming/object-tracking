@@ -16,18 +16,18 @@ else:
 
 class LocationSketch(object):
     def __init__(self, canvas):
-        self._canvas = canvas
-        self._drawLines = True
-        self._drawPoints = True
+        self.__canvas = canvas
+        self.__drawLines = True
+        self.__drawPoints = True
 
     def toggle_lines(self):
-        self._drawLines = not self._drawLines
+        self.__drawLines = not self.__drawLines
 
     def toggle_points(self):
-        self._drawPoints = not self._drawPoints
+        self.__drawPoints = not self.__drawPoints
 
     def clear_canvas(self):
-        self._canvas.delete("all")
+        self.__canvas.delete("all")
 
     def plot_vals(self, locations, w, h):
         prev_x, prev_y = None, None
@@ -41,8 +41,8 @@ class LocationSketch(object):
 
             # Check if width of image has changed
             if x_val[1] != curr_w:
-                self._canvas.delete("all")
-                self._canvas.config(width=x_val[1], height=y_val[1])
+                self.__canvas.delete("all")
+                self.__canvas.config(width=x_val[1], height=y_val[1])
                 curr_w = x_val[1]
                 prev_x, prev_y = None, None
                 continue
@@ -50,11 +50,11 @@ class LocationSketch(object):
             x = abs(x_val[1] - x_val[0])
             y = y_val[0]
 
-            if self._drawPoints:
-                self._canvas.create_oval(x - 1, y - 1, x + 1, y + 1)
+            if self.__drawPoints:
+                self.__canvas.create_oval(x - 1, y - 1, x + 1, y + 1)
 
-            if self._drawLines and prev_x is not None:
-                self._canvas.create_line(prev_x, prev_y, x, y, fill="red")
+            if self.__drawLines and prev_x is not None:
+                self.__canvas.create_line(prev_x, prev_y, x, y, fill="red")
 
             prev_x, prev_y = x, y
 
