@@ -26,7 +26,7 @@ class LocationClient(GenericClient):
     # Blocking
     def get_x(self, timeout=None):
         while not self._stopped:
-            if not self.__x_ready.wait():
+            if not self.__x_ready.wait(timeout):
                 raise TimeoutException
             with self._lock:
                 if self.__x_ready.is_set() and not self._stopped:
@@ -36,7 +36,7 @@ class LocationClient(GenericClient):
     # Blocking
     def get_y(self, timeout=None):
         while not self._stopped:
-            if not self.__y_ready.wait():
+            if not self.__y_ready.wait(timeout):
                 raise TimeoutException
             with self._lock:
                 if self.__y_ready.is_set() and not self._stopped:

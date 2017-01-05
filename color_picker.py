@@ -83,11 +83,10 @@ class ColorPicker(object):
                 self.__x_adj = 0
                 self.__y_adj = 0
             elif key == ord("q"):
-                break
+                self.__cam.close()
 
             cnt += 1
 
-        self.__cam.close()
         print("Exiting...")
 
 
