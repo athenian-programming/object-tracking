@@ -53,10 +53,11 @@ class GenericServer(object):
                     logging.error("Error releasing client {0}".format(name))
 
     def stop(self):
-        logging.info("Stopping server")
-        self._stopped = True
-        self.set_currval(None)
-        self._grpc_server.stop(0)
+        if not self._stopped:
+            logging.info("Stopping server")
+            self._stopped = True
+            self.set_currval(None)
+            self._grpc_server.stop(0)
 
 
 class TimeoutException(Exception):

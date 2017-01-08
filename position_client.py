@@ -69,6 +69,7 @@ class PositionClient(GenericClient):
                 time.sleep(pause_secs)
 
     def stop(self):
-        logging.info("Stopping position client")
-        self._stopped = True
-        self.__ready.set()
+        if not self._stopped:
+            logging.info("Stopping position client")
+            self._stopped = True
+            self.__ready.set()

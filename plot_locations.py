@@ -57,6 +57,7 @@ if __name__ == "__main__":
             time.sleep(.10)
 
     except KeyboardInterrupt:
+        print("Exiting...")
+    finally:
         s.close()
         locations.stop()
-        print("Exiting...")

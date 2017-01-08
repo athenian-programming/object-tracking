@@ -209,7 +209,6 @@ if __name__ == "__main__":
     try:
         tracker.start()
     except KeyboardInterrupt:
+        logging.info("Exiting...")
+    finally:
         tracker.stop()
-        pass
-
-    logging.info("Exiting...")

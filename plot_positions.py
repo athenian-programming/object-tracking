@@ -67,8 +67,8 @@ if __name__ == "__main__":
             s.write(dict(x=x, y=y))
             time.sleep(.10)
 
-
     except KeyboardInterrupt:
+        print("Exiting...")
+    finally:
         s.close()
         positions.stop()
-        print("Exiting...")

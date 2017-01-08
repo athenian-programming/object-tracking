@@ -26,5 +26,6 @@ if __name__ == "__main__":
             except TimeoutException:
                 print("No change in value")
     except KeyboardInterrupt:
-        positions.stop()
         print("Exiting...")
+    finally:
+        positions.stop()

@@ -46,4 +46,6 @@ class PositionServer(FocusLinePositionServerServicer, GenericServer):
             while not self._stopped:
                 time.sleep(1)
         except KeyboardInterrupt:
+            pass
+        finally:
             self.stop()

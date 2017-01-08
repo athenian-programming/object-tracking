@@ -353,7 +353,6 @@ if __name__ == "__main__":
     try:
         line_follower.start()
     except KeyboardInterrupt:
+        logging.info("Exiting...")
+    finally:
         line_follower.stop()
-        pass
-
-    logging.info("Exiting...")

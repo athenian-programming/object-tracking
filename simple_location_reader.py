@@ -23,5 +23,6 @@ if __name__ == "__main__":
         while True:
             print("Got location: {0}".format(locations.get_xy()))
     except KeyboardInterrupt:
-        locations.stop()
         print("Exiting...")
+    finally:
+        locations.stop()

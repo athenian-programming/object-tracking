@@ -86,7 +86,8 @@ class LocationClient(GenericClient):
                 time.sleep(pause_secs)
 
     def stop(self):
-        logging.info("Stopping location client")
-        self._stopped = True
-        self.__x_ready.set()
-        self.__y_ready.set()
+        if not self._stopped:
+            logging.info("Stopping location client")
+            self._stopped = True
+            self.__x_ready.set()
+            self.__y_ready.set()
