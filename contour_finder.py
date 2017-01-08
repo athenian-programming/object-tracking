@@ -39,5 +39,10 @@ class ContourFinder(object):
         # Get all contours
         contours = cv2.findContours(grayscale, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)[1]
 
+        # cv2.imshow("HSV", hsv_image)
+        # cv2.imshow("Mask", in_range_mask)
+        # cv2.imshow("Res", in_range_result)
+        # cv2.imshow("Grayscale", grayscale)
+
         # Return max contour
         return find_max_contour(contours, minimum)

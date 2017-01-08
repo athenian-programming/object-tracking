@@ -29,8 +29,8 @@ def on_publish(client, userdata, mid):
 def publish_locations(client, userdata):
     while True:
         x_loc, y_loc = locations.get_xy()
-        (result, mid) = client.publish("/{0}/x".format(userdata[__CAMERA_NAME]), payload=x_loc[0])
-        (result, mid) = client.publish("/{0}/y".format(userdata[__CAMERA_NAME]), payload=y_loc[0])
+        result, mid = client.publish("/{0}/x".format(userdata[__CAMERA_NAME]), payload=x_loc[0])
+        result, mid = client.publish("/{0}/y".format(userdata[__CAMERA_NAME]), payload=y_loc[0])
 
 
 if __name__ == "__main__":

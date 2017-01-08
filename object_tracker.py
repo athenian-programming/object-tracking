@@ -124,8 +124,6 @@ class ObjectTracker:
                 cv2.putText(image, text, ui.text_loc(), ui.text_font(), ui.text_size(), RED, 1)
 
                 cv2.imshow("Image", image)
-                # cv2.imshow("Mask", mask)
-                # cv2.imshow("Res", result)
 
                 key = cv2.waitKey(1) & 0xFF
 
