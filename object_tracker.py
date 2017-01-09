@@ -20,6 +20,12 @@ from opencv_utils import GREEN
 from opencv_utils import RED
 from opencv_utils import is_raspi
 
+if is_raspi():
+    from blinkt import set_pixel, show, clear
+    # import dothat.backlight as backlight
+    # import dothat.lcd as lcd
+    # backlight.rgb(200, 0,0)
+
 
 class ObjectTracker:
     def __init__(self, bgr_color, width, percent, minimum, hsv_range, grpc_port, display=False):
@@ -187,14 +193,6 @@ if __name__ == "__main__":
 
     logging.basicConfig(stream=sys.stderr, level=args["loglevel"],
                         format="%(asctime)s %(name)-10s %(funcName)-10s():%(lineno)i: %(levelname)-6s %(message)s")
-
-    # Raspi specific
-    # import dothat.backlight as backlight
-    # import dothat.lcd as lcd
-    # backlight.rgb(200, 0,0)
-
-    if is_raspi():
-        from blinkt import set_pixel, show, clear
 
     tracker = ObjectTracker(eval(args["bgr"]),
                             int(args["width"]),

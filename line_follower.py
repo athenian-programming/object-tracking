@@ -23,6 +23,9 @@ from opencv_utils import YELLOW
 from opencv_utils import is_raspi
 from position_server import PositionServer
 
+if is_raspi():
+    from blinkt import set_pixel, show, clear
+
 
 class LineFollower(object):
     def __init__(self,
@@ -336,9 +339,6 @@ if __name__ == "__main__":
 
     logging.basicConfig(stream=sys.stdout, level=args["loglevel"],
                         format="%(funcName)s():%(lineno)i: %(message)s %(levelname)s")
-
-    if is_raspi():
-        from blinkt import set_pixel, show, clear
 
     line_follower = LineFollower(eval(args["bgr"]),
                                  args["focus"],
