@@ -5,12 +5,13 @@ import sys
 
 import paho.mqtt.client as paho
 
-__CAMERA_NAME = "camera_name"
+from mqtt_utils import CAMERA_NAME
+from mqtt_utils import mqtt_server_info
 
 
 def on_connect(client, userdata, flags, rc):
     print("Connected with result code: {0}".format(rc))
-    client.subscribe("/{0}/#".format(userdata[__CAMERA_NAME]))
+    client.subscribe("/{0}/#".format(userdata[CAMERA_NAME]))
 
 
 def on_disconnect(client, userdata, flags, rc):
@@ -22,32 +23,32 @@ def on_message(client, userdata, msg):
 
 
 if __name__ == "__main__":
+    # Parse CLI args
     parser = argparse.ArgumentParser()
     parser.add_argument("-g", "--grpc", required=True, help="gRPC location server hostname")
     parser.add_argument("-m", "--mqtt", required=True, help="MQTT server hostname")
     parser.add_argument("-c", "--camera", required=True, help="Camera name")
     args = vars(parser.parse_args())
 
+    # Setup logging
     logging.basicConfig(stream=sys.stderr, level=logging.INFO,
                         format="%(asctime)s %(name)-10s %(funcName)-10s():%(lineno)i: %(levelname)-6s %(message)s")
 
-    if ":" in args["mqtt"]:
-        mqtt_hostname = args["mqtt"][:args["mqtt"].index(":")]
-        mqtt_port = int(args["mqtt"][args["mqtt"].index(":") + 1:])
-    else:
-        mqtt_hostname = args["mqtt"]
-        mqtt_port = 1883
+    # Determine MQTT server details
+    mqtt_hostname, mqtt_port = mqtt_server_info(args["mqtt"])
 
-    userdata = {__CAMERA_NAME: args["camera"]}
+    # Create userdata dictionary
+    userdata = {CAMERA_NAME: args["camera"]}
 
-    client = paho.Client()
-    client.user_data_set(userdata)
+    # Initialize MQTT client
+    client = paho.Client(userdata=userdata)
     client.on_connect = on_connect
     client.on_disconnect = on_disconnect
     client.on_message = on_message
 
     try:
-        logging.info("Connecting to MQTT server at {0}".format(args["mqtt"]))
+        # Connect to MQTT server
+        logging.info("Connecting to MQTT server at {0}:{1}".format(mqtt_hostname, mqtt_port))
         client.connect(mqtt_hostname, port=mqtt_port, keepalive=60)
         client.loop_forever()
     except socket.error:

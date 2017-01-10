@@ -9,8 +9,8 @@ from threading import Thread
 import paho.mqtt.client as paho
 
 from location_client import LocationClient
-
-__CAMERA_NAME = "camera_name"
+from mqtt_utils import CAMERA_NAME
+from mqtt_utils import mqtt_server_info
 
 
 def on_connect(client, userdata, flags, rc):
@@ -29,41 +29,41 @@ def on_publish(client, userdata, mid):
 def publish_locations(client, userdata):
     while True:
         x_loc, y_loc = locations.get_xy()
-        result, mid = client.publish("/{0}/x".format(userdata[__CAMERA_NAME]), payload=x_loc[0])
-        result, mid = client.publish("/{0}/y".format(userdata[__CAMERA_NAME]), payload=y_loc[0])
+        result, mid = client.publish("/{0}/x".format(userdata[CAMERA_NAME]), payload=x_loc[0])
+        result, mid = client.publish("/{0}/y".format(userdata[CAMERA_NAME]), payload=y_loc[0])
 
 
 if __name__ == "__main__":
+    # Parse CLI args
     parser = argparse.ArgumentParser()
     parser.add_argument("-g", "--grpc", required=True, help="gRPC location server hostname")
     parser.add_argument("-m", "--mqtt", required=True, help="MQTT server hostname")
     parser.add_argument("-c", "--camera", required=True, help="Camera name")
     args = vars(parser.parse_args())
 
+    locations = LocationClient(args["grpc"])
     logging.basicConfig(stream=sys.stderr, level=logging.INFO,
                         format="%(asctime)s %(name)-10s %(funcName)-10s():%(lineno)i: %(levelname)-6s %(message)s")
 
+    # Determine MQTT server details
+    mqtt_hostname, mqtt_port = mqtt_server_info(args["mqtt"])
+
+    # Create userdata dictionary
+    userdata = {CAMERA_NAME: args["camera"]}
+
+    # Start location reader in thread
     locations = LocationClient(args["grpc"])
-
-    if ":" in args["mqtt"]:
-        mqtt_hostname = args["mqtt"][:args["mqtt"].index(":")]
-        mqtt_port = int(args["mqtt"][args["mqtt"].index(":") + 1:])
-    else:
-        mqtt_hostname = args["mqtt"]
-        mqtt_port = 1883
-
-    userdata = {__CAMERA_NAME: args["camera"]}
-
     Thread(target=locations.read_locations).start()
 
-    client = paho.Client()
-    client.user_data_set(userdata)
+    # Initialize MQTT client
+    client = paho.Client(userdata=userdata)
     client.on_connect = on_connect
     client.on_disconnect = on_disconnect
     client.on_publish = on_publish
 
     try:
-        logging.info("Connecting to MQTT server at {0}".format(args["mqtt"]))
+        # Connect to MQTT server
+        logging.info("Connecting to MQTT server at {0}:{1}".format(mqtt_hostname, mqtt_port))
         client.connect(mqtt_hostname, port=mqtt_port, keepalive=60)
         client.loop_forever()
     except socket.error:
