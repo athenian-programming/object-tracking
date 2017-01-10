@@ -8,6 +8,7 @@ from threading import Thread
 
 import grpc
 
+from defaults import FORMAT_DEFAULT
 from gen.grpc_server_pb2 import ClientInfo
 from gen.grpc_server_pb2 import FocusLinePositionServerStub
 from gen.grpc_server_pb2 import ObjectLocationServerStub
@@ -37,8 +38,7 @@ def read_positions(hostname):
 
 
 if __name__ == "__main__":
-    logging.basicConfig(stream=sys.stderr, level=logging.INFO,
-                        format="%(asctime)s %(name)-10s %(funcName)-10s():%(lineno)i: %(levelname)-6s %(message)s")
+    logging.basicConfig(stream=sys.stderr, level=logging.INFO, format=FORMAT_DEFAULT)
 
     Thread(target=read_locations, args=("localhost:50052",)).start()
     Thread(target=read_positions, args=("localhost:50053",)).start()

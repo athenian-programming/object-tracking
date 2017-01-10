@@ -11,9 +11,10 @@ import cv2
 import imutils
 
 import camera
+import defaults as defs
 import opencv_utils as utils
-import ui_defaults as ui
 from contour_finder import ContourFinder
+from defaults import FORMAT_DEFAULT
 from location_server import LocationServer
 from opencv_utils import BLUE
 from opencv_utils import GREEN
@@ -127,7 +128,7 @@ class ObjectTracker:
                 cv2.line(image, (mid_x + middle_inc, 0), (mid_x + middle_inc, img_height), x_color, 1)
                 cv2.line(image, (0, mid_y - middle_inc), (img_width, mid_y - middle_inc), y_color, 1)
                 cv2.line(image, (0, mid_y + middle_inc), (img_width, mid_y + middle_inc), y_color, 1)
-                cv2.putText(image, text, ui.text_loc(), ui.text_font(), ui.text_size(), RED, 1)
+                cv2.putText(image, text, defs.TEXT_LOC, defs.TEXT_FONT, defs.TEXT_SIZE, RED, 1)
 
                 cv2.imshow("Image", image)
 
@@ -191,8 +192,7 @@ if __name__ == "__main__":
                         action="store_const", dest="loglevel", const=logging.DEBUG)
     args = vars(parser.parse_args())
 
-    logging.basicConfig(stream=sys.stderr, level=args["loglevel"],
-                        format="%(asctime)s %(name)-10s %(funcName)-10s():%(lineno)i: %(levelname)-6s %(message)s")
+    logging.basicConfig(stream=sys.stderr, level=logging.INFO, format=FORMAT_DEFAULT)
 
     tracker = ObjectTracker(eval(args["bgr"]),
                             int(args["width"]),

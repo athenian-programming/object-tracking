@@ -8,6 +8,7 @@ from threading import Thread
 
 import paho.mqtt.client as paho
 
+from defaults import FORMAT_DEFAULT
 from location_client import LocationClient
 from mqtt_utils import CAMERA_NAME
 from mqtt_utils import mqtt_server_info
@@ -41,9 +42,7 @@ if __name__ == "__main__":
     parser.add_argument("-c", "--camera", required=True, help="Camera name")
     args = vars(parser.parse_args())
 
-    locations = LocationClient(args["grpc"])
-    logging.basicConfig(stream=sys.stderr, level=logging.INFO,
-                        format="%(asctime)s %(name)-10s %(funcName)-10s():%(lineno)i: %(levelname)-6s %(message)s")
+    logging.basicConfig(stream=sys.stderr, level=logging.INFO, format=FORMAT_DEFAULT)
 
     # Determine MQTT server details
     mqtt_hostname, mqtt_port = mqtt_server_info(args["mqtt"])

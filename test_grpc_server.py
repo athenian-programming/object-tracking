@@ -3,6 +3,7 @@ import sys
 import time
 from threading import Thread
 
+from defaults import FORMAT_DEFAULT
 from location_server import LocationServer
 from position_server import PositionServer
 
@@ -35,8 +36,7 @@ def test_position_server(port):
 
 
 if __name__ == "__main__":
-    logging.basicConfig(stream=sys.stderr, level=logging.INFO,
-                        format="%(asctime)s %(name)-10s %(funcName)-10s():%(lineno)i: %(levelname)-6s %(message)s")
+    logging.basicConfig(stream=sys.stderr, level=logging.INFO, format=FORMAT_DEFAULT)
 
     Thread(target=test_location_server, args=(50052,)).start()
     Thread(target=test_position_server, args=(50053,)).start()

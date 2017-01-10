@@ -5,6 +5,7 @@ import logging
 import sys
 from threading import Thread
 
+from defaults import FORMAT_DEFAULT
 from location_client import LocationClient
 from opencv_utils import is_python3
 
@@ -64,8 +65,7 @@ if __name__ == "__main__":
     parser.add_argument("-g", "--grpc", required=True, help="gRPC location server hostname")
     args = vars(parser.parse_args())
 
-    logging.basicConfig(stream=sys.stderr, level=logging.INFO,
-                        format="%(asctime)s %(name)-10s %(funcName)-10s():%(lineno)i: %(levelname)-6s %(message)s")
+    logging.basicConfig(stream=sys.stderr, level=logging.INFO, format=FORMAT_DEFAULT)
 
     locations = LocationClient(args["grpc"])
     Thread(target=locations.read_locations).start()

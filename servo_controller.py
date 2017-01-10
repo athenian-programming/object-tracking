@@ -7,6 +7,7 @@ from threading import Thread
 
 from pyfirmata import Arduino
 
+from defaults import FORMAT_DEFAULT
 from location_client import LocationClient
 from servo import Servo
 
@@ -161,8 +162,7 @@ if __name__ == "__main__":
                         action="store_const", dest="loglevel", const=logging.DEBUG)
     args = vars(parser.parse_args())
 
-    logging.basicConfig(stream=sys.stderr, level=args["loglevel"],
-                        format="%(asctime)s %(name)-10s %(funcName)-10s():%(lineno)i: %(levelname)-6s %(message)s")
+    logging.basicConfig(stream=sys.stderr, level=logging.INFO, format=FORMAT_DEFAULT)
 
     # Setup firmata client
     port = "/dev/" + args["serial"]

@@ -8,6 +8,7 @@ import plotly.graph_objs as go
 import plotly.plotly as py
 import plotly.tools as tls
 
+from defaults import FORMAT_DEFAULT
 from location_client import LocationClient
 
 if __name__ == "__main__":
@@ -15,8 +16,7 @@ if __name__ == "__main__":
     parser.add_argument("-g", "--grpc", required=True, help="gRPC location server hostname")
     args = vars(parser.parse_args())
 
-    logging.basicConfig(stream=sys.stderr, level=logging.INFO,
-                        format="%(asctime)s %(name)-10s %(funcName)-10s():%(lineno)i: %(levelname)-6s %(message)s")
+    logging.basicConfig(stream=sys.stderr, level=logging.INFO, format=FORMAT_DEFAULT)
 
     # Start location client
     locations = LocationClient(args["grpc"])

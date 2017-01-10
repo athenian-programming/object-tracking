@@ -13,8 +13,8 @@ import imutils
 import numpy as np
 
 import camera
+import defaults as defs
 import opencv_utils as utils
-import ui_defaults as ui
 from contour_finder import ContourFinder
 from opencv_utils import BLUE
 from opencv_utils import GREEN
@@ -260,7 +260,7 @@ class LineFollower(object):
                 x_color = GREEN if focus_in_middle else RED if focus_x_missing else BLUE
                 cv2.line(image, (mid_x - mid_inc, 0), (mid_x - mid_inc, img_height), x_color, 1)
                 cv2.line(image, (mid_x + mid_inc, 0), (mid_x + mid_inc, img_height), x_color, 1)
-                cv2.putText(image, text, ui.text_loc(), ui.text_font(), ui.text_size(), RED, 1)
+                cv2.putText(image, text, defs.TEXT_LOC, defs.TEXT_FONT, defs.TEXT_SIZE, RED, 1)
 
                 cv2.imshow("Image", image)
                 # cv2.imshow("Focus", focus_image)
