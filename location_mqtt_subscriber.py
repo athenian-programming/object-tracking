@@ -15,7 +15,7 @@ def on_connect(client, userdata, flags, rc):
     client.subscribe("/{0}/#".format(userdata[CAMERA_NAME]))
 
 
-def on_disconnect(client, userdata, flags, rc):
+def on_disconnect(client, userdata, rc):
     print("Disconnected with result code: {0}".format(rc))
 
 

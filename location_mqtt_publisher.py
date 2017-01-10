@@ -19,7 +19,7 @@ def on_connect(client, userdata, flags, rc):
     Thread(target=publish_locations, args=(client, userdata)).start()
 
 
-def on_disconnect(client, userdata, flags, rc):
+def on_disconnect(client, userdata, rc):
     print("Disconnected with result code: {0}".format(rc))
 
 
