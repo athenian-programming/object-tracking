@@ -129,7 +129,7 @@ Required pip packages: grpcio, future, imutils, pyFirmata
 $ pip install grpcio
 $ pip install future
 $ pip install imutils
-$ pip install pyFirmata
+$ pip install pyfirmata
 ```
 
 

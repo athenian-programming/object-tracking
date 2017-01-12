@@ -25,20 +25,21 @@ if __name__ == "__main__":
     stream_ids = tls.get_credentials_file()['stream_ids']
     stream_id = stream_ids[0]
 
-    trace1 = go.Scatter(x=[],
-                        y=[],
-                        mode='lines+markers',
-                        stream=dict(token=stream_id, maxpoints=80))
-    data = go.Data([trace1])
+    # Declare graph
+    graph = go.Scatter(x=[],
+                       y=[],
+                       mode='lines+markers',
+                       stream=dict(token=stream_id, maxpoints=80))
+    data = go.Data([graph])
     layout = go.Layout(title='Target Locations',
                        xaxis=go.XAxis(range=[0, 800]),
                        yaxis=go.YAxis(range=[0, 450]))
     fig = go.Figure(data=data, layout=layout)
     py.plot(fig, filename='plot-locations')
 
-    # Now write data
-    s = py.Stream(stream_id)
-    s.open()
+    # Write data
+    stream = py.Stream(stream_id)
+    stream.open()
 
     logging.info("Opening plot.ly tab")
     time.sleep(5)
@@ -53,11 +54,11 @@ if __name__ == "__main__":
             x = abs(x_val[1] - x_val[0])
             y = abs(y_val[1] - y_val[0])
 
-            s.write(dict(x=x, y=y))
+            stream.write(dict(x=x, y=y))
             time.sleep(.10)
 
     except KeyboardInterrupt:
         print("Exiting...")
     finally:
-        s.close()
+        stream.close()
         locations.stop()
