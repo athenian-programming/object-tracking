@@ -80,7 +80,7 @@ and adjusts the pan/tilt servos accordingly.
 ### Usage 
 
 ```bash
-$ python servo_controller.py --port ttyACM0 --grpc localhost
+$ servo_controller.py --port ttyACM0 --grpc localhost
 ```
 
 ### CLI Options
@@ -101,7 +101,7 @@ $ python servo_controller.py --port ttyACM0 --grpc localhost
 ### Usage 
 
 ```bash
-$ python line_follower.py --bgr "[174, 56, 5]" --display 
+$ line_follower.py --bgr "[174, 56, 5]" --display 
 ```
 
 ### CLI Options
