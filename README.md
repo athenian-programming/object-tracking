@@ -175,3 +175,8 @@ On the OSX machine type:
 $ xhost + my-raspi
 my-raspi being added to access control list
 ```
+
+### Plot.ly
+
+Details on setting up plot.ly are 
+[here](http://www.athenian-robotics.org/site/plotly/).
