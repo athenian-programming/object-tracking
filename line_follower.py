@@ -87,210 +87,212 @@ class LineFollower(object):
         self.__position_server.write_position(False, -1, -1, -1, -1, -1)
 
         while self.__cam.is_open() and not self.__closed:
+            try:
+                image = self.__cam.read()
+                image = imutils.resize(image, width=self.__width)
 
-            image = self.__cam.read()
-            image = imutils.resize(image, width=self.__width)
+                img_height, img_width = image.shape[:2]
 
-            img_height, img_width = image.shape[:2]
+                middle_pct = (self.__percent / 100.0) / 2
+                mid_x = img_width / 2
+                mid_y = img_height / 2
+                mid_inc = int(mid_x * middle_pct)
+                focus_line_inter = None
+                focus_img_x = None
+                mid_line_inter = None
+                degrees = None
+                mid_line_cross = None
 
-            middle_pct = (self.__percent / 100.0) / 2
-            mid_x = img_width / 2
-            mid_y = img_height / 2
-            mid_inc = int(mid_x * middle_pct)
-            focus_line_inter = None
-            focus_img_x = None
-            mid_line_inter = None
-            degrees = None
-            mid_line_cross = None
+                focus_line_y = int(img_height - (img_height * (self.__focus_line_pct / 100.0)))
 
-            focus_line_y = int(img_height - (img_height * (self.__focus_line_pct / 100.0)))
+                focus_mask = np.zeros(image.shape[:2], dtype="uint8")
+                cv2.rectangle(focus_mask, (0, focus_line_y - 5), (img_width, focus_line_y + 5), 255, -1)
+                focus_image = cv2.bitwise_and(image, image, mask=focus_mask)
 
-            focus_mask = np.zeros(image.shape[:2], dtype="uint8")
-            cv2.rectangle(focus_mask, (0, focus_line_y - 5), (img_width, focus_line_y + 5), 255, -1)
-            focus_image = cv2.bitwise_and(image, image, mask=focus_mask)
+                focus_contour = self.__contour_finder.get_max_contour(focus_image, 100)
+                if focus_contour is not None:
+                    focus_moment = cv2.moments(focus_contour)
+                    focus_area = int(focus_moment["m00"])
+                    focus_img_x = int(focus_moment["m10"] / focus_area)
+                    # focus_img_y = int(focus_moment["m01"] / focus_area)
 
-            focus_contour = self.__contour_finder.get_max_contour(focus_image, 100)
-            if focus_contour is not None:
-                focus_moment = cv2.moments(focus_contour)
-                focus_area = int(focus_moment["m00"])
-                focus_img_x = int(focus_moment["m10"] / focus_area)
-                # focus_img_y = int(focus_moment["m01"] / focus_area)
+                text = "#{0} ({1}, {2})".format(self.__cnt, img_width, img_height)
+                text += " {0}%".format(self.__percent)
 
-            text = "#{0} ({1}, {2})".format(self.__cnt, img_width, img_height)
-            text += " {0}%".format(self.__percent)
+                contour = self.__contour_finder.get_max_contour(image, self.__minimum)
+                if contour is not None:
+                    moment = cv2.moments(contour)
+                    area = int(moment["m00"])
+                    img_x = int(moment["m10"] / area)
+                    img_y = int(moment["m01"] / area)
 
-            contour = self.__contour_finder.get_max_contour(image, self.__minimum)
-            if contour is not None:
-                moment = cv2.moments(contour)
-                area = int(moment["m00"])
-                img_x = int(moment["m10"] / area)
-                img_y = int(moment["m01"] / area)
+                    # if self._display:
+                    # (x, y, w, h) = cv2.boundingRect(contour)
+                    # cv2.rectangle(frame, (x, y), (x + w, y + h), BLUE, 2)
+                    # cv2.drawContours(frame, [contour], -1, GREEN, 2)
+                    # cv2.circle(frame, (img_x, img_y), 4, RED, -1)
 
-                # if self._display:
-                # (x, y, w, h) = cv2.boundingRect(contour)
-                # cv2.rectangle(frame, (x, y), (x + w, y + h), BLUE, 2)
-                # cv2.drawContours(frame, [contour], -1, GREEN, 2)
-                # cv2.circle(frame, (img_x, img_y), 4, RED, -1)
+                    rect = cv2.minAreaRect(contour)
+                    box = cv2.boxPoints(rect)
 
-                rect = cv2.minAreaRect(contour)
-                box = cv2.boxPoints(rect)
+                    # if self.__display:
+                    #    cv2.drawContours(image, [np.int0(box)], 0, RED, 2)
 
-                # if self.__display:
-                #    cv2.drawContours(image, [np.int0(box)], 0, RED, 2)
+                    point_lr = box[0]
+                    point_ll = box[1]
+                    point_ul = box[2]
+                    point_ur = box[3]
 
-                point_lr = box[0]
-                point_ll = box[1]
-                point_ul = box[2]
-                point_ur = box[3]
+                    line1 = distance(point_lr, point_ur)
+                    line2 = distance(point_ur, point_ul)
 
-                line1 = distance(point_lr, point_ur)
-                line2 = distance(point_ur, point_ul)
+                    if line1 < line2:
+                        point_lr = box[1]
+                        point_ll = box[2]
+                        point_ul = box[3]
+                        point_ur = box[0]
+                        line_width = line1
+                    else:
+                        line_width = line2
 
-                if line1 < line2:
-                    point_lr = box[1]
-                    point_ll = box[2]
-                    point_ul = box[3]
-                    point_ur = box[0]
-                    line_width = line1
+                    delta_y = point_lr[1] - point_ur[1]
+                    delta_x = point_lr[0] - point_ur[0]
+
+                    # Calculate angle of line
+                    if delta_x == 0:
+                        # Vertical line
+                        slope = None
+                        degrees = 90
+                    else:
+                        # Non-vertical line
+                        slope = delta_y / delta_x
+                        radians = math.atan(slope)
+                        degrees = int(math.degrees(radians)) * -1
+
+                    # Draw line for slope
+                    if slope is None:
+                        # Vertical
+                        y_inter = None
+                        if self.__display:
+                            cv2.line(image, (img_x, 0), (img_x, img_height), BLUE, 2)
+                    else:
+                        # Non vertical
+                        y_inter = int(img_y - (slope * img_x))
+                        other_y = int((img_width * slope) + y_inter)
+                        if self.__display:
+                            cv2.line(image, (0, y_inter), (img_width, other_y), BLUE, 2)
+
+                    if focus_img_x is not None:
+                        text += " Pos: {0}".format(focus_img_x - mid_x)
+
+                    text += " Angle: {0}".format(degrees)
+
+                    # Calculate point where line intersects focus line
+                    if slope != 0:
+                        focus_line_inter = int((focus_line_y - y_inter) / slope) if y_inter is not None else img_x
+
+                    # Calculate point where line intersects x midpoint
+                    if slope is None:
+                        # Vertical line
+                        if focus_line_inter == mid_x:
+                            mid_line_inter = mid_y
+                    else:
+                        # Non-vertical line
+                        mid_line_inter = int((slope * mid_x) + y_inter)
+
+                    if mid_line_inter is not None:
+                        mid_line_cross = focus_line_y - mid_line_inter
+                        mid_line_cross = mid_line_cross if mid_line_cross > 0 else -1
+                        if mid_line_cross != -1:
+                            text += " Mid cross: {0}".format(mid_line_cross)
+
+                    pass
+                    # vx, vy, x, y = cv2.fitLine(contour, cv2.DIST_L2, 0, 0.01, 0.01)
+                    # lefty = int((-x * vy / vx) + y)
+                    # righty = int(((img_width - x) * vy / vx) + y)
+                    # cv2.line(image, (0, lefty), (img_width - 1, righty), GREEN, 2)
+                    # Flip this to reverse polarity
+                    # delta_y = float(lefty - righty)
+                    # delta_x = float(img_width - 1)
+                    # slope = round(delta_y / delta_x, 1)
+                    # radians = math.atan(slope)
+                    # degrees = round(math.degrees(radians), 1)
+                    # text += " {0} degrees".format(degrees)
+
+                focus_in_middle = mid_x - mid_inc <= focus_img_x <= mid_x + mid_inc if focus_img_x is not None else False
+                focus_x_missing = focus_img_x is None
+
+                # Write position if it is different from previous value written
+                if focus_img_x != self.__prev_focus_img_x or (
+                            self.__report_midline and mid_line_cross != self.__prev_mid_line_cross):
+                    self.__position_server.write_position(focus_img_x is not None,
+                                                          focus_img_x - mid_x if focus_img_x is not None else 0,
+                                                          degrees,
+                                                          mid_line_cross if mid_line_cross is not None else -1,
+                                                          img_width,
+                                                          mid_inc)
+                    self.__prev_focus_img_x = focus_img_x
+                    self.__prev_mid_line_cross = mid_line_cross
+
+                if focus_x_missing:
+                    set_left_leds(RED)
+                    set_right_leds(RED)
                 else:
-                    line_width = line2
+                    set_left_leds(GREEN if focus_in_middle else BLUE)
+                    set_right_leds(GREEN if focus_in_middle else BLUE)
 
-                delta_y = point_lr[1] - point_ur[1]
-                delta_x = point_lr[0] - point_ur[0]
+                if self.__display:
+                    # Draw focus line
+                    cv2.line(image, (0, focus_line_y), (img_width, focus_line_y), GREEN, 2)
 
-                # Calculate angle of line
-                if delta_x == 0:
-                    # Vertical line
-                    slope = None
-                    degrees = 90
+                    # Draw point where intersects focus line
+                    if focus_line_inter is not None:
+                        cv2.circle(image, (focus_line_inter, focus_line_y), 6, RED, -1)
+
+                    # Draw center of focus image
+                    if focus_img_x is not None:
+                        cv2.circle(image, (focus_img_x, focus_line_y + 10), 6, YELLOW, -1)
+
+                    # Draw point of midline insection
+                    if mid_line_inter is not None and mid_line_inter <= focus_line_y:
+                        cv2.circle(image, (mid_x, mid_line_inter), 6, RED, -1)
+
+                    x_color = GREEN if focus_in_middle else RED if focus_x_missing else BLUE
+                    cv2.line(image, (mid_x - mid_inc, 0), (mid_x - mid_inc, img_height), x_color, 1)
+                    cv2.line(image, (mid_x + mid_inc, 0), (mid_x + mid_inc, img_height), x_color, 1)
+                    cv2.putText(image, text, defs.TEXT_LOC, defs.TEXT_FONT, defs.TEXT_SIZE, RED, 1)
+
+                    cv2.imshow("Image", image)
+                    # cv2.imshow("Focus", focus_image)
+
+                    key = cv2.waitKey(30) & 0xFF
+
+                    if key == ord("w"):
+                        self.set_width(self.__width - 10)
+                    elif key == ord("W"):
+                        self.set_width(self.__width + 10)
+                    elif key == ord("-") or key == ord("_"):
+                        self.set_percent(self.__percent - 1)
+                    elif key == ord("+") or key == ord("="):
+                        self.set_percent(self.__percent + 1)
+                    elif key == ord("j"):
+                        self.set_focus_line_pct(self.__focus_line_pct - 1)
+                    elif key == ord("k"):
+                        self.set_focus_line_pct(self.__focus_line_pct + 1)
+                    elif key == ord("r"):
+                        self.set_width(self.__orig_width)
+                        self.set_percent(self.__orig_percent)
+                    elif key == ord("p"):
+                        utils.save_image(image)
+                    elif key == ord("q"):
+                        self.stop()
                 else:
-                    # Non-vertical line
-                    slope = delta_y / delta_x
-                    radians = math.atan(slope)
-                    degrees = int(math.degrees(radians)) * -1
+                    # Nap if display is not on
+                    time.sleep(.1)
 
-                # Draw line for slope
-                if slope is None:
-                    # Vertical
-                    y_inter = None
-                    if self.__display:
-                        cv2.line(image, (img_x, 0), (img_x, img_height), BLUE, 2)
-                else:
-                    # Non vertical
-                    y_inter = int(img_y - (slope * img_x))
-                    other_y = int((img_width * slope) + y_inter)
-                    if self.__display:
-                        cv2.line(image, (0, y_inter), (img_width, other_y), BLUE, 2)
-
-                if focus_img_x is not None:
-                    text += " Pos: {0}".format(focus_img_x - mid_x)
-
-                text += " Angle: {0}".format(degrees)
-
-                # Calculate point where line intersects focus line
-                if slope != 0:
-                    focus_line_inter = int((focus_line_y - y_inter) / slope) if y_inter is not None else img_x
-
-                # Calculate point where line intersects x midpoint
-                if slope is None:
-                    # Vertical line
-                    if focus_line_inter == mid_x:
-                        mid_line_inter = mid_y
-                else:
-                    # Non-vertical line
-                    mid_line_inter = int((slope * mid_x) + y_inter)
-
-                if mid_line_inter is not None:
-                    mid_line_cross = focus_line_y - mid_line_inter
-                    mid_line_cross = mid_line_cross if mid_line_cross > 0 else -1
-                    if mid_line_cross != -1:
-                        text += " Mid cross: {0}".format(mid_line_cross)
-
-                pass
-                # vx, vy, x, y = cv2.fitLine(contour, cv2.DIST_L2, 0, 0.01, 0.01)
-                # lefty = int((-x * vy / vx) + y)
-                # righty = int(((img_width - x) * vy / vx) + y)
-                # cv2.line(image, (0, lefty), (img_width - 1, righty), GREEN, 2)
-                # Flip this to reverse polarity
-                # delta_y = float(lefty - righty)
-                # delta_x = float(img_width - 1)
-                # slope = round(delta_y / delta_x, 1)
-                # radians = math.atan(slope)
-                # degrees = round(math.degrees(radians), 1)
-                # text += " {0} degrees".format(degrees)
-
-            focus_in_middle = mid_x - mid_inc <= focus_img_x <= mid_x + mid_inc if focus_img_x is not None else False
-            focus_x_missing = focus_img_x is None
-
-            # Write position if it is different from previous value written
-            if focus_img_x != self.__prev_focus_img_x or (
-                        self.__report_midline and mid_line_cross != self.__prev_mid_line_cross):
-                self.__position_server.write_position(focus_img_x is not None,
-                                                     focus_img_x - mid_x if focus_img_x is not None else 0,
-                                                      degrees,
-                                                      mid_line_cross if mid_line_cross is not None else -1,
-                                                      img_width,
-                                                      mid_inc)
-                self.__prev_focus_img_x = focus_img_x
-                self.__prev_mid_line_cross = mid_line_cross
-
-            if focus_x_missing:
-                set_left_leds(RED)
-                set_right_leds(RED)
-            else:
-                set_left_leds(GREEN if focus_in_middle else BLUE)
-                set_right_leds(GREEN if focus_in_middle else BLUE)
-
-            if self.__display:
-                # Draw focus line
-                cv2.line(image, (0, focus_line_y), (img_width, focus_line_y), GREEN, 2)
-
-                # Draw point where intersects focus line
-                if focus_line_inter is not None:
-                    cv2.circle(image, (focus_line_inter, focus_line_y), 6, RED, -1)
-
-                # Draw center of focus image
-                if focus_img_x is not None:
-                    cv2.circle(image, (focus_img_x, focus_line_y + 10), 6, YELLOW, -1)
-
-                # Draw point of midline insection
-                if mid_line_inter is not None and mid_line_inter <= focus_line_y:
-                    cv2.circle(image, (mid_x, mid_line_inter), 6, RED, -1)
-
-                x_color = GREEN if focus_in_middle else RED if focus_x_missing else BLUE
-                cv2.line(image, (mid_x - mid_inc, 0), (mid_x - mid_inc, img_height), x_color, 1)
-                cv2.line(image, (mid_x + mid_inc, 0), (mid_x + mid_inc, img_height), x_color, 1)
-                cv2.putText(image, text, defs.TEXT_LOC, defs.TEXT_FONT, defs.TEXT_SIZE, RED, 1)
-
-                cv2.imshow("Image", image)
-                # cv2.imshow("Focus", focus_image)
-
-                key = cv2.waitKey(30) & 0xFF
-
-                if key == ord("w"):
-                    self.set_width(self.__width - 10)
-                elif key == ord("W"):
-                    self.set_width(self.__width + 10)
-                elif key == ord("-") or key == ord("_"):
-                    self.set_percent(self.__percent - 1)
-                elif key == ord("+") or key == ord("="):
-                    self.set_percent(self.__percent + 1)
-                elif key == ord("j"):
-                    self.set_focus_line_pct(self.__focus_line_pct - 1)
-                elif key == ord("k"):
-                    self.set_focus_line_pct(self.__focus_line_pct + 1)
-                elif key == ord("r"):
-                    self.set_width(self.__orig_width)
-                    self.set_percent(self.__orig_percent)
-                elif key == ord("p"):
-                    utils.save_image(image)
-                elif key == ord("q"):
-                    self.stop()
-            else:
-                # Nap if display is not on
-                time.sleep(.1)
-
-            self.__cnt += 1
+                self.__cnt += 1
+            except BaseException as e:
+                logging.error("Unexpected error in main loop [{0}]".format(e))
 
         if is_raspi():
             clear()

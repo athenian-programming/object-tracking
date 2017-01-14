@@ -73,88 +73,90 @@ class ObjectTracker:
         self.__location_server.write_location(-1, -1, 0, 0, 0)
 
         while self.__cam.is_open() and not self.__stopped:
+            try:
+                image = self.__cam.read()
+                image = imutils.resize(image, width=self.__width)
 
-            image = self.__cam.read()
-            image = imutils.resize(image, width=self.__width)
+                middle_pct = (self.__percent / 100.0) / 2
+                img_height, img_width = image.shape[:2]
 
-            middle_pct = (self.__percent / 100.0) / 2
-            img_height, img_width = image.shape[:2]
+                mid_x = img_width / 2
+                mid_y = img_height / 2
+                img_x = -1
+                img_y = -1
 
-            mid_x = img_width / 2
-            mid_y = img_height / 2
-            img_x = -1
-            img_y = -1
+                # The middle margin calculation is based on % of width for horizontal and vertical boundry
+                middle_inc = int(mid_x * middle_pct)
 
-            # The middle margin calculation is based on % of width for horizontal and vertical boundry
-            middle_inc = int(mid_x * middle_pct)
+                text = "#{0} ({1}, {2})".format(self.__cnt, img_width, img_height)
+                text += " {0}%".format(self.__percent)
 
-            text = "#{0} ({1}, {2})".format(self.__cnt, img_width, img_height)
-            text += " {0}%".format(self.__percent)
+                contour = self.__contour_finder.get_max_contour(image, self.__minimum)
+                if contour is not None:
+                    moment = cv2.moments(contour)
+                    area = int(moment["m00"])
+                    img_x = int(moment["m10"] / area)
+                    img_y = int(moment["m01"] / area)
 
-            contour = self.__contour_finder.get_max_contour(image, self.__minimum)
-            if contour is not None:
-                moment = cv2.moments(contour)
-                area = int(moment["m00"])
-                img_x = int(moment["m10"] / area)
-                img_y = int(moment["m01"] / area)
+                    if self.__display:
+                        x, y, w, h = cv2.boundingRect(contour)
+                        cv2.rectangle(image, (x, y), (x + w, y + h), BLUE, 2)
+                        cv2.drawContours(image, [contour], -1, GREEN, 2)
+                        cv2.circle(image, (img_x, img_y), 4, RED, -1)
+                        text += " ({0}, {1})".format(img_x, img_y)
+                        text += " {0}".format(area)
 
+                x_in_middle = mid_x - middle_inc <= img_x <= mid_x + middle_inc
+                y_in_middle = mid_y - middle_inc <= img_y <= mid_y + middle_inc
+                x_missing = img_x == -1
+                y_missing = img_y == -1
+
+                set_left_leds(RED if x_missing else (GREEN if x_in_middle else BLUE))
+                set_right_leds(RED if y_missing else (GREEN if y_in_middle else BLUE))
+
+                # Write location if it is different from previous value written
+                if img_x != self.__prev_x or img_y != self.__prev_y:
+                    self.__location_server.write_location(img_x, img_y, img_width, img_height, middle_inc)
+                    self.__prev_x = img_x
+                    self.__prev_y = img_y
+
+                # Display images
                 if self.__display:
-                    x, y, w, h = cv2.boundingRect(contour)
-                    cv2.rectangle(image, (x, y), (x + w, y + h), BLUE, 2)
-                    cv2.drawContours(image, [contour], -1, GREEN, 2)
-                    cv2.circle(image, (img_x, img_y), 4, RED, -1)
-                    text += " ({0}, {1})".format(img_x, img_y)
-                    text += " {0}".format(area)
+                    x_color = GREEN if x_in_middle else RED if x_missing else BLUE
+                    y_color = GREEN if y_in_middle else RED if y_missing else BLUE
+                    cv2.line(image, (mid_x - middle_inc, 0), (mid_x - middle_inc, img_height), x_color, 1)
+                    cv2.line(image, (mid_x + middle_inc, 0), (mid_x + middle_inc, img_height), x_color, 1)
+                    cv2.line(image, (0, mid_y - middle_inc), (img_width, mid_y - middle_inc), y_color, 1)
+                    cv2.line(image, (0, mid_y + middle_inc), (img_width, mid_y + middle_inc), y_color, 1)
+                    cv2.putText(image, text, defs.TEXT_LOC, defs.TEXT_FONT, defs.TEXT_SIZE, RED, 1)
 
-            x_in_middle = mid_x - middle_inc <= img_x <= mid_x + middle_inc
-            y_in_middle = mid_y - middle_inc <= img_y <= mid_y + middle_inc
-            x_missing = img_x == -1
-            y_missing = img_y == -1
+                    cv2.imshow("Image", image)
 
-            set_left_leds(RED if x_missing else (GREEN if x_in_middle else BLUE))
-            set_right_leds(RED if y_missing else (GREEN if y_in_middle else BLUE))
+                    key = cv2.waitKey(1) & 0xFF
 
-            # Write location if it is different from previous value written
-            if img_x != self.__prev_x or img_y != self.__prev_y:
-                self.__location_server.write_location(img_x, img_y, img_width, img_height, middle_inc)
-                self.__prev_x = img_x
-                self.__prev_y = img_y
+                    if key == ord("w"):
+                        self.set_width(self.__width - 10)
+                    elif key == ord("W"):
+                        self.set_width(self.__width + 10)
+                    elif key == ord("-") or key == ord("_"):
+                        self.set_percent(self.__percent - 1)
+                    elif key == ord("+") or key == ord("="):
+                        self.set_percent(self.__percent + 1)
+                    elif key == ord("r"):
+                        self.set_width(self.__orig_width)
+                        self.set_percent(self.__orig_percent)
+                    elif key == ord("p"):
+                        utils.save_image(image)
+                    elif key == ord("q"):
+                        self.stop()
+                else:
+                    # Nap if display is not on
+                    # time.sleep(.01)
+                    pass
 
-            # Display images
-            if self.__display:
-                x_color = GREEN if x_in_middle else RED if x_missing else BLUE
-                y_color = GREEN if y_in_middle else RED if y_missing else BLUE
-                cv2.line(image, (mid_x - middle_inc, 0), (mid_x - middle_inc, img_height), x_color, 1)
-                cv2.line(image, (mid_x + middle_inc, 0), (mid_x + middle_inc, img_height), x_color, 1)
-                cv2.line(image, (0, mid_y - middle_inc), (img_width, mid_y - middle_inc), y_color, 1)
-                cv2.line(image, (0, mid_y + middle_inc), (img_width, mid_y + middle_inc), y_color, 1)
-                cv2.putText(image, text, defs.TEXT_LOC, defs.TEXT_FONT, defs.TEXT_SIZE, RED, 1)
-
-                cv2.imshow("Image", image)
-
-                key = cv2.waitKey(1) & 0xFF
-
-                if key == ord("w"):
-                    self.set_width(self.__width - 10)
-                elif key == ord("W"):
-                    self.set_width(self.__width + 10)
-                elif key == ord("-") or key == ord("_"):
-                    self.set_percent(self.__percent - 1)
-                elif key == ord("+") or key == ord("="):
-                    self.set_percent(self.__percent + 1)
-                elif key == ord("r"):
-                    self.set_width(self.__orig_width)
-                    self.set_percent(self.__orig_percent)
-                elif key == ord("p"):
-                    utils.save_image(image)
-                elif key == ord("q"):
-                    self.stop()
-            else:
-                # Nap if display is not on
-                # time.sleep(.01)
-                pass
-
-            self.__cnt += 1
+                self.__cnt += 1
+            except BaseException as e:
+                logging.error("Unexpected error in main loop [{0}]".format(e))
 
         if is_raspi():
             clear()
