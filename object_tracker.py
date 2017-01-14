@@ -38,8 +38,7 @@ class ObjectTracker:
         self.__display = display
         self.__stopped = False
 
-        self.__prev_x = -1
-        self.__prev_y = -1
+        self.__prev_x, self.__prev_y = -1, -1
         self.__cnt = 0
         self.__lock = Lock()
         self.__currval = None
@@ -51,14 +50,12 @@ class ObjectTracker:
     def set_percent(self, percent):
         if 2 <= percent <= 98:
             self.__percent = percent
-            self.__prev_x = -1
-            self.__prev_y = -1
+            self.__prev_x, self.__prev_y = -1, -1
 
     def set_width(self, width):
         if 200 <= width <= 4000:
             self.__width = width
-            self.__prev_x = -1
-            self.__prev_y = -1
+            self.__prev_x, self.__prev_y = -1, -1
 
     # Do not run this in a background thread. cv2.waitKey has to run in main thread
     def start(self):
@@ -80,10 +77,8 @@ class ObjectTracker:
                 middle_pct = (self.__percent / 100.0) / 2
                 img_height, img_width = image.shape[:2]
 
-                mid_x = img_width / 2
-                mid_y = img_height / 2
-                img_x = -1
-                img_y = -1
+                mid_x, mid_y = img_width / 2, img_height / 2
+                img_x, img_y = -1, -1
 
                 # The middle margin calculation is based on % of width for horizontal and vertical boundry
                 middle_inc = int(mid_x * middle_pct)
@@ -117,8 +112,7 @@ class ObjectTracker:
                 # Write location if it is different from previous value written
                 if img_x != self.__prev_x or img_y != self.__prev_y:
                     self.__location_server.write_location(img_x, img_y, img_width, img_height, middle_inc)
-                    self.__prev_x = img_x
-                    self.__prev_y = img_y
+                    self.__prev_x, self.__prev_y = img_x, img_y
 
                 # Display images
                 if self.__display:
