@@ -70,29 +70,28 @@ if __name__ == "__main__":
     locations = LocationClient(args["grpc"])
     Thread(target=locations.read_locations).start()
 
-    init_w = 800
-    init_h = 450
+    init_w, init_h = 800, 450
 
-    top = tk.Tk()
+    frame = tk.Tk()
 
-    canvas = tk.Canvas(top, bg="white", width=init_w, height=init_h)
+    canvas = tk.Canvas(frame, bg="white", width=init_w, height=init_h)
     canvas.pack()
 
     sketch = LocationSketch(canvas)
 
-    b = tk.Button(top, text="Clear", command=sketch.clear_canvas)
+    b = tk.Button(frame, text="Clear", command=sketch.clear_canvas)
     b.pack(side=tk.LEFT)
 
     lb_var = tk.IntVar()
     lb_var.set(1)
-    lb = tk.Checkbutton(top, text="Lines", variable=lb_var, command=sketch.toggle_lines)
+    lb = tk.Checkbutton(frame, text="Lines", variable=lb_var, command=sketch.toggle_lines)
     lb.pack(side=tk.LEFT)
 
     pb_var = tk.IntVar()
     pb_var.set(1)
-    pb = tk.Checkbutton(top, text="Points", variable=pb_var, command=sketch.toggle_points)
+    pb = tk.Checkbutton(frame, text="Points", variable=pb_var, command=sketch.toggle_points)
     pb.pack(side=tk.LEFT)
 
     Thread(target=sketch.plot_vals, args=(locations, init_w, init_h)).start()
 
-    top.mainloop()
+    frame.mainloop()
