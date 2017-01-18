@@ -72,26 +72,26 @@ if __name__ == "__main__":
 
     init_w, init_h = 800, 450
 
-    frame = tk.Tk()
+    root = tk.Tk()
 
-    canvas = tk.Canvas(frame, bg="white", width=init_w, height=init_h)
+    canvas = tk.Canvas(root, bg="white", width=init_w, height=init_h)
     canvas.pack()
 
     sketch = LocationSketch(canvas)
 
-    b = tk.Button(frame, text="Clear", command=sketch.clear_canvas)
+    b = tk.Button(root, text="Clear", command=sketch.clear_canvas)
     b.pack(side=tk.LEFT)
 
     lb_var = tk.IntVar()
     lb_var.set(1)
-    lb = tk.Checkbutton(frame, text="Lines", variable=lb_var, command=sketch.toggle_lines)
+    lb = tk.Checkbutton(root, text="Lines", variable=lb_var, command=sketch.toggle_lines)
     lb.pack(side=tk.LEFT)
 
     pb_var = tk.IntVar()
     pb_var.set(1)
-    pb = tk.Checkbutton(frame, text="Points", variable=pb_var, command=sketch.toggle_points)
+    pb = tk.Checkbutton(root, text="Points", variable=pb_var, command=sketch.toggle_points)
     pb.pack(side=tk.LEFT)
 
     Thread(target=sketch.plot_vals, args=(locations, init_w, init_h)).start()
 
-    frame.mainloop()
+    root.mainloop()
