@@ -39,11 +39,6 @@ decreasing the minimum target pixel area.
 $ python object_tracker.py --bgr "[174, 56, 5]" --display 
 ```
 
-### Sample Image
-
-![alt text](https://github.com/pambrose/opencv_object_tracking/raw/master/docs/target_img.png "Object Tracking")
-
-
 ### CLI Options
 
 | Option         | Description                                        | Default |
@@ -57,6 +52,11 @@ $ python object_tracker.py --bgr "[174, 56, 5]" --display
 | -p, --port     | gRPC server port                                   | 50051   |
 | -v, --verbose  | Include debugging info                             | false   |
 | -h, --help     | Summary of options                                 |         |
+
+
+### Sample Image
+
+![alt text](https://github.com/pambrose/opencv_object_tracking/raw/master/docs/target_img.png "Object Tracking")
 
 
 ### Display Keystrokes
@@ -123,7 +123,7 @@ $ line_follower.py --bgr "[174, 56, 5]" --display
 
 ### Client
 
-Required pip packages: grpcio, future, imutils, pyFirmata
+Required pip packages: grpcio, future, imutils, pyfirmata
 
 ```bash
 $ pip install grpcio
