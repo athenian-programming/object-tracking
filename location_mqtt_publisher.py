@@ -37,8 +37,8 @@ if __name__ == "__main__":
     # Parse CLI args
     parser = argparse.ArgumentParser()
     parser.add_argument("-g", "--grpc", required=True, help="gRPC location server hostname")
-    parser.add_argument("-m", "--mqtt", required=True, help="MQTT server hostname")
     parser.add_argument("-c", "--camera", required=True, help="Camera name")
+    parser.add_argument("-m", "--mqtt", required=True, help="MQTT server hostname")
     args = vars(parser.parse_args())
 
     logging.basicConfig(**LOGGING_ARGS)
