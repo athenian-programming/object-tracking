@@ -2,15 +2,14 @@
 
 import argparse
 import logging
-import socket
+import time
 from threading import Thread
-
-import paho.mqtt.client as paho
 
 from common_constants import CAMERA_NAME
 from common_constants import LOGGING_ARGS
 from common_utils import mqtt_broker_info
 from location_client import LocationClient
+from mqtt_connection import MqttConnection
 
 
 def on_connect(client, userdata, flags, rc):
@@ -29,8 +28,9 @@ def on_publish(client, userdata, mid):
 def publish_locations(client, userdata):
     while True:
         x_loc, y_loc = locations.get_xy()
-        result, mid = client.publish("/{0}/x".format(userdata[CAMERA_NAME]), payload=x_loc[0])
-        result, mid = client.publish("/{0}/y".format(userdata[CAMERA_NAME]), payload=y_loc[0])
+        if x_loc is not None and y_loc is not None:
+            result, mid = client.publish("/{0}/x".format(userdata[CAMERA_NAME]), payload=x_loc[0])
+            result, mid = client.publish("/{0}/y".format(userdata[CAMERA_NAME]), payload=y_loc[0])
 
 
 if __name__ == "__main__":
@@ -41,32 +41,25 @@ if __name__ == "__main__":
     parser.add_argument("-m", "--mqtt", required=True, help="MQTT server hostname")
     args = vars(parser.parse_args())
 
+    # Setup logging
     logging.basicConfig(**LOGGING_ARGS)
-
-    # Determine MQTT server details
-    mqtt_hostname, mqtt_port = mqtt_broker_info(args["mqtt"])
-
-    # Create userdata dictionary
-    userdata = {CAMERA_NAME: args["camera"]}
 
     # Start location reader in thread
     locations = LocationClient(args["grpc"])
     locations.start()
 
     # Initialize MQTT client
-    client = paho.Client(userdata=userdata)
-    client.on_connect = on_connect
-    client.on_disconnect = on_disconnect
-    client.on_publish = on_publish
+    hostname, port = mqtt_broker_info(args["mqtt"])
+    mqtt_conn = MqttConnection(hostname, port, userdata={CAMERA_NAME: args["camera"]})
+    mqtt_conn.client.on_connect = on_connect
+    mqtt_conn.client.on_disconnect = on_disconnect
+    mqtt_conn.client.on_publish = on_publish
 
     try:
-        # Connect to MQTT server
-        logging.info("Connecting to MQTT server at {0}:{1}".format(mqtt_hostname, mqtt_port))
-        client.connect(mqtt_hostname, port=mqtt_port, keepalive=60)
-        client.loop_forever()
-    except socket.error:
-        logging.error("Cannot connect to MQTT server at: {0}:{1}".format(mqtt_hostname, mqtt_port))
+        mqtt_conn.connect()
+        while True: time.sleep(60)
     except KeyboardInterrupt:
+        mqtt_conn.disconnect()
         pass
     finally:
         locations.stop()

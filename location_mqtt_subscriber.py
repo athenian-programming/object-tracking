@@ -1,12 +1,11 @@
 import argparse
 import logging
-import socket
-
-import paho.mqtt.client as paho
+import time
 
 from common_constants import CAMERA_NAME
 from common_constants import LOGGING_ARGS
 from common_utils import mqtt_broker_info
+from mqtt_connection import MqttConnection
 
 
 def on_connect(client, userdata, flags, rc):
@@ -36,23 +35,18 @@ if __name__ == "__main__":
     # Determine MQTT server details
     mqtt_hostname, mqtt_port = mqtt_broker_info(args["mqtt"])
 
-    # Create userdata dictionary
-    userdata = {CAMERA_NAME: args["camera"]}
-
     # Initialize MQTT client
-    client = paho.Client(userdata=userdata)
-    client.on_connect = on_connect
-    client.on_disconnect = on_disconnect
-    client.on_message = on_message
+    hostname, port = mqtt_broker_info(args["mqtt"])
+    mqtt_conn = MqttConnection(hostname, port, userdata={CAMERA_NAME: args["camera"]})
+    mqtt_conn.client.on_connect = on_connect
+    mqtt_conn.client.on_disconnect = on_disconnect
+    mqtt_conn.client.on_message = on_message
 
     try:
-        # Connect to MQTT server
-        logging.info("Connecting to MQTT server at {0}:{1}".format(mqtt_hostname, mqtt_port))
-        client.connect(mqtt_hostname, port=mqtt_port, keepalive=60)
-        client.loop_forever()
-    except socket.error:
-        logging.error("Cannot connect to MQTT server at: {0}:{1}".format(mqtt_hostname, mqtt_port))
+        mqtt_conn.connect()
+        while True: time.sleep(60)
     except KeyboardInterrupt:
+        mqtt_conn.disconnect()
         pass
 
     print("Exiting...")
