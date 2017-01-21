@@ -3,8 +3,8 @@
 import argparse
 import logging
 
+from common_utils import LOGGING_ARGS
 from location_client import LocationClient
-from utils import LOGGING_ARGS
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

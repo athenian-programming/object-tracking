@@ -7,10 +7,10 @@ from threading import Thread
 
 import grpc
 
+from common_utils import LOGGING_ARGS
 from gen.grpc_server_pb2 import ClientInfo
 from gen.grpc_server_pb2 import FocusLinePositionServerStub
 from gen.grpc_server_pb2 import ObjectLocationServerStub
-from utils import LOGGING_ARGS
 
 
 def read_locations(hostname):

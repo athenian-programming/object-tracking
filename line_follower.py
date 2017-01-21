@@ -14,13 +14,13 @@ import numpy as np
 import camera
 import defaults as defs
 import opencv_utils as utils
+from common_utils import is_raspi
 from contour_finder import ContourFinder
 from opencv_utils import BLUE
 from opencv_utils import GREEN
 from opencv_utils import RED
 from opencv_utils import YELLOW
 from position_server import PositionServer
-from utils import is_raspi
 
 if is_raspi():
     from blinkt import set_pixel, show, clear

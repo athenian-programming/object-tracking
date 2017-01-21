@@ -7,9 +7,9 @@ import plotly.graph_objs as go
 import plotly.plotly as py
 import plotly.tools as tls
 
+from common_utils import LOGGING_ARGS
 from grpc_support import TimeoutException
 from position_client import PositionClient
-from utils import LOGGING_ARGS
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

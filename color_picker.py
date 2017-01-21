@@ -9,9 +9,9 @@ import numpy as np
 
 import camera
 import defaults as defs
+from common_utils import LOGGING_ARGS
 from opencv_utils import GREEN
 from opencv_utils import RED
-from utils import LOGGING_ARGS
 
 
 class ColorPicker(object):
