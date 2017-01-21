@@ -35,7 +35,7 @@ if __name__ == "__main__":
     # Determine MQTT server details
     mqtt_hostname, mqtt_port = mqtt_broker_info(args["mqtt"])
 
-    # Initialize MQTT client
+    # Setup MQTT client
     hostname, port = mqtt_broker_info(args["mqtt"])
     mqtt_conn = MqttConnection(hostname, port, userdata={CAMERA_NAME: args["camera"]})
     mqtt_conn.client.on_connect = on_connect
