@@ -2,7 +2,6 @@
 
 import argparse
 import logging
-from threading import Thread
 
 from defaults import LOGGING_ARGS
 from grpc_support import TimeoutException
@@ -16,7 +15,7 @@ if __name__ == "__main__":
     logging.basicConfig(**LOGGING_ARGS)
 
     positions = PositionClient(args["grpc"])
-    Thread(target=positions.read_positions).start()
+    positions.start()
 
     try:
         while True:

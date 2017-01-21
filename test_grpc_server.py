@@ -9,8 +9,7 @@ from position_server import PositionServer
 
 def test_location_server(port):
     server = LocationServer(port)
-
-    Thread(target=server.start_location_server).start()
+    server.start()
 
     for i in range(0, 100):
         server.write_location(x=i, y=i + 1, width=i + 2, height=i + 3, middle_inc=i + 4)
@@ -20,7 +19,7 @@ def test_location_server(port):
 def test_position_server(port):
     server = PositionServer(port)
     try:
-        Thread(target=server.start_position_server).start()
+        server.start()
     except BaseException as e:
         logging.error("Unable to start position server [{0}]".format(e))
 

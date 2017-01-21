@@ -11,6 +11,12 @@ color_picker.py is used to choose a target BGR value.
 $ ./color_picker.py 
 ```
 
+### CLI Options
+
+| Option         | Description                                        | Default |
+|:---------------|----------------------------------------------------|---------|
+| -w, --width    | Image width                                        | 400     |
+
 ### Display Keystrokes
 
 | Keystroke  | Action                                             |

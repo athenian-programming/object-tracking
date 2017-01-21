@@ -1,7 +1,6 @@
 import argparse
 import logging
 import time
-from threading import Thread
 
 import plotly.graph_objs as go
 import plotly.plotly as py
@@ -19,7 +18,7 @@ if __name__ == "__main__":
 
     # Start location client
     locations = LocationClient(args["grpc"])
-    Thread(target=locations.read_locations).start()
+    locations.start()
 
     stream_ids = tls.get_credentials_file()['stream_ids']
     stream_id = stream_ids[0]

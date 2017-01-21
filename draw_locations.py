@@ -67,7 +67,7 @@ if __name__ == "__main__":
     logging.basicConfig(**LOGGING_ARGS)
 
     locations = LocationClient(args["grpc"])
-    Thread(target=locations.read_locations).start()
+    locations.start()
 
     init_w, init_h = 800, 450
 

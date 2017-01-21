@@ -1,5 +1,6 @@
 import logging
 import time
+from threading import Thread
 
 import grpc
 from concurrent import futures
@@ -48,3 +49,7 @@ class LocationServer(ObjectLocationServerServicer, GenericServer):
             pass
         finally:
             self.stop()
+
+    def start(self):
+        Thread(target=self.start_location_server).start()
+        time.sleep(1)

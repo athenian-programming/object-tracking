@@ -3,9 +3,7 @@
 import argparse
 import logging
 import sys
-import time
 from threading import Lock
-from threading import Thread
 
 import cv2
 import imutils
@@ -61,8 +59,7 @@ class ObjectTracker:
     def start(self):
 
         try:
-            Thread(target=self.__location_server.start_location_server).start()
-            time.sleep(1)
+            self.__location_server.start()
         except BaseException as e:
             logging.error("Unable to start location server [{0}]".format(e))
             sys.exit(1)

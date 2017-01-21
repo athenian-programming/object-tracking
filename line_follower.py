@@ -6,7 +6,6 @@ import math
 import sys
 import time
 from threading import Lock
-from threading import Thread
 
 import cv2
 import imutils
@@ -78,8 +77,7 @@ class LineFollower(object):
     # Do not run this in a background thread. cv2.waitKey has to run in main thread
     def start(self):
         try:
-            Thread(target=self.__position_server.start_position_server).start()
-            time.sleep(1)
+            self.__position_server.start()
         except BaseException as e:
             logging.error("Unable to start position server [{0}]".format(e))
             sys.exit(1)

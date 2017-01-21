@@ -174,7 +174,7 @@ if __name__ == "__main__":
         sys.exit(0)
 
     locations = LocationClient(args["grpc"])
-    Thread(target=locations.read_locations).start()
+    locations.start()
 
     # Create servos
     servo_x = Servo("Pan", board, "d:{0}:s".format(args["xservo"]), secs_per_180=1.0, pix_per_degree=8)
@@ -188,22 +188,19 @@ if __name__ == "__main__":
         # Set servo X to go first
         servo_x.readyEvent.set()
 
-    servo_x_t = Thread(target=servo_x.start, args=(True,
-                                                   lambda: locations.get_x(),
-                                                   servo_y.readyEvent if not args["calib"] else None))
-    servo_y_t = Thread(target=servo_y.start, args=(False,
-                                                   lambda: locations.get_y(),
-                                                   servo_x.readyEvent if not args["calib"] else None))
-
-    servo_x_t.start()
-    servo_y_t.start()
+    servo_x.start(True,
+                  lambda: locations.get_x(),
+                  servo_y.readyEvent if not args["calib"] else None)
+    servo_y.start(False,
+                  lambda: locations.get_y(),
+                  servo_x.readyEvent if not args["calib"] else None)
 
     try:
         if calib_t is not None:
             calib_t.join()
         else:
-            servo_x_t.join()
-            servo_y_t.join()
+            servo_x.join()
+            servo_y.join()
     except KeyboardInterrupt:
         logging.info("Exiting...")
     finally:

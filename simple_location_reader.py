@@ -2,7 +2,6 @@
 
 import argparse
 import logging
-from threading import Thread
 
 from defaults import LOGGING_ARGS
 from location_client import LocationClient
@@ -15,8 +14,7 @@ if __name__ == "__main__":
     logging.basicConfig(**LOGGING_ARGS)
 
     locations = LocationClient(args["grpc"])
-
-    Thread(target=locations.read_locations).start()
+    locations.start()
 
     try:
         while True:

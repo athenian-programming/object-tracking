@@ -1,17 +1,22 @@
 #!/usr/bin/env python2
 
+import argparse
+import logging
+
 import cv2
 import imutils
 import numpy as np
 
 import camera
 import defaults as defs
+from defaults import LOGGING_ARGS
 from opencv_utils import GREEN
 from opencv_utils import RED
 
 
 class ColorPicker(object):
-    def __init__(self):
+    def __init__(self, width):
+        self.__width = width
         self.__roi_size = 24
         self.__roi_inc = 6
         self.__move_inc = 4
@@ -24,7 +29,7 @@ class ColorPicker(object):
         cnt = 0
         while self.__cam.is_open():
             image = self.__cam.read()
-            image = imutils.resize(image, width=600)
+            image = imutils.resize(image, width=self.__width)
             frame_h, frame_w = image.shape[:2]
 
             roi_x = (frame_w / 2) - (self.__roi_size / 2) + self.__x_adj
@@ -76,12 +81,10 @@ class ColorPicker(object):
                 self.__x_adj += self.__move_inc
             elif self.__roi_size >= self.__roi_inc * 2 and (key == ord("-") or key == ord("_")):
                 self.__roi_size -= self.__roi_inc
-                self.__x_adj = 0
-                self.__y_adj = 0
+                self.__x_adj, self.__y_adj = 0, 0
             elif self.__roi_size <= self.__roi_inc * 49 and (key == ord("+") or key == ord("=")):
                 self.__roi_size += self.__roi_inc
-                self.__x_adj = 0
-                self.__y_adj = 0
+                self.__x_adj, self.__y_adj = 0, 0
             elif key == ord("q"):
                 self.__cam.close()
 
@@ -91,8 +94,14 @@ class ColorPicker(object):
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-w", "--width", default=400, type=int, help="Image width [400]")
+    args = vars(parser.parse_args())
+
+    logging.basicConfig(**LOGGING_ARGS)
+
     try:
-        color_picker = ColorPicker()
+        color_picker = ColorPicker(int(args["width"]))
         color_picker.start()
     except KeyboardInterrupt as e:
         print("Exiting...")

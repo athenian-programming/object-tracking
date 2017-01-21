@@ -1,5 +1,6 @@
 import logging
 import time
+from threading import Thread
 
 import grpc
 from concurrent import futures
@@ -49,3 +50,7 @@ class PositionServer(FocusLinePositionServerServicer, GenericServer):
             pass
         finally:
             self.stop()
+
+    def start(self):
+        Thread(target=self.start_position_server).start()
+        time.sleep(1)

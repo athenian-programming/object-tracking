@@ -2,6 +2,7 @@ import logging
 import socket
 import time
 from threading import Event
+from threading import Thread
 
 import grpc
 
@@ -67,6 +68,9 @@ class PositionClient(GenericClient):
             except BaseException as e:
                 logging.info("Disconnected from gRPC server at {0} [{1}]".format(self._hostname, e))
                 time.sleep(pause_secs)
+
+    def start(self):
+        Thread(target=self.read_positions).start()
 
     def stop(self):
         if not self._stopped:

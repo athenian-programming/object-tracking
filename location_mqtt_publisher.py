@@ -51,7 +51,7 @@ if __name__ == "__main__":
 
     # Start location reader in thread
     locations = LocationClient(args["grpc"])
-    Thread(target=locations.read_locations).start()
+    locations.start()
 
     # Initialize MQTT client
     client = paho.Client(userdata=userdata)

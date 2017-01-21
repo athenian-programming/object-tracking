@@ -2,6 +2,7 @@ import logging
 import time
 
 from threading import Event
+from threading import Thread
 
 
 class Servo(object):
@@ -12,6 +13,7 @@ class Servo(object):
         self.__ppd = pix_per_degree
         self.__stopped = False
         self.__ready_event = Event()
+        self.__thread = None
         self.jiggle()
 
     def jiggle(self):
@@ -39,7 +41,7 @@ class Servo(object):
             self.__pin.write(val)
             time.sleep(wait)
 
-    def start(self, forward, loc_source, other_ready_event):
+    def run_servo(self, forward, loc_source, other_ready_event):
 
         while not self.__stopped:
             try:
@@ -99,6 +101,13 @@ class Servo(object):
                     other_ready_event.set()
 
             time.sleep(.25)
+
+    def start(self, forward, loc_source, other_ready_event):
+        self.__thread = Thread(target=self.run_servo, args=(forward, loc_source, other_ready_event))
+        self.__thread.start()
+
+    def join(self):
+        self.__thread.join()
 
     def stop(self):
         logging.info("Stopping servo {0}".format(self.name()))

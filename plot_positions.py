@@ -2,7 +2,6 @@ import argparse
 import datetime
 import logging
 import time
-from threading import Thread
 
 import plotly.graph_objs as go
 import plotly.plotly as py
@@ -21,7 +20,7 @@ if __name__ == "__main__":
 
     # Start position client
     positions = PositionClient(args["grpc"])
-    Thread(target=positions.read_positions).start()
+    positions.start()
 
     stream_ids = tls.get_credentials_file()['stream_ids']
     stream_id = stream_ids[1]
