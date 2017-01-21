@@ -1,10 +1,10 @@
 import argparse
 import logging
-import time
 
 from common_constants import CAMERA_NAME
 from common_constants import LOGGING_ARGS
 from common_utils import mqtt_broker_info
+from common_utils import sleep
 from mqtt_connection import MqttConnection
 
 
@@ -44,7 +44,7 @@ if __name__ == "__main__":
 
     try:
         mqtt_conn.connect()
-        while True: time.sleep(60)
+        sleep()
     except KeyboardInterrupt:
         mqtt_conn.disconnect()
         pass
