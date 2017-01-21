@@ -9,7 +9,7 @@ import numpy as np
 
 import camera
 import defaults as defs
-from common_utils import LOGGING_ARGS
+from common_constants import LOGGING_ARGS
 from opencv_utils import GREEN
 from opencv_utils import RED
 

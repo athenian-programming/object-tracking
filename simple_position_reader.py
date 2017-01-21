@@ -3,7 +3,7 @@
 import argparse
 import logging
 
-from common_utils import LOGGING_ARGS
+from common_constants import LOGGING_ARGS
 from grpc_support import TimeoutException
 from position_client import PositionClient
 

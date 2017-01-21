@@ -7,7 +7,7 @@ from threading import Thread
 
 from pyfirmata import Arduino
 
-from common_utils import LOGGING_ARGS
+from common_constants import LOGGING_ARGS
 from location_client import LocationClient
 from servo import Servo
 

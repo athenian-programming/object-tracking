@@ -6,7 +6,7 @@ import plotly.graph_objs as go
 import plotly.plotly as py
 import plotly.tools as tls
 
-from common_utils import LOGGING_ARGS
+from common_constants import LOGGING_ARGS
 from location_client import LocationClient
 
 if __name__ == "__main__":

@@ -2,7 +2,7 @@ import logging
 import time
 from threading import Thread
 
-from common_utils import LOGGING_ARGS
+from common_constants import LOGGING_ARGS
 from location_server import LocationServer
 from position_server import PositionServer
 

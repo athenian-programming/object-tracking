@@ -4,8 +4,8 @@ import socket
 
 import paho.mqtt.client as paho
 
-from common_utils import CAMERA_NAME
-from common_utils import LOGGING_ARGS
+from common_constants import CAMERA_NAME
+from common_constants import LOGGING_ARGS
 from common_utils import mqtt_broker_info
 
 

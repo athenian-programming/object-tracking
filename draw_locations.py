@@ -4,7 +4,7 @@ import argparse
 import logging
 from threading import Thread
 
-from common_utils import LOGGING_ARGS
+from common_constants import LOGGING_ARGS
 from common_utils import is_python3
 from location_client import LocationClient
 
