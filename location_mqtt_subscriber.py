@@ -9,12 +9,12 @@ from mqtt_connection import MqttConnection
 
 
 def on_connect(client, userdata, flags, rc):
-    print("Connected with result code: {0}".format(rc))
+    logging.info("Connected with result code: {0}".format(rc))
     client.subscribe("/{0}/#".format(userdata[CAMERA_NAME]))
 
 
 def on_disconnect(client, userdata, rc):
-    print("Disconnected with result code: {0}".format(rc))
+    logging.info("Disconnected with result code: {0}".format(rc))
 
 
 def on_message(client, userdata, msg):
