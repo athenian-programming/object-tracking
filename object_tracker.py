@@ -14,7 +14,7 @@ import camera
 import defaults as defs
 import opencv_utils as utils
 from contour_finder import ContourFinder
-from defaults import FORMAT_DEFAULT
+from defaults import LOGGING_ARGS
 from location_server import LocationServer
 from opencv_utils import BLUE
 from opencv_utils import GREEN
@@ -188,7 +188,7 @@ if __name__ == "__main__":
                         action="store_const", dest="loglevel", const=logging.DEBUG)
     args = vars(parser.parse_args())
 
-    logging.basicConfig(stream=sys.stderr, level=logging.INFO, format=FORMAT_DEFAULT)
+    logging.basicConfig(**LOGGING_ARGS)
 
     tracker = ObjectTracker(eval(args["bgr"]),
                             int(args["width"]),

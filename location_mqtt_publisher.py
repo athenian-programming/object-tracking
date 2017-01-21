@@ -3,12 +3,11 @@
 import argparse
 import logging
 import socket
-import sys
 from threading import Thread
 
 import paho.mqtt.client as paho
 
-from defaults import FORMAT_DEFAULT
+from defaults import LOGGING_ARGS
 from location_client import LocationClient
 from mqtt_utils import CAMERA_NAME
 from mqtt_utils import mqtt_server_info
@@ -42,7 +41,7 @@ if __name__ == "__main__":
     parser.add_argument("-c", "--camera", required=True, help="Camera name")
     args = vars(parser.parse_args())
 
-    logging.basicConfig(stream=sys.stderr, level=logging.INFO, format=FORMAT_DEFAULT)
+    logging.basicConfig(**LOGGING_ARGS)
 
     # Determine MQTT server details
     mqtt_hostname, mqtt_port = mqtt_server_info(args["mqtt"])
