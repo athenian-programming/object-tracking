@@ -41,12 +41,11 @@ if __name__ == "__main__":
     mqtt_conn.client.on_connect = on_connect
     mqtt_conn.client.on_disconnect = on_disconnect
     mqtt_conn.client.on_message = on_message
+    mqtt_conn.connect()
 
     try:
-        mqtt_conn.connect()
         sleep()
     except KeyboardInterrupt:
         mqtt_conn.disconnect()
-        pass
 
     print("Exiting...")
