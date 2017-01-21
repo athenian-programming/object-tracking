@@ -7,10 +7,10 @@ from threading import Thread
 
 import paho.mqtt.client as paho
 
-from defaults import LOGGING_ARGS
 from location_client import LocationClient
-from mqtt_utils import CAMERA_NAME
-from mqtt_utils import mqtt_server_info
+from utils import CAMERA_NAME
+from utils import LOGGING_ARGS
+from utils import mqtt_broker_info
 
 
 def on_connect(client, userdata, flags, rc):
@@ -44,7 +44,7 @@ if __name__ == "__main__":
     logging.basicConfig(**LOGGING_ARGS)
 
     # Determine MQTT server details
-    mqtt_hostname, mqtt_port = mqtt_server_info(args["mqtt"])
+    mqtt_hostname, mqtt_port = mqtt_broker_info(args["mqtt"])
 
     # Create userdata dictionary
     userdata = {CAMERA_NAME: args["camera"]}

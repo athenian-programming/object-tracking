@@ -12,12 +12,12 @@ import camera
 import defaults as defs
 import opencv_utils as utils
 from contour_finder import ContourFinder
-from defaults import LOGGING_ARGS
 from location_server import LocationServer
 from opencv_utils import BLUE
 from opencv_utils import GREEN
 from opencv_utils import RED
-from opencv_utils import is_raspi
+from utils import LOGGING_ARGS
+from utils import is_raspi
 
 if is_raspi():
     from blinkt import set_pixel, show, clear

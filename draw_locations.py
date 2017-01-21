@@ -4,9 +4,9 @@ import argparse
 import logging
 from threading import Thread
 
-from defaults import LOGGING_ARGS
 from location_client import LocationClient
-from opencv_utils import is_python3
+from utils import LOGGING_ARGS
+from utils import is_python3
 
 if is_python3():
     import tkinter as tk

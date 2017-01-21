@@ -19,8 +19,8 @@ from opencv_utils import BLUE
 from opencv_utils import GREEN
 from opencv_utils import RED
 from opencv_utils import YELLOW
-from opencv_utils import is_raspi
 from position_server import PositionServer
+from utils import is_raspi
 
 if is_raspi():
     from blinkt import set_pixel, show, clear

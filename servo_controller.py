@@ -7,9 +7,9 @@ from threading import Thread
 
 from pyfirmata import Arduino
 
-from defaults import LOGGING_ARGS
 from location_client import LocationClient
 from servo import Servo
+from utils import LOGGING_ARGS
 
 
 def calibrate(locations, servo_x, servo_y):
