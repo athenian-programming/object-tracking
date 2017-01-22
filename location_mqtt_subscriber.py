@@ -10,7 +10,7 @@ from mqtt_connection import MqttConnection
 
 def on_connect(client, userdata, flags, rc):
     logging.info("Connected with result code: {0}".format(rc))
-    client.subscribe("/{0}/#".format(userdata[CAMERA_NAME]))
+    client.subscribe("{0}/#".format(userdata[CAMERA_NAME]))
 
 
 def on_disconnect(client, userdata, rc):
