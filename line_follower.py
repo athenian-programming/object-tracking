@@ -5,6 +5,7 @@ import logging
 import math
 import sys
 import time
+import traceback
 from logging import info
 from threading import Lock
 
@@ -291,6 +292,7 @@ class LineFollower(object):
 
                 self.__cnt += 1
             except BaseException as e:
+                traceback.print_exc()
                 logging.error("Unexpected error in main loop [{0}]".format(e))
 
         if is_raspi():
