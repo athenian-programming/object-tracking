@@ -1,6 +1,7 @@
 import argparse
 import logging
 import time
+from logging import info
 
 import plotly.graph_objs as go
 import plotly.plotly as py
@@ -39,7 +40,7 @@ if __name__ == "__main__":
     stream = py.Stream(stream_id)
     stream.open()
 
-    logging.info("Opening plot.ly tab")
+    info("Opening plot.ly tab")
     time.sleep(5)
 
     try:

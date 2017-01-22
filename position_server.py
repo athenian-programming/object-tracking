@@ -1,5 +1,5 @@
-import logging
 import time
+from logging import info
 from threading import Thread
 
 import grpc
@@ -17,7 +17,7 @@ class PositionServer(FocusLinePositionServerServicer, GenericServer):
         super(PositionServer, self).__init__(port)
 
     def registerClient(self, request, context):
-        logging.info("Connected to client {0} [{1}]".format(context.peer(), request.info))
+        info("Connected to client {0} [{1}]".format(context.peer(), request.info))
         with self._cnt_lock:
             self._invoke_cnt += 1
         return ServerInfo(info="Server invoke count {0}".format(self._invoke_cnt))
@@ -38,7 +38,7 @@ class PositionServer(FocusLinePositionServerServicer, GenericServer):
             self._id += 1
 
     def start_position_server(self):
-        logging.info("Starting gRPC server listening on {0}".format(self._hostname))
+        info("Starting gRPC server listening on {0}".format(self._hostname))
         self._grpc_server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
         add_FocusLinePositionServerServicer_to_server(self, self._grpc_server)
         self._grpc_server.add_insecure_port(self._hostname)

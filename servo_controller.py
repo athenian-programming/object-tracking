@@ -3,6 +3,8 @@
 import argparse
 import logging
 import sys
+from logging import error
+from logging import info
 from threading import Thread
 
 from pyfirmata import Arduino
@@ -168,9 +170,9 @@ if __name__ == "__main__":
     port = "/dev/" + args["serial"]
     try:
         board = Arduino(port)
-        logging.info("Connected to Arduino at: {0}".format(port))
+        info("Connected to Arduino at: {0}".format(port))
     except OSError as e:
-        logging.error("Failed to connect to Arduino at {0} - [{1}]".format(port, e))
+        error("Failed to connect to Arduino at {0} - [{1}]".format(port, e))
         sys.exit(0)
 
     locations = LocationClient(args["grpc"])
@@ -202,7 +204,7 @@ if __name__ == "__main__":
             servo_x.join()
             servo_y.join()
     except KeyboardInterrupt:
-        logging.info("Exiting...")
+        info("Exiting...")
     finally:
         servo_x.stop()
         servo_y.stop()

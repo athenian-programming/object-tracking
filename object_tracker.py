@@ -3,6 +3,7 @@
 import argparse
 import logging
 import sys
+from logging import info
 from threading import Lock
 
 import cv2
@@ -198,6 +199,6 @@ if __name__ == "__main__":
     try:
         tracker.start()
     except KeyboardInterrupt:
-        logging.info("Exiting...")
+        info("Exiting...")
     finally:
         tracker.stop()

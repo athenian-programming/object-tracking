@@ -1,5 +1,5 @@
 import datetime
-import logging
+from logging import info
 
 import cv2
 
@@ -12,4 +12,4 @@ YELLOW = (0, 255, 255)
 def save_image(frame):
     file_name = "ct-{0}.png".format(datetime.datetime.now().strftime("%H-%M-%S"))
     cv2.imwrite(file_name, frame)
-    logging.info("Wrote image to {0}".format(file_name))
+    info("Wrote image to {0}".format(file_name))

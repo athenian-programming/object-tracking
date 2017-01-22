@@ -1,6 +1,7 @@
-import logging
 import socket
 import time
+from logging import error
+from logging import info
 from threading import Event
 from threading import Thread
 
@@ -60,16 +61,16 @@ class LocationClient(GenericClient):
         channel = grpc.insecure_channel(self._hostname)
         stub = ObjectLocationServerStub(channel)
         while not self._stopped:
-            logging.info("Connecting to gRPC server at {0}...".format(self._hostname))
+            info("Connecting to gRPC server at {0}...".format(self._hostname))
             try:
                 client_info = ClientInfo(info="{0} client".format(socket.gethostname()))
                 server_info = stub.registerClient(client_info)
             except BaseException as e:
-                logging.error("Failed to connect to gRPC server at {0} [{1}]".format(self._hostname, e))
+                error("Failed to connect to gRPC server at {0} [{1}]".format(self._hostname, e))
                 time.sleep(pause_secs)
                 continue
 
-            logging.info("Connected to gRPC server at {0} [{1}]".format(self._hostname, server_info.info))
+            info("Connected to gRPC server at {0} [{1}]".format(self._hostname, server_info.info))
 
             try:
                 for loc in stub.getObjectLocations(client_info):
@@ -83,7 +84,7 @@ class LocationClient(GenericClient):
                     self.__x_ready.set()
                     self.__y_ready.set()
             except BaseException as e:
-                logging.info("Disconnected from gRPC server at {0} [{1}]".format(self._hostname, e))
+                info("Disconnected from gRPC server at {0} [{1}]".format(self._hostname, e))
                 time.sleep(pause_secs)
 
     def start(self):
@@ -91,7 +92,7 @@ class LocationClient(GenericClient):
 
     def stop(self):
         if not self._stopped:
-            logging.info("Stopping location client")
+            info("Stopping location client")
             self._stopped = True
             self.__x_ready.set()
             self.__y_ready.set()

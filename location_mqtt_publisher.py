@@ -2,6 +2,7 @@
 
 import argparse
 import logging
+from logging import info
 from threading import Thread
 
 from common_constants import CAMERA_NAME
@@ -13,12 +14,12 @@ from mqtt_connection import MqttConnection
 
 
 def on_connect(client, userdata, flags, rc):
-    logging.info("Connected with result code: {0}".format(rc))
+    info("Connected with result code: {0}".format(rc))
     Thread(target=publish_locations, args=(client, userdata)).start()
 
 
 def on_disconnect(client, userdata, rc):
-    logging.info("Disconnected with result code: {0}".format(rc))
+    info("Disconnected with result code: {0}".format(rc))
 
 
 def on_publish(client, userdata, mid):

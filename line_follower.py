@@ -5,6 +5,7 @@ import logging
 import math
 import sys
 import time
+from logging import info
 from threading import Lock
 
 import cv2
@@ -353,6 +354,6 @@ if __name__ == "__main__":
     try:
         line_follower.start()
     except KeyboardInterrupt:
-        logging.info("Exiting...")
+        info("Exiting...")
     finally:
         line_follower.stop()

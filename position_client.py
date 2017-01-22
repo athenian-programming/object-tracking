@@ -1,6 +1,7 @@
-import logging
 import socket
 import time
+from logging import error
+from logging import info
 from threading import Event
 from threading import Thread
 
@@ -44,16 +45,16 @@ class PositionClient(GenericClient):
         channel = grpc.insecure_channel(self._hostname)
         stub = FocusLinePositionServerStub(channel)
         while not self._stopped:
-            logging.info("Connecting to gRPC server at {0}...".format(self._hostname))
+            info("Connecting to gRPC server at {0}...".format(self._hostname))
             try:
                 client_info = ClientInfo(info="{0} client".format(socket.gethostname()))
                 server_info = stub.registerClient(client_info)
             except BaseException as e:
-                logging.error("Failed to connect to gRPC server at {0} [{1}]".format(self._hostname, e))
+                error("Failed to connect to gRPC server at {0} [{1}]".format(self._hostname, e))
                 time.sleep(pause_secs)
                 continue
 
-            logging.info("Connected to gRPC server at {0} [{1}]".format(self._hostname, server_info.info))
+            info("Connected to gRPC server at {0} [{1}]".format(self._hostname, server_info.info))
             try:
                 for pos in stub.getFocusLinePositions(client_info):
                     with self._lock:
@@ -66,7 +67,7 @@ class PositionClient(GenericClient):
                         self.__middle_inc = pos.middle_inc
                     self.__ready.set()
             except BaseException as e:
-                logging.info("Disconnected from gRPC server at {0} [{1}]".format(self._hostname, e))
+                info("Disconnected from gRPC server at {0} [{1}]".format(self._hostname, e))
                 time.sleep(pause_secs)
 
     def start(self):
@@ -74,6 +75,6 @@ class PositionClient(GenericClient):
 
     def stop(self):
         if not self._stopped:
-            logging.info("Stopping position client")
+            info("Stopping position client")
             self._stopped = True
             self.__ready.set()

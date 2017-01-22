@@ -1,6 +1,5 @@
-import logging
 import time
-
+from logging import info
 from threading import Event
 from threading import Thread
 
@@ -55,7 +54,7 @@ class Servo(object):
 
                 # Skip if object is not seen
                 if img_pos == -1 or img_total == -1:
-                    logging.info("No target seen: {0}".format(self.__name))
+                    info("No target seen: {0}".format(self.__name))
                     continue
 
                 midpoint = img_total / 2
@@ -91,7 +90,7 @@ class Servo(object):
                 wait_time = (self.__secs_per_180 / 180) * delta
 
                 # if curr_pos != new_pos:
-                # logging.info("Pos: [{0} Delta: {1}".format(new_pos, delta))
+                # info("Pos: [{0} Delta: {1}".format(new_pos, delta))
 
                 # Write servo values
                 self.write_pin(new_pos, wait_time)
@@ -110,5 +109,5 @@ class Servo(object):
         self.__thread.join()
 
     def stop(self):
-        logging.info("Stopping servo {0}".format(self.name()))
+        info("Stopping servo {0}".format(self.name()))
         self.__stopped = True
