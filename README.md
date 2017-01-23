@@ -13,6 +13,9 @@ as described [here](http://www.athenian-robotics.org/opencv/)
 * [imutils](https://github.com/jrosebr1/imutils)
 as described [here](http://www.athenian-robotics.org/imutils/)
 
+* [numpy](http://www.numpy.org)
+as described [here](http://www.athenian-robotics.org/numpy/)
+
 * [MQTT](http://mqtt.org) client 
 as described [here](http://www.athenian-robotics.org/mqtt-client/)
 
