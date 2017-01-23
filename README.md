@@ -2,11 +2,16 @@
 
 ## Setup
 
-Install [gRPC](http://www.grpc.io/docs/guides/index.html) 
-as described [here](http://www.athenian-robotics.org/grpc/)
+Install the following Python packages: 
 
-Install [OpenCV](http://opencv.org) 
-as described [here](http://www.athenian-robotics.org/opencv/)
+*  [gRPC](http://www.grpc.io/docs/guides/index.html) 
+as described [here](http://www.athenian-robotics.org/grpc/).
+
+*  [OpenCV](http://opencv.org) 
+as described [here](http://www.athenian-robotics.org/opencv/).
+
+*  [imutils](https://github.com/jrosebr1/imutils)
+as described [here](http://www.athenian-robotics.org/imutils/).
 
 ## Color Picker 
 
