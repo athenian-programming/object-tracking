@@ -1,5 +1,12 @@
 # OpenCV Object Tracking and Pan/Tilt Servo Control
 
+## Setup
+
+Install [gRPC](http://www.grpc.io/docs/guides/index.html) 
+as described [here](http://www.athenian-robotics.org/grpc/)
+
+Install [OpenCV](http://opencv.org) 
+as described [here](http://www.athenian-robotics.org/opencv/)
 
 ## Color Picker 
 
