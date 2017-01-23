@@ -14,7 +14,7 @@ as described [here](http://www.athenian-robotics.org/opencv/)
 as described [here](http://www.athenian-robotics.org/imutils/)
 
 * [MQTT](http://mqtt.org) client 
-as describer [here](http://www.athenian-robotics.org/mqtt-client/)
+as described [here](http://www.athenian-robotics.org/mqtt-client/)
 
 ## Color Picker 
 
