@@ -132,30 +132,11 @@ $ servo_controller.py --port ttyACM0 --grpc localhost
 * [Blinkt](http://www.athenian-robotics.org/blinkt/)
 
 ### Software
-* [PyCharm IDE](https://www.jetbrains.com/pycharm/)
 * [pyfirmata](http://www.athenian-robotics.org/pyfirmata/)
 * [gRPC](http://www.athenian-robotics.org/grpc/)
 * [OpenCV](http://www.athenian-robotics.org/opencv/)
 * [Plot.ly](http://www.athenian-robotics.org/plotly/)
-* [OpenCV Python Tutorial](http://docs.opencv.org/3.0-beta/doc/py_tutorials/py_tutorials.html)
 
 
-## Setup Details
-
-### Displaying Raspi camera images on OSX
-
-1) Set **DISPLAY** env var to use the OSX machine (in this case *my-mac*). 
-On the Raspi type:
-```bash
-$ set DISPLAY my-mac:0
-```
-
-2) Start the *[X](https://en.wikipedia.org/wiki/X_Window_System) server* 
-[XQuartz](https://www.xquartz.org) on the OSX machine.
-
-3) Add the Raspi host name to enable connections to the X server (in this case *my-raspi*). 
-On the OSX machine type:
-```bash
-$ xhost + my-raspi
-my-raspi being added to access control list
-```
+Instructions on how to display Raspi OpenCV camera images on a Mac are 
+[here](http://www.athenian-robotics.org/opencv/)
