@@ -19,8 +19,8 @@ as described [here](http://www.athenian-robotics.org/numpy/)
 * [MQTT](http://mqtt.org) client 
 as described [here](http://www.athenian-robotics.org/mqtt-client/)
 
-* [pyfirmata](https://github.com/tino/pyFirmata) client 
-as described [here]()
+* [pyFirmata](https://github.com/tino/pyFirmata) client 
+as described [here](http://www.athenian-robotics.org/arduino/)
 
 ## Color Picker 
 
@@ -129,15 +129,15 @@ $ servo_controller.py --port ttyACM0 --grpc localhost
 ### Hardware
 * [Raspberry Pi Camera](https://www.adafruit.com/products/3099)
 * [Pan/Tilt Kit](https://www.adafruit.com/product/1967)
-* [Blinkt](https://www.adafruit.com/products/3195)
+* [Blinkt](http://www.athenian-robotics.org/blinkt/)
 
 ### Software
 * [PyCharm IDE](https://www.jetbrains.com/pycharm/)
-* [pyfirmata](https://github.com/tino/pyFirmata)
-* [gRPC](http://www.grpc.io/docs/tutorials/basic/python.html)
-* [OpenCV](https://github.com/opencv/opencv)
+* [pyfirmata](http://www.athenian-robotics.org/pyfirmata/)
+* [gRPC](http://www.athenian-robotics.org/grpc/)
+* [OpenCV](http://www.athenian-robotics.org/opencv/)
+* [Plot.ly](http://www.athenian-robotics.org/plotly/)
 * [OpenCV Python Tutorial](http://docs.opencv.org/3.0-beta/doc/py_tutorials/py_tutorials.html)
-* [Blinkt Docs](http://docs.pimoroni.com/blinkt/)
 
 
 ## Setup Details
@@ -159,8 +159,3 @@ On the OSX machine type:
 $ xhost + my-raspi
 my-raspi being added to access control list
 ```
-
-### Plot.ly
-
-Details on setting up plot.ly are 
-[here](http://www.athenian-robotics.org/site/plotly/).
