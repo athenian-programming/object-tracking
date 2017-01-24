@@ -123,29 +123,6 @@ $ servo_controller.py --port ttyACM0 --grpc localhost
 | -h, --help     | Summary of options                                 |         |
 
 
-## Line Follower
-
-### Usage 
-
-```bash
-$ line_follower.py --bgr "[174, 56, 5]" --display 
-```
-
-### CLI Options
-
-| Option         | Description                                        | Default |
-|:---------------|----------------------------------------------------|---------|
-| -b, --bgr      | BGR target value                                   |         |
-| -w, --width    | Image width                                        | 400     |
-| -f, --focus    | Focus line % from bottom                           | 10      |
-| -e, --percent  | Middle percent                                     | 15      |
-| -m, --min      | Minimum target pixel area                          | 100     |
-| -r, --range    | HSV Range                                          | 20      |
-| -d, --display  | Display image                                      | false   |
-| -p, --port     | gRPC server port                                   | 50051   |
-| -v, --verbose  | Include debugging info                             | false   |
-| -h, --help     | Summary of options                                 |         |
-
 
 ## Relevant Links
 

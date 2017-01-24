@@ -63,7 +63,7 @@ def calibrate(locations, servo_x, servo_y):
             name = "y"
             servo = servo_y
         elif key == "g":
-            servo.readyEvent.set()
+            servo.ready_event.set()
         elif key == "l":
             servo.write_pin(90)
             servo_pos = 90
@@ -188,14 +188,14 @@ if __name__ == "__main__":
         calib_t.start()
     else:
         # Set servo X to go first
-        servo_x.readyEvent.set()
+        servo_x.ready_event.set()
 
     servo_x.start(True,
                   lambda: locations.get_x(),
-                  servo_y.readyEvent if not args["calib"] else None)
+                  servo_y.ready_event if not args["calib"] else None)
     servo_y.start(False,
                   lambda: locations.get_y(),
-                  servo_x.readyEvent if not args["calib"] else None)
+                  servo_x.ready_event if not args["calib"] else None)
 
     try:
         if calib_t is not None:

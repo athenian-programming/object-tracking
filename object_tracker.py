@@ -10,7 +10,7 @@ import cv2
 import imutils
 
 import camera
-import defaults as defs
+import opencv_defaults as defs
 import opencv_utils as utils
 from common_constants import LOGGING_ARGS
 from common_utils import is_raspi

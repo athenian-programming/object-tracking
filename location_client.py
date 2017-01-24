@@ -24,6 +24,7 @@ class LocationClient(GenericClient):
         self.__width = -1
         self.__height = -1
         self.__middle_inc = -1
+        self._stopped = False
 
     # Blocking
     def get_x(self, timeout=None):

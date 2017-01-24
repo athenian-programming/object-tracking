@@ -15,6 +15,7 @@ from grpc_support import GenericServer
 class LocationServer(ObjectLocationServerServicer, GenericServer):
     def __init__(self, port):
         super(LocationServer, self).__init__(port)
+        self._grpc_server = None
 
     def registerClient(self, request, context):
         info("Connected to client {0} [{1}]".format(context.peer(), request.info))

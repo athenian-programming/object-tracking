@@ -9,17 +9,6 @@ service ObjectLocationServer {
 
     rpc getObjectLocations (ClientInfo) returns (stream ObjectLocation) {
     }
-
-}
-
-service FocusLinePositionServer {
-
-    rpc registerClient (ClientInfo) returns (ServerInfo) {
-    }
-
-    rpc getFocusLinePositions (ClientInfo) returns (stream FocusLinePosition) {
-    }
-
 }
 
 message ClientInfo {
@@ -37,16 +26,6 @@ message ObjectLocation {
     int32 width = 4;
     int32 height = 5;
     int32 middle_inc = 6;
-}
-
-message FocusLinePosition {
-    int32 id = 1;
-    bool in_focus = 2;
-    int32 mid_offset = 3;
-    int32 degrees = 4;
-    int32 mid_line_cross = 5;
-    int32 width = 6;
-    int32 middle_inc = 7;
 }
 
 

@@ -25,7 +25,7 @@ class Servo(object):
         return self.__name
 
     @property
-    def readyEvent(self):
+    def ready_event(self):
         return self.__ready_event
 
     def read_pin(self):
