@@ -8,20 +8,6 @@ from common_utils import mqtt_broker_info
 from common_utils import sleep
 from mqtt_connection import MqttConnection
 
-
-def on_connect(client, userdata, flags, rc):
-    info("Connected with result code: {0}".format(rc))
-    client.subscribe("{0}/#".format(userdata[CAMERA_NAME]))
-
-
-def on_disconnect(client, userdata, rc):
-    info("Disconnected with result code: {0}".format(rc))
-
-
-def on_message(client, userdata, msg):
-    print("{0} {1}".format(msg.topic, msg.payload))
-
-
 if __name__ == "__main__":
     # Parse CLI args
     parser = argparse.ArgumentParser()
@@ -35,6 +21,21 @@ if __name__ == "__main__":
 
     # Determine MQTT server details
     mqtt_hostname, mqtt_port = mqtt_broker_info(args["mqtt"])
+
+
+    # Define MQTT callbacks
+    def on_connect(client, userdata, flags, rc):
+        info("Connected with result code: {0}".format(rc))
+        client.subscribe("{0}/#".format(userdata[CAMERA_NAME]))
+
+
+    def on_disconnect(client, userdata, rc):
+        info("Disconnected with result code: {0}".format(rc))
+
+
+    def on_message(client, userdata, msg):
+        print("{0} {1}".format(msg.topic, msg.payload))
+
 
     # Setup MQTT client
     hostname, port = mqtt_broker_info(args["mqtt"])

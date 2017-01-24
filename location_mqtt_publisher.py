@@ -12,28 +12,6 @@ from common_utils import sleep
 from location_client import LocationClient
 from mqtt_connection import MqttConnection
 
-
-def on_connect(client, userdata, flags, rc):
-    info("Connected with result code: {0}".format(rc))
-    Thread(target=publish_locations, args=(client, userdata)).start()
-
-
-def on_disconnect(client, userdata, rc):
-    info("Disconnected with result code: {0}".format(rc))
-
-
-def on_publish(client, userdata, mid):
-    print("Published message id: {0}".format(mid))
-
-
-def publish_locations(client, userdata):
-    while True:
-        x_loc, y_loc = locations.get_xy()
-        if x_loc is not None and y_loc is not None:
-            result, mid = client.publish("{0}/x".format(userdata[CAMERA_NAME]), payload=x_loc[0])
-            result, mid = client.publish("{0}/y".format(userdata[CAMERA_NAME]), payload=y_loc[0])
-
-
 if __name__ == "__main__":
     # Parse CLI args
     parser = argparse.ArgumentParser()
@@ -48,6 +26,29 @@ if __name__ == "__main__":
     # Start location reader in thread
     locations = LocationClient(args["grpc"])
     locations.start()
+
+
+    # Define MQTT callbacks
+    def on_connect(client, userdata, flags, rc):
+        info("Connected with result code: {0}".format(rc))
+        Thread(target=publish_locations, args=(client, userdata)).start()
+
+
+    def on_disconnect(client, userdata, rc):
+        info("Disconnected with result code: {0}".format(rc))
+
+
+    def on_publish(client, userdata, mid):
+        print("Published message id: {0}".format(mid))
+
+
+    def publish_locations(client, userdata):
+        while True:
+            x_loc, y_loc = locations.get_xy()
+            if x_loc is not None and y_loc is not None:
+                result, mid = client.publish("{0}/x".format(userdata[CAMERA_NAME]), payload=x_loc[0])
+                result, mid = client.publish("{0}/y".format(userdata[CAMERA_NAME]), payload=y_loc[0])
+
 
     # Setup MQTT client
     hostname, port = mqtt_broker_info(args["mqtt"])

@@ -19,6 +19,9 @@ as described [here](http://www.athenian-robotics.org/numpy/)
 * [MQTT](http://mqtt.org) client 
 as described [here](http://www.athenian-robotics.org/mqtt-client/)
 
+* [pyfirmata](https://github.com/tino/pyFirmata) client 
+as described [here]()
+
 ## Color Picker 
 
 color_picker.py is used to choose a target BGR value.
@@ -143,19 +146,6 @@ $ line_follower.py --bgr "[174, 56, 5]" --display
 | -v, --verbose  | Include debugging info                             | false   |
 | -h, --help     | Summary of options                                 |         |
 
-## Pip requirements
-
-### Client
-
-Required pip packages: grpcio, future, imutils, pyfirmata
-
-```bash
-$ pip install grpcio
-$ pip install future
-$ pip install imutils
-$ pip install pyfirmata
-```
-
 
 ## Relevant Links
 
@@ -166,7 +156,7 @@ $ pip install pyfirmata
 
 ### Software
 * [PyCharm IDE](https://www.jetbrains.com/pycharm/)
-* [Pyfirmata](https://github.com/tino/pyFirmata)
+* [pyfirmata](https://github.com/tino/pyFirmata)
 * [gRPC](http://www.grpc.io/docs/tutorials/basic/python.html)
 * [OpenCV](https://github.com/opencv/opencv)
 * [OpenCV Python Tutorial](http://docs.opencv.org/3.0-beta/doc/py_tutorials/py_tutorials.html)
@@ -174,13 +164,6 @@ $ pip install pyfirmata
 
 
 ## Setup Details
-
-### Installing OpenCV
-
-```bash
-$ brew tap homebrew/science
-$ brew install opencv3 --with-contrib --with-python3 --with-java --with-examples 
-```
 
 ### Displaying Raspi camera images on OSX
 
@@ -190,8 +173,8 @@ On the Raspi type:
 $ set DISPLAY my-mac:0
 ```
 
-2) Start the [X](https://en.wikipedia.org/wiki/X_Window_System) server [XQuartz](https://www.xquartz.org) 
-on the OSX machine.
+2) Start the *[X](https://en.wikipedia.org/wiki/X_Window_System) server* 
+[XQuartz](https://www.xquartz.org) on the OSX machine.
 
 3) Add the Raspi host name to enable connections to the X server (in this case *my-raspi*). 
 On the OSX machine type:

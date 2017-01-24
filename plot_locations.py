@@ -11,10 +11,12 @@ from common_constants import LOGGING_ARGS
 from location_client import LocationClient
 
 if __name__ == "__main__":
+    # Parse CLI args
     parser = argparse.ArgumentParser()
     parser.add_argument("-g", "--grpc", required=True, help="gRPC location server hostname")
     args = vars(parser.parse_args())
 
+    # Setup logging
     logging.basicConfig(**LOGGING_ARGS)
 
     # Start location client
@@ -25,14 +27,9 @@ if __name__ == "__main__":
     stream_id = stream_ids[0]
 
     # Declare graph
-    graph = go.Scatter(x=[],
-                       y=[],
-                       mode='lines+markers',
-                       stream=dict(token=stream_id, maxpoints=80))
+    graph = go.Scatter(x=[], y=[], mode='lines+markers', stream=dict(token=stream_id, maxpoints=80))
     data = go.Data([graph])
-    layout = go.Layout(title='Target Locations',
-                       xaxis=go.XAxis(range=[0, 800]),
-                       yaxis=go.YAxis(range=[0, 450]))
+    layout = go.Layout(title='Target Locations', xaxis=go.XAxis(range=[0, 800]), yaxis=go.YAxis(range=[0, 450]))
     fig = go.Figure(data=data, layout=layout)
     py.plot(fig, filename='plot-locations')
 
@@ -57,7 +54,9 @@ if __name__ == "__main__":
             time.sleep(.10)
 
     except KeyboardInterrupt:
-        print("Exiting...")
+        pass
     finally:
         stream.close()
         locations.stop()
+
+    print("Exiting...")

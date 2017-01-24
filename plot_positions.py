@@ -13,10 +13,12 @@ from grpc_support import TimeoutException
 from position_client import PositionClient
 
 if __name__ == "__main__":
+    # Parse CLI args
     parser = argparse.ArgumentParser()
     parser.add_argument("-g", "--grpc", required=True, help="gRPC location server hostname")
     args = vars(parser.parse_args())
 
+    # Setup logging
     logging.basicConfig(**LOGGING_ARGS)
 
     # Start position client
@@ -27,13 +29,9 @@ if __name__ == "__main__":
     stream_id = stream_ids[1]
 
     # Declare graph
-    graph = go.Scatter(x=[],
-                       y=[],
-                       mode='lines+markers',
-                       stream=dict(token=stream_id, maxpoints=80))
+    graph = go.Scatter(x=[], y=[], mode='lines+markers', stream=dict(token=stream_id, maxpoints=80))
     data = go.Data([graph])
-    layout = go.Layout(title='Line Offsets',
-                       yaxis=go.YAxis(range=[-400, 400]))
+    layout = go.Layout(title='Line Offsets', yaxis=go.YAxis(range=[-400, 400]))
     fig = go.Figure(data=data, layout=layout)
     py.plot(fig, filename='plot-positions')
 
@@ -68,7 +66,9 @@ if __name__ == "__main__":
             time.sleep(.10)
 
     except KeyboardInterrupt:
-        print("Exiting...")
+        pass
     finally:
         stream.close()
         positions.stop()
+
+    print("Exiting...")
