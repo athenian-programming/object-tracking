@@ -3,11 +3,10 @@
 import argparse
 import logging
 
+import camera
 import cv2
 import imutils
 import numpy as np
-
-import camera
 import opencv_defaults as defs
 from common_constants import LOGGING_ARGS
 from opencv_utils import GREEN
@@ -68,7 +67,9 @@ class ColorPicker(object):
 
             key = cv2.waitKey(30) & 0xFF
 
-            if key == ord("c") or key == ord(" "):
+            if key == 255:
+                pass
+            elif key == ord("c") or key == ord(" "):
                 print(bgr_text)
             elif roi_y >= self.__move_inc and (key == 0 or key == ord("k")):  # Up
                 self.__y_adj -= self.__move_inc

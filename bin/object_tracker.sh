@@ -1,4 +1,4 @@
 #! /bin/bash
 
-export PYTHONPATH=${PYTHONPATH}:../common_robotics_python
+export PYTHONPATH=${PYTHONPATH}:../common-robotics
 ./object_tracker.py --bgr "[174, 56, 5]" --display

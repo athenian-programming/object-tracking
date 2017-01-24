@@ -6,10 +6,9 @@ import sys
 from logging import info
 from threading import Lock
 
+import camera
 import cv2
 import imutils
-
-import camera
 import opencv_defaults as defs
 import opencv_utils as utils
 from common_constants import LOGGING_ARGS
@@ -126,13 +125,15 @@ class ObjectTracker:
 
                     key = cv2.waitKey(1) & 0xFF
 
-                    if key == ord("w"):
+                    if key == 255:
+                        pass
+                    elif key == ord("w"):
                         self.set_width(self.__width - 10)
                     elif key == ord("W"):
                         self.set_width(self.__width + 10)
-                    elif key == ord("-") or key == ord("_"):
+                    elif key == ord("-") or key == ord("_") or key == 0:
                         self.set_percent(self.__percent - 1)
-                    elif key == ord("+") or key == ord("="):
+                    elif key == ord("+") or key == ord("=") or key == 1:
                         self.set_percent(self.__percent + 1)
                     elif key == ord("r"):
                         self.set_width(self.__orig_width)
