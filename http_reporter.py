@@ -9,8 +9,8 @@ from location_client import LocationClient
 http = Flask(__name__)
 
 
-@http.route("/")
-def xy_vals():
+@http.route("/count")
+def val_count():
     global count
     return "Read {0} values".format(count)
 
@@ -31,8 +31,10 @@ if __name__ == "__main__":
     # Setup logging
     logging.basicConfig(**LOGGING_ARGS)
 
+    # Start client
     locations = LocationClient(args["grpc"]).start()
 
+    # Run read_values in a thread
     count = 0
     Thread(target=read_values).start()
 
