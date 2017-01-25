@@ -23,9 +23,8 @@ if __name__ == "__main__":
     # Setup logging
     logging.basicConfig(**LOGGING_ARGS)
 
-    # Start location reader in thread
-    locations = LocationClient(args["grpc"])
-    locations.start()
+    # Start location reader
+    locations = LocationClient(args["grpc"]).start()
 
 
     # Define MQTT callbacks

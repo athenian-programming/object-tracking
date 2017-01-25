@@ -7,10 +7,9 @@ from logging import error
 from logging import info
 from threading import Thread
 
-from pyfirmata import Arduino
-
 from common_constants import LOGGING_ARGS
 from location_client import LocationClient
+from pyfirmata import Arduino
 from servo import Servo
 
 
@@ -175,8 +174,7 @@ if __name__ == "__main__":
         error("Failed to connect to Arduino at {0} - [{1}]".format(port, e))
         sys.exit(0)
 
-    locations = LocationClient(args["grpc"])
-    locations.start()
+    locations = LocationClient(args["grpc"]).start()
 
     # Create servos
     servo_x = Servo("Pan", board, "d:{0}:s".format(args["xservo"]), secs_per_180=1.0, pix_per_degree=8)

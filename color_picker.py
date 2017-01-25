@@ -24,6 +24,7 @@ class ColorPicker(object):
         self.__mag_width = 400
         self.__cam = camera.Camera()
 
+    # Do not run this in a background thread. cv2.waitKey has to run in main thread
     def start(self):
         cnt = 0
         while self.__cam.is_open():
@@ -102,7 +103,8 @@ if __name__ == "__main__":
     logging.basicConfig(**LOGGING_ARGS)
 
     try:
-        color_picker = ColorPicker(int(args["width"]))
-        color_picker.start()
+        ColorPicker(int(args["width"])).start()
     except KeyboardInterrupt as e:
-        print("Exiting...")
+        pass
+
+    print("Exiting...")
