@@ -8,8 +8,7 @@ from location_server import LocationServer
 
 
 def test_location_server(port):
-    server = LocationServer(port)
-    server.start()
+    server = LocationServer(port).start()
 
     for i in range(0, 100):
         server.write_location(x=i, y=i + 1, width=i + 2, height=i + 3, middle_inc=i + 4)

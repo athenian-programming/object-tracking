@@ -4,7 +4,6 @@ from threading import Thread
 
 import grpc
 from concurrent import futures
-
 from gen.grpc_server_pb2 import ObjectLocation
 from gen.grpc_server_pb2 import ObjectLocationServerServicer
 from gen.grpc_server_pb2 import ServerInfo
@@ -54,3 +53,4 @@ class LocationServer(ObjectLocationServerServicer, GenericServer):
     def start(self):
         Thread(target=self.start_location_server).start()
         time.sleep(1)
+        return self
