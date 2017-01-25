@@ -57,7 +57,6 @@ class ObjectTracker:
 
     # Do not run this in a background thread. cv2.waitKey has to run in main thread
     def start(self):
-
         try:
             self.__location_server.start()
         except BaseException as e:
@@ -200,6 +199,8 @@ if __name__ == "__main__":
     try:
         tracker.start()
     except KeyboardInterrupt:
-        info("Exiting...")
+        pass
     finally:
         tracker.stop()
+
+    info("Exiting...")

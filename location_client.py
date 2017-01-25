@@ -6,7 +6,6 @@ from threading import Event
 from threading import Thread
 
 import grpc
-
 from gen.grpc_server_pb2 import ClientInfo
 from gen.grpc_server_pb2 import ObjectLocationServerStub
 from grpc_support import GenericClient
@@ -90,6 +89,7 @@ class LocationClient(GenericClient):
 
     def start(self):
         Thread(target=self.read_locations).start()
+        return self
 
     def stop(self):
         if not self._stopped:

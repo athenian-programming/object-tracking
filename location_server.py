@@ -14,6 +14,7 @@ from grpc_support import GenericServer
 class LocationServer(ObjectLocationServerServicer, GenericServer):
     def __init__(self, port):
         super(LocationServer, self).__init__(port)
+        self._stopped = False
         self._grpc_server = None
 
     def registerClient(self, request, context):
@@ -54,3 +55,6 @@ class LocationServer(ObjectLocationServerServicer, GenericServer):
         Thread(target=self.start_location_server).start()
         time.sleep(1)
         return self
+
+    def stop(self):
+        self._stopped = True
