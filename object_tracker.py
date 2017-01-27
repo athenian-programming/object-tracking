@@ -12,7 +12,6 @@ import imutils
 import opencv_defaults as defs
 import opencv_utils as utils
 from common_constants import LOGGING_ARGS
-from common_utils import is_raspi
 from contour_finder import ContourFinder
 from location_server import LocationServer
 from opencv_utils import BLUE
@@ -151,8 +150,8 @@ class ObjectTracker:
             except BaseException as e:
                 logging.error("Unexpected error in main loop [{0}]".format(e))
 
-        if is_raspi():
-            clear()
+        # if is_raspi():
+        #    clear()
         self.__cam.close()
 
     def stop(self):
@@ -161,17 +160,19 @@ class ObjectTracker:
 
 
 def set_left_leds(color):
-    if is_raspi():
-        for i in range(0, 4):
-            set_pixel(i, color[2], color[1], color[0], brightness=0.05)
-        show()
+    # if is_raspi():
+    #    for i in range(0, 4):
+    #        set_pixel(i, color[2], color[1], color[0], brightness=0.05)
+    #    show()
+    pass
 
 
 def set_right_leds(color):
-    if is_raspi():
-        for i in range(4, 8):
-            set_pixel(i, color[2], color[1], color[0], brightness=0.05)
-        show()
+    # if is_raspi():
+    #    for i in range(4, 8):
+    #        set_pixel(i, color[2], color[1], color[0], brightness=0.05)
+    #    show()
+    pass
 
 
 if __name__ == "__main__":
