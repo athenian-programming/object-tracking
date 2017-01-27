@@ -1,4 +1,4 @@
 #! /bin/bash
 
 export PYTHONPATH=${PYTHONPATH}:../common-robotics
-./hat_controller.py --grpc pleiku --flip
+./hat_controller.py --grpc pleiku
