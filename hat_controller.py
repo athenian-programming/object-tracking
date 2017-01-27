@@ -2,16 +2,13 @@
 
 import argparse
 import logging
-import sys
-from logging import error
 from logging import info
 from threading import Thread
 
+import pantilthat as pth
 from common_constants import LOGGING_ARGS
-from common_utils import is_windows
+from hat_servo import HatServo
 from location_client import LocationClient
-from pyfirmata import Arduino
-from servo import Servo
 
 
 def calibrate(locations, servo_x, servo_y):
@@ -154,11 +151,7 @@ def calibrate(locations, servo_x, servo_y):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-s", "--serial", default="ttyACM0", type=str,
-                        help="Arduino serial port [ttyACM0] (OSX is cu.usbmodemXXXX)")
     parser.add_argument("-g", "--grpc", required=True, help="gRPC location server hostname")
-    parser.add_argument("-x", "--xservo", default=5, type=int, help="X servo PWM pin [5]")
-    parser.add_argument("-y", "--yservo", default=6, type=int, help="Y servo PWM pin [6]")
     parser.add_argument("-c", "--calib", default=False, action="store_true", help="Calibration mode [false]")
     parser.add_argument("-v", "--verbose", default=logging.INFO, help="Include debugging info",
                         action="store_const", dest="loglevel", const=logging.DEBUG)
@@ -166,20 +159,11 @@ if __name__ == "__main__":
 
     logging.basicConfig(**LOGGING_ARGS)
 
-    # Setup firmata client
-    port = ("" if is_windows() else "/dev/") + args["serial"]
-    try:
-        board = Arduino(port)
-        info("Connected to Arduino at: {0}".format(port))
-    except OSError as e:
-        error("Failed to connect to Arduino at {0} - [{1}]".format(port, e))
-        sys.exit(0)
-
     locations = LocationClient(args["grpc"]).start()
 
     # Create servos
-    servo_x = Servo("Pan", board, "d:{0}:s".format(args["xservo"]), secs_per_180=1.0, pix_per_degree=8)
-    servo_y = Servo("Tilt", board, "d:{0}:s".format(args["yservo"]), secs_per_180=1.0, pix_per_degree=8)
+    servo_x = HatServo("Pan", pth.pan, secs_per_180=1.0, pix_per_degree=8)
+    servo_y = HatServo("Tilt", pth.tilt, secs_per_180=1.0, pix_per_degree=8)
 
     calib_t = None
     if args["calib"]:
@@ -207,5 +191,4 @@ if __name__ == "__main__":
     finally:
         servo_x.stop()
         servo_y.stop()
-        board.exit()
         locations.stop()
