@@ -27,8 +27,8 @@ if __name__ == "__main__":
     locations = LocationClient(args["grpc"]).start()
 
     # Create servos
-    servo_x = HatServo("Pan", alternate and not calib, pth.pan, 1.0, 8)
-    servo_y = HatServo("Tilt", alternate and not calib, pth.tilt, 1.0, 8)
+    servo_x = HatServo("Pan", alternate, pth.pan, 1.0, 8)
+    servo_y = HatServo("Tilt", alternate, pth.tilt, 1.0, 8)
 
     calib_t = None
     if calib:
@@ -38,9 +38,8 @@ if __name__ == "__main__":
         if alternate:
             # Set servo X to go first if alternating
             servo_x.ready_event.set()
-
-    servo_x.start(False, lambda: locations.get_x(), servo_y.ready_event if not calib else None)
-    servo_y.start(False, lambda: locations.get_y(), servo_x.ready_event if not calib else None)
+        servo_x.start(False, lambda: locations.get_x(), servo_y.ready_event if not calib else None)
+        servo_y.start(False, lambda: locations.get_y(), servo_x.ready_event if not calib else None)
 
     try:
         if calib_t is not None:
