@@ -18,9 +18,9 @@ class HatServo(object):
 
     def jiggle(self):
         # Provoke an update from the color tracker
-        self.set_angle(-5, pause=.1)
-        self.set_angle(5, pause=.1)
-        self.set_angle(0, pause=.1)
+        self.set_angle(85, pause=.1)
+        self.set_angle(95, pause=.1)
+        self.set_angle(90, pause=.1)
 
     def set_angle(self, val, pause=None):
         print("Servo angle: {0}".format(val - 90))
