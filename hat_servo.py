@@ -91,7 +91,7 @@ class HatServo(object):
                 # info("Pos: [{0} Delta: {1}".format(new_pos, delta))
 
                 # Write servo values
-                self.set_angle(new_pos, pause=wait_time)
+                self.set_angle(new_pos - 90, pause=wait_time)
 
             finally:
                 if other_ready_event is not None:
