@@ -173,8 +173,8 @@ if __name__ == "__main__":
         # Set servo X to go first
         servo_x.ready_event.set()
 
-    servo_x.start(True, lambda: locations.get_x(), servo_y.ready_event if not args["calib"] else None)
-    # servo_y.start(False, lambda: locations.get_y(), servo_x.ready_event if not args["calib"] else None)
+    servo_x.start(False, lambda: locations.get_x(), servo_y.ready_event if not args["calib"] else None)
+    servo_y.start(False, lambda: locations.get_y(), servo_x.ready_event if not args["calib"] else None)
 
     try:
         if calib_t is not None:
