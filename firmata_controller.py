@@ -48,28 +48,29 @@ if __name__ == "__main__":
     servo_x = FirmataServo("Pan", alternate, board, "d:{0}:s".format(xservo), 1.0, 8)
     servo_y = FirmataServo("Tilt", alternate, board, "d:{0}:s".format(yservo), 1.0, 8)
 
-    calib_t = None
-    if calib:
-        calib_t = Thread(target=calibrate_servo.calibrate, args=(locations, servo_x, servo_y))
-        calib_t.start()
-    else:
-        if alternate:
-            # Set servo X to go first
-            servo_x.ready_event.set()
-        servo_x.start(True, lambda: locations.get_x(), servo_y.ready_event if not calib else None)
-        servo_y.start(False, lambda: locations.get_y(), servo_x.ready_event if not calib else None)
-
     try:
-        if calib_t is not None:
-            calib_t.join()
+        if calib:
+            try:
+                calib_t = Thread(target=calibrate_servo.calibrate, args=(locations, servo_x, servo_y))
+                calib_t.start()
+                calib_t.join()
+            except KeyboardInterrupt:
+                pass
         else:
-            servo_x.join()
-            servo_y.join()
-    except KeyboardInterrupt:
-        pass
+            if alternate:
+                # Set servo X to go first
+                servo_x.ready_event.set()
+            try:
+                servo_x.start(True, lambda: locations.get_x(), servo_y.ready_event if not calib else None)
+                servo_y.start(False, lambda: locations.get_y(), servo_x.ready_event if not calib else None)
+                servo_x.join()
+                servo_y.join()
+            except KeyboardInterrupt:
+                pass
+            finally:
+                servo_x.stop()
+                servo_y.stop()
     finally:
-        servo_x.stop()
-        servo_y.stop()
         board.exit()
         locations.stop()
 
