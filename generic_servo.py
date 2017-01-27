@@ -13,7 +13,6 @@ class Servo(object):
         self.__stopped = False
         self.__ready_event = Event()
         self.__thread = None
-        self.__currpos = None
 
     @property
     def name(self):
@@ -24,7 +23,7 @@ class Servo(object):
         return self.__ready_event
 
     def determine_currpos(self):
-        return self.__currpos
+        pass
 
     def set_angle(self, val, pause=None):
         pass
@@ -47,8 +46,6 @@ class Servo(object):
                 midpoint = img_total / 2
 
                 curr_pos = self.determine_currpos()
-                print("Got curr_pos {0}".format(curr_pos))
-                print("Have self.__currpos {0}".format(self.__currpos))
 
                 if img_pos < midpoint - middle_inc:
                     err = abs(midpoint - img_pos)
