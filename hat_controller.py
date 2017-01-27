@@ -152,41 +152,45 @@ def calibrate(locations, servo_x, servo_y):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-g", "--grpc", required=True, help="gRPC location server hostname")
+    parser.add_argument("-a", "--alternate", default=False, action="store_true", help="Alternate servo actions [false]")
     parser.add_argument("-c", "--calib", default=False, action="store_true", help="Calibration mode [false]")
     parser.add_argument("-v", "--verbose", default=logging.INFO, help="Include debugging info",
                         action="store_const", dest="loglevel", const=logging.DEBUG)
     args = vars(parser.parse_args())
+    alternate = args["alternate"]
+    calibrate = args["calib"]
 
     logging.basicConfig(**LOGGING_ARGS)
 
     locations = LocationClient(args["grpc"]).start()
 
     # Create servos
-    servo_x = HatServo("Pan", pth.pan, secs_per_180=1.0, pix_per_degree=8)
-    servo_y = HatServo("Tilt", pth.tilt, secs_per_180=1.0, pix_per_degree=8)
+    servo_x = HatServo("Pan", alternate, pth.pan, secs_per_180=1.0, pix_per_degree=8)
+    servo_y = HatServo("Tilt", alternate, pth.tilt, secs_per_180=1.0, pix_per_degree=8)
 
     calib_t = None
-    if args["calib"]:
+    if calibrate:
         calib_t = Thread(target=calibrate, args=(locations, servo_x, servo_y))
         calib_t.start()
     else:
-        # Set servo X to go first
-        servo_x.ready_event.set()
+        if alternate:
+            # Set servo X to go first if alternating
+            servo_x.ready_event.set()
 
-    servo_x.start(False, lambda: locations.get_x(), servo_y.ready_event if not args["calib"] else None)
-    servo_y.start(False, lambda: locations.get_y(), servo_x.ready_event if not args["calib"] else None)
+    servo_x.start(False, lambda: locations.get_x(), servo_y.ready_event if not calibrate else None)
+    servo_y.start(False, lambda: locations.get_y(), servo_x.ready_event if not calibrate else None)
 
     try:
         if calib_t is not None:
             calib_t.join()
         else:
             servo_x.join()
-            #servo_y.join()
+            servo_y.join()
     except KeyboardInterrupt:
         pass
     finally:
         servo_x.stop()
-        #servo_y.stop()
+        servo_y.stop()
         locations.stop()
 
     info("Exiting...")

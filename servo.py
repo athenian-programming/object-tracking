@@ -95,7 +95,7 @@ class Servo(object):
                 if other_ready_event is not None:
                     other_ready_event.set()
 
-            time.sleep(.25)
+            time.sleep(.10)
 
     def start(self, forward, loc_source, other_ready_event):
         self.__thread = Thread(target=self.run_servo, args=(forward, loc_source, other_ready_event))

@@ -5,8 +5,9 @@ from threading import Thread
 
 
 class HatServo(object):
-    def __init__(self, name, hat_func, secs_per_180=0.50, pix_per_degree=6.5):
+    def __init__(self, name, alternate, hat_func, secs_per_180=0.50, pix_per_degree=6.5):
         self.__name = name
+        self.__alternate = alternate
         self.__hat_func = hat_func
         self.__secs_per_180 = secs_per_180
         self.__ppd = pix_per_degree
@@ -41,8 +42,9 @@ class HatServo(object):
 
         while not self.__stopped:
             try:
-                # self.__ready_event.wait()
-                # self.__ready_event.clear()
+                if self.__alternate:
+                    self.__ready_event.wait()
+                    self.__ready_event.clear()
 
                 # print(self.__name + " is evaluating location")
 
@@ -89,10 +91,10 @@ class HatServo(object):
                 self.set_angle(new_pos, pause=wait_time)
 
             finally:
-                if other_ready_event is not None:
+                if self.__alternate and other_ready_event is not None:
                     other_ready_event.set()
 
-            time.sleep(.25)
+            time.sleep(.10)
 
     def start(self, forward, loc_source, other_ready_event):
         self.__thread = Thread(target=self.run_servo, args=(forward, loc_source, other_ready_event))
