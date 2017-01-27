@@ -46,6 +46,9 @@ class HatServo(object):
                 # print(self.__name + " is evaluating location")
 
                 # Get latest location
+                vals = loc_source()
+                print("Length = {0}".format(len(vals)))
+                print(vals)
                 img_pos, img_total, middle_inc = loc_source()
 
                 # Skip if object is not seen
@@ -61,19 +64,21 @@ class HatServo(object):
                     err = abs(midpoint - img_pos)
                     adj = max(int(err / self.__ppd), 1)
                     new_pos = curr_pos + adj if forward else curr_pos - adj
-                    print(
-                        "{0} off by {1} pixels going from {2} to {3} adj {4}".format(self.__name, err, new_pos,
-                                                                                     curr_pos,
-                                                                                     adj))
+                    print("{0} off by {1} pixels going from {2} to {3} adj {4}".format(self.__name,
+                                                                                       err,
+                                                                                       new_pos,
+                                                                                       curr_pos,
+                                                                                       adj))
                 elif img_pos > midpoint + middle_inc:
                     # err = img_pos - (midpoint + middle_inc)
                     err = img_pos - midpoint
                     adj = max(int(err / self.__ppd), 1)
                     new_pos = curr_pos - adj if forward else curr_pos + adj
-                    print(
-                        "{0} off by {1} pixels going from {2} to {3} adj {4}".format(self.__name, err, new_pos,
-                                                                                     curr_pos,
-                                                                                     adj))
+                    print("{0} off by {1} pixels going from {2} to {3} adj {4}".format(self.__name,
+                                                                                       err,
+                                                                                       new_pos,
+                                                                                       curr_pos,
+                                                                                       adj))
                 else:
                     # print "{0} in middle".format(self.name)
                     # new_pos = curr_pos
