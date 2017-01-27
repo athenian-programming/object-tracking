@@ -47,6 +47,8 @@ class Servo(object):
                 midpoint = img_total / 2
 
                 curr_pos = self.determine_currpos()
+                print("Got curr_pos {0}".format(curr_pos))
+                print("Have self.__currpos {0}".format(self.__currpos))
 
                 if img_pos < midpoint - middle_inc:
                     err = abs(midpoint - img_pos)

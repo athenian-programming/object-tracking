@@ -20,4 +20,4 @@ class HatServo(Servo):
         if pause is not None:
             time.sleep(pause)
         self.__currpos = val
-
+        print("Setting self.__currpos {0}".format(self.__currpos))
