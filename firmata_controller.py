@@ -45,8 +45,8 @@ if __name__ == "__main__":
     locations = LocationClient(args["grpc"]).start()
 
     # Create servos
-    servo_x = FirmataServo("Pan", alternate, board, "d:{0}:s".format(xservo), 1.0, 8)
-    servo_y = FirmataServo("Tilt", alternate, board, "d:{0}:s".format(yservo), 1.0, 8)
+    servo_x = FirmataServo("Pan", alternate and not calib, board, "d:{0}:s".format(xservo), 1.0, 8)
+    servo_y = FirmataServo("Tilt", alternate and not calib, board, "d:{0}:s".format(yservo), 1.0, 8)
 
     calib_t = None
     if calib:

@@ -15,6 +15,12 @@ class FirmataServo(Servo):
         self.write_pin(80)
         self.write_pin(90)
 
+    def set_angle(self, val, pause=None):
+        self.write_pin(val, pause)
+
+    def get_currpos(self):
+        return self.read_pin()
+
     def read_pin(self):
         return self.__pin.read()
 
@@ -23,15 +29,9 @@ class FirmataServo(Servo):
             self.__pin.write(val)
             time.sleep(pause)
         else:
-            wait = (self.__secs_per_180 / 180) * abs((val - self.read_pin()))
+            wait = (self.__secs_per_180 / 180) * abs((val - self.get_currpos()))
             self.__pin.write(val)
             time.sleep(wait)
-
-    def set_angle(self, val, pause=None):
-        self.write_pin(val, pause)
-
-    def determine_currpos(self):
-        return self.read_pin()
 
     def run_servo2(self, forward, loc_source, other_ready_event):
         while not self.__stopped:
@@ -50,7 +50,7 @@ class FirmataServo(Servo):
 
                 midpoint = img_total / 2
 
-                curr_pos = self.determine_currpos()
+                curr_pos = self.get_currpos()
 
                 if img_pos < midpoint - middle_inc:
                     err = abs(midpoint - img_pos)

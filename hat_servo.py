@@ -15,7 +15,7 @@ class HatServo(Servo):
         self.set_angle(80, pause=.1)
         self.set_angle(90, pause=.1)
 
-    def determine_currpos(self):
+    def get_currpos(self):
         return self.__currpos
 
     def set_angle(self, val, pause=None):

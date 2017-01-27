@@ -27,8 +27,8 @@ if __name__ == "__main__":
     locations = LocationClient(args["grpc"]).start()
 
     # Create servos
-    servo_x = HatServo("Pan", alternate, pth.pan, 1.0, 8)
-    servo_y = HatServo("Tilt", alternate, pth.tilt, 1.0, 8)
+    servo_x = HatServo("Pan", alternate and not calib, pth.pan, 1.0, 8)
+    servo_y = HatServo("Tilt", alternate and not calib, pth.tilt, 1.0, 8)
 
     calib_t = None
     if calib:

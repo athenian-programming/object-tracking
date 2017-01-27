@@ -22,7 +22,7 @@ class Servo(object):
     def ready_event(self):
         return self.__ready_event
 
-    def determine_currpos(self):
+    def get_currpos(self):
         pass
 
     def set_angle(self, val, pause=None):
@@ -45,7 +45,7 @@ class Servo(object):
 
                 midpoint = img_total / 2
 
-                curr_pos = self.determine_currpos()
+                curr_pos = self.get_currpos()
 
                 if img_pos < midpoint - middle_inc:
                     err = abs(midpoint - img_pos)
