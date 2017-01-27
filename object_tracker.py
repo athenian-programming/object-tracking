@@ -19,8 +19,9 @@ from opencv_utils import BLUE
 from opencv_utils import GREEN
 from opencv_utils import RED
 
-if is_raspi():
-    from blinkt import set_pixel, show, clear
+
+# if is_raspi():
+# from blinkt import set_pixel, show, clear
     # import dothat.backlight as backlight
     # import dothat.lcd as lcd
     # backlight.rgb(200, 0,0)
