@@ -199,9 +199,11 @@ if __name__ == "__main__":
             servo_x.join()
             servo_y.join()
     except KeyboardInterrupt:
-        info("Exiting...")
+        pass
     finally:
         servo_x.stop()
         servo_y.stop()
         board.exit()
         locations.stop()
+
+    info("Exiting...")

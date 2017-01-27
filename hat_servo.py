@@ -23,7 +23,8 @@ class HatServo(object):
         self.set_angle(0, pause=.1)
 
     def set_angle(self, val, pause=None):
-        self.__hat_func(val)
+        print("Servo angle: {0}".format(val - 90))
+        self.__hat_func(val - 90)
         if pause is not None:
             time.sleep(pause)
         self.__currpos = val
@@ -62,14 +63,14 @@ class HatServo(object):
                     adj = max(int(err / self.__ppd), 1)
                     new_pos = curr_pos + adj if forward else curr_pos - adj
                     print("{0} off by {1} pixels going from {2} to {3} adj {4}"
-                          .format(self.__name, err, new_pos, curr_pos, adj))
+                          .format(self.__name, err, curr_pos, new_pos, adj))
                 elif img_pos > midpoint + middle_inc:
                     # err = img_pos - (midpoint + middle_inc)
                     err = img_pos - midpoint
                     adj = max(int(err / self.__ppd), 1)
                     new_pos = curr_pos - adj if forward else curr_pos + adj
                     print("{0} off by {1} pixels going from {2} to {3} adj {4}"
-                          .format(self.__name, err, new_pos, curr_pos, adj))
+                          .format(self.__name, err, curr_pos, new_pos, adj))
                 else:
                     # print "{0} in middle".format(self.name)
                     # new_pos = curr_pos
@@ -84,8 +85,8 @@ class HatServo(object):
                 # if curr_pos != new_pos:
                 # info("Pos: [{0} Delta: {1}".format(new_pos, delta))
 
-                # Write servo values
-                # self.set_angle(new_pos, pause=wait_time)
+                # Write servo value
+                self.set_angle(new_pos, pause=wait_time)
 
             finally:
                 if other_ready_event is not None:

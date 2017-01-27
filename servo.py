@@ -88,7 +88,7 @@ class Servo(object):
                 # if curr_pos != new_pos:
                 # info("Pos: [{0} Delta: {1}".format(new_pos, delta))
 
-                # Write servo values
+                # Write servo value
                 self.write_pin(new_pos, wait_time)
 
             finally:
