@@ -21,19 +21,20 @@ from opencv_utils import RED
 
 # if is_raspi():
 # from blinkt import set_pixel, show, clear
-    # import dothat.backlight as backlight
-    # import dothat.lcd as lcd
-    # backlight.rgb(200, 0,0)
+# import dothat.backlight as backlight
+# import dothat.lcd as lcd
+# backlight.rgb(200, 0,0)
 
 
 class ObjectTracker:
-    def __init__(self, bgr_color, width, percent, minimum, hsv_range, grpc_port, display=False):
+    def __init__(self, bgr_color, width, percent, minimum, hsv_range, grpc_port, display=False, flip=False):
         self.__width = width
         self.__orig_percent = percent
         self.__orig_width = width
         self.__percent = percent
         self.__minimum = minimum
         self.__display = display
+        self.__flip = flip
         self.__stopped = False
 
         self.__prev_x, self.__prev_y = -1, -1
@@ -69,6 +70,9 @@ class ObjectTracker:
             try:
                 image = self.__cam.read()
                 image = imutils.resize(image, width=self.__width)
+
+                if self.__flip:
+                    image = cv2.flip(image, 0)
 
                 middle_pct = (self.__percent / 100.0) / 2
                 img_height, img_width = image.shape[:2]
@@ -178,6 +182,7 @@ def set_right_leds(color):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-b", "--bgr", type=str, required=True, help="BGR target value, e.g., -b \"[174, 56, 5]\"")
+    parser.add_argument("-f", "--flip", default=False, action="store_true", help="Flip image [false]")
     parser.add_argument("-w", "--width", default=400, type=int, help="Image width [400]")
     parser.add_argument("-e", "--percent", default=15, type=int, help="Middle percent [15]")
     parser.add_argument("-m", "--min", default=100, type=int, help="Minimum pixel area [100]")
@@ -196,7 +201,8 @@ if __name__ == "__main__":
                             int(args["min"]),
                             int(args["range"]),
                             args["port"],
-                            args["display"])
+                            display=args["display"],
+                            flip=args["flip"])
 
     try:
         tracker.start()
