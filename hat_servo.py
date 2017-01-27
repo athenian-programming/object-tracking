@@ -41,8 +41,8 @@ class HatServo(object):
 
         while not self.__stopped:
             try:
-                self.__ready_event.wait()
-                self.__ready_event.clear()
+                # self.__ready_event.wait()
+                # self.__ready_event.clear()
 
                 # print(self.__name + " is evaluating location")
 
