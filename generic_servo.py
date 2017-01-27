@@ -85,5 +85,5 @@ class Servo(object):
         self.__thread.join()
 
     def stop(self):
-        info("Stopping servo {0}".format(self.name()))
+        info("Stopping servo {0}".format(self.name))
         self.__stopped = True
