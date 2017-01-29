@@ -36,6 +36,7 @@ $ ./color_picker.py
 
 | Option         | Description                                        | Default |
 |:---------------|----------------------------------------------------|---------|
+| -u, --usb      | Use USB Raspi camera                               | false   |
 | -w, --width    | Image width                                        | 400     |
 
 ### Display Keystrokes
@@ -71,6 +72,7 @@ $ python object_tracker.py --bgr "[174, 56, 5]" --display
 | Option         | Description                                        | Default |
 |:---------------|----------------------------------------------------|---------|
 | -b, --bgr      | BGR target value                                   |         |
+| -u, --usb      | Use USB Raspi camera                               | false   |
 | -w, --width    | Image width                                        | 400     |
 | -e, --percent  | Middle percent                                     | 15      |
 | -m, --min      | Minimum target pixel area                          | 100     |

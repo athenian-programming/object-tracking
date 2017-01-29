@@ -104,7 +104,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-w", "--width", default=400, type=int, help="Image width [400]")
     parser.add_argument("-f", "--flip", default=False, action="store_true", help="Flip image [false]")
-    parser.add_argument("-u", "--usb", default=False, action="store_true", help="User USB Raspi camera [false]")
+    parser.add_argument("-u", "--usb", default=False, action="store_true", help="Use USB Raspi camera [false]")
     args = vars(parser.parse_args())
 
     logging.basicConfig(**LOGGING_ARGS)
