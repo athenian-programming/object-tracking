@@ -111,7 +111,7 @@ if __name__ == "__main__":
     logging.basicConfig(**LOGGING_ARGS)
 
     try:
-        ColorPicker(int(args["width"]), flip=bool(args["flip"])).start()
+        ColorPicker(args["width"], flip=args["flip"], usb_camera=args["usb"]).start()
     except KeyboardInterrupt as e:
         pass
 
