@@ -64,7 +64,7 @@ decreasing the minimum target pixel area.
 ### Usage 
 
 ```bash
-$ python object_tracker.py --bgr "[174, 56, 5]" --display 
+$ python object_tracker.py --bgr "174, 56, 5" --display 
 ```
 
 ### CLI Options
@@ -77,6 +77,7 @@ $ python object_tracker.py --bgr "[174, 56, 5]" --display
 | -e, --percent  | Middle percent                                     | 15      |
 | -m, --min      | Minimum target pixel area                          | 100     |
 | -r, --range    | HSV Range                                          | 20      |
+| -l, --leds     | Enable Blinkt led feedback                         | false   |
 | -d, --display  | Display image                                      | false   |
 | -p, --port     | gRPC server port                                   | 50051   |
 | -v, --verbose  | Include debugging info                             | false   |

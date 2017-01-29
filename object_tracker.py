@@ -12,19 +12,12 @@ import imutils
 import opencv_defaults as defs
 import opencv_utils as utils
 from common_constants import LOGGING_ARGS
+from common_utils import is_raspi
 from contour_finder import ContourFinder
+from location_server import LocationServer
 from opencv_utils import BLUE
 from opencv_utils import GREEN
 from opencv_utils import RED
-
-from location_server import LocationServer
-
-
-# if is_raspi():
-# from blinkt import set_pixel, show, clear
-# import dothat.backlight as backlight
-# import dothat.lcd as lcd
-# backlight.rgb(200, 0,0)
 
 
 class ObjectTracker:
@@ -34,10 +27,11 @@ class ObjectTracker:
                  percent,
                  minimum,
                  hsv_range,
-                 grpc_port,
+                 grpc_port=50051,
                  display=False,
                  flip=False,
-                 usb_camera=False):
+                 usb_camera=False,
+                 leds=False):
         self.__width = width
         self.__orig_percent = percent
         self.__orig_width = width
@@ -45,6 +39,7 @@ class ObjectTracker:
         self.__minimum = minimum
         self.__display = display
         self.__flip = flip
+        self.__leds = leds
         self.__stopped = False
 
         self.__prev_x, self.__prev_y = -1, -1
@@ -55,6 +50,9 @@ class ObjectTracker:
         self.__contour_finder = ContourFinder(bgr_color, hsv_range)
         self.__location_server = LocationServer(grpc_port)
         self.__cam = camera.Camera(use_picamera=not usb_camera)
+
+        if self.__leds:
+            pass
 
     def set_percent(self, percent):
         if 2 <= percent <= 98:
@@ -116,8 +114,8 @@ class ObjectTracker:
                 x_missing = img_x == -1
                 y_missing = img_y == -1
 
-                set_left_leds(RED if x_missing else (GREEN if x_in_middle else BLUE))
-                set_right_leds(RED if y_missing else (GREEN if y_in_middle else BLUE))
+                self.set_left_leds(RED if x_missing else (GREEN if x_in_middle else BLUE))
+                self.set_right_leds(RED if y_missing else (GREEN if y_in_middle else BLUE))
 
                 # Write location if it is different from previous value written
                 if img_x != self.__prev_x or img_y != self.__prev_y:
@@ -164,34 +162,33 @@ class ObjectTracker:
             except BaseException as e:
                 logging.error("Unexpected error in main loop [{0}]".format(e))
 
-        # if is_raspi():
-        #    clear()
+        self.clear_leds()
         self.__cam.close()
 
     def stop(self):
         self.__stopped = True
         self.__location_server.stop()
 
+    def clear_leds(self):
+        if self.__leds:
+            clear()
 
-def set_left_leds(color):
-    # if is_raspi():
-    #    for i in range(0, 4):
-    #        set_pixel(i, color[2], color[1], color[0], brightness=0.05)
-    #    show()
-    pass
+    def set_left_leds(self, color):
+        if self.__leds:
+            for i in range(0, 4):
+                set_pixel(i, color[2], color[1], color[0], brightness=0.05)
+            show()
 
-
-def set_right_leds(color):
-    # if is_raspi():
-    #    for i in range(4, 8):
-    #        set_pixel(i, color[2], color[1], color[0], brightness=0.05)
-    #    show()
-    pass
+    def set_right_leds(self, color):
+        if self.__leds:
+            for i in range(4, 8):
+                set_pixel(i, color[2], color[1], color[0], brightness=0.05)
+            show()
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-b", "--bgr", type=str, required=True, help="BGR target value, e.g., -b \"[174, 56, 5]\"")
+    parser.add_argument("-b", "--bgr", type=str, required=True, help="BGR target value, e.g., -b \"174, 56, 5\"")
     parser.add_argument("-u", "--usb", default=False, action="store_true", help="Use USB Raspi camera [false]")
     parser.add_argument("-f", "--flip", default=False, action="store_true", help="Flip image [false]")
     parser.add_argument("-w", "--width", default=400, type=int, help="Image width [400]")
@@ -199,6 +196,7 @@ if __name__ == "__main__":
     parser.add_argument("-m", "--min", default=100, type=int, help="Minimum pixel area [100]")
     parser.add_argument("-r", "--range", default=20, type=int, help="HSV range")
     parser.add_argument("-p", "--port", default=50051, type=int, help="gRPC port [50051]")
+    parser.add_argument("-l", "--leds", default=False, action="store_true", help="Enable Blinkt led feedback [false]")
     parser.add_argument("-d", "--display", default=False, action="store_true", help="Display image [false]")
     parser.add_argument("-v", "--verbose", default=logging.INFO, help="Include debugging info",
                         action="store_const", dest="loglevel", const=logging.DEBUG)
@@ -206,15 +204,16 @@ if __name__ == "__main__":
 
     logging.basicConfig(**LOGGING_ARGS)
 
-    tracker = ObjectTracker(eval(args["bgr"]),
-                            args["width"],
-                            args["percent"],
-                            args["min"],
-                            args["range"],
-                            args["port"],
+    tracker = ObjectTracker(bgr_color=eval(args["bgr"] if "[" in args["bgr"] else "[{0}]".format(args["bgr"])),
+                            width=args["width"],
+                            percent=args["percent"],
+                            minimum=args["min"],
+                            hsv_range=args["range"],
+                            grpc_port=args["port"],
                             display=args["display"],
                             flip=args["flip"],
-                            usb_camera=args["usb"])
+                            usb_camera=args["usb"],
+                            leds=args["leds"] and is_raspi())
 
     try:
         tracker.start()
