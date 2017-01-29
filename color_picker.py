@@ -72,6 +72,8 @@ class ColorPicker(object):
             cv2.imshow("Average BGR Value", color_img)
             cv2.imshow("Image", image)
 
+            cnt += 1
+
             key = cv2.waitKey(30) & 0xFF
 
             if key == 255:
@@ -84,8 +86,8 @@ class ColorPicker(object):
                 self.__y_adj += self.__move_inc
             elif roi_x >= self.__move_inc and (key == 2 or key == ord("h")):  # Left
                 self.__x_adj -= self.__move_inc
-            elif roi_x <= frame_w - self.__roi_size - self.__move_inc - self.__move_inc and (
-                            key == 3 or key == ord("l")):  # Right
+            elif roi_x <= frame_w - self.__roi_size - self.__move_inc - self.__move_inc \
+                    and (key == 3 or key == ord("l")):  # Right
                 self.__x_adj += self.__move_inc
             elif self.__roi_size >= self.__roi_inc * 2 and (key == ord("-") or key == ord("_")):
                 self.__roi_size -= self.__roi_inc
@@ -95,8 +97,7 @@ class ColorPicker(object):
                 self.__x_adj, self.__y_adj = 0, 0
             elif key == ord("q"):
                 self.__cam.close()
-
-            cnt += 1
+                break
 
         print("Exiting...")
 

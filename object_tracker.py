@@ -13,10 +13,11 @@ import opencv_defaults as defs
 import opencv_utils as utils
 from common_constants import LOGGING_ARGS
 from contour_finder import ContourFinder
-from location_server import LocationServer
 from opencv_utils import BLUE
 from opencv_utils import GREEN
 from opencv_utils import RED
+
+from location_server import LocationServer
 
 
 # if is_raspi():
@@ -27,7 +28,16 @@ from opencv_utils import RED
 
 
 class ObjectTracker:
-    def __init__(self, bgr_color, width, percent, minimum, hsv_range, grpc_port, display=False, flip=False):
+    def __init__(self,
+                 bgr_color,
+                 width,
+                 percent,
+                 minimum,
+                 hsv_range,
+                 grpc_port,
+                 display=False,
+                 flip=False,
+                 usb_camera=False):
         self.__width = width
         self.__orig_percent = percent
         self.__orig_width = width
@@ -44,7 +54,7 @@ class ObjectTracker:
 
         self.__contour_finder = ContourFinder(bgr_color, hsv_range)
         self.__location_server = LocationServer(grpc_port)
-        self.__cam = camera.Camera()
+        self.__cam = camera.Camera(use_picamera=not usb_camera)
 
     def set_percent(self, percent):
         if 2 <= percent <= 98:
@@ -182,6 +192,7 @@ def set_right_leds(color):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-b", "--bgr", type=str, required=True, help="BGR target value, e.g., -b \"[174, 56, 5]\"")
+    parser.add_argument("-u", "--usb", default=False, action="store_true", help="User USB Raspi camera [false]")
     parser.add_argument("-f", "--flip", default=False, action="store_true", help="Flip image [false]")
     parser.add_argument("-w", "--width", default=400, type=int, help="Image width [400]")
     parser.add_argument("-e", "--percent", default=15, type=int, help="Middle percent [15]")
@@ -196,13 +207,14 @@ if __name__ == "__main__":
     logging.basicConfig(**LOGGING_ARGS)
 
     tracker = ObjectTracker(eval(args["bgr"]),
-                            int(args["width"]),
-                            int(args["percent"]),
-                            int(args["min"]),
-                            int(args["range"]),
+                            args["width"],
+                            args["percent"],
+                            args["min"],
+                            args["range"],
                             args["port"],
                             display=args["display"],
-                            flip=args["flip"])
+                            flip=args["flip"],
+                            usb_camera=args["usb"])
 
     try:
         tracker.start()
