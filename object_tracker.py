@@ -19,6 +19,9 @@ from opencv_utils import BLUE
 from opencv_utils import GREEN
 from opencv_utils import RED
 
+if is_raspi():
+    from blinkt import set_pixel, show
+
 
 class ObjectTracker:
     def __init__(self,
@@ -50,9 +53,6 @@ class ObjectTracker:
         self.__contour_finder = ContourFinder(bgr_color, hsv_range)
         self.__location_server = LocationServer(grpc_port)
         self.__cam = camera.Camera(use_picamera=not usb_camera)
-
-        if self.__leds:
-            from blinkt import set_pixel, show
 
     def set_percent(self, percent):
         if 2 <= percent <= 98:
@@ -170,8 +170,8 @@ class ObjectTracker:
         self.__location_server.stop()
 
     def clear_leds(self):
-        self.set_left_leds([0,0,0])
-        self.set_right_leds([0,0,0])
+        self.set_left_leds([0, 0, 0])
+        self.set_right_leds([0, 0, 0])
 
     def set_left_leds(self, color):
         if self.__leds:
