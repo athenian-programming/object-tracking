@@ -19,6 +19,7 @@ from opencv_utils import BLUE
 from opencv_utils import GREEN
 from opencv_utils import RED
 
+# I tried to include this in the constructor and make it depedent on self.__leds, but it does not work
 if is_raspi():
     from blinkt import set_pixel, show
 
