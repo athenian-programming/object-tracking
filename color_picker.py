@@ -14,16 +14,17 @@ from opencv_utils import RED
 
 
 class ColorPicker(object):
-    def __init__(self, width, flip=False):
+    def __init__(self, width, flip=False, usb_camera=False):
         self.__width = width
         self.__flip = flip
+        self.__usb_camera = usb_camera
         self.__roi_size = 24
         self.__roi_inc = 6
         self.__move_inc = 4
         self.__x_adj = 0
         self.__y_adj = 0
         self.__mag_width = 400
-        self.__cam = camera.Camera()
+        self.__cam = camera.Camera(use_picamera=not usb_camera)
 
     # Do not run this in a background thread. cv2.waitKey has to run in main thread
     def start(self):
@@ -104,6 +105,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-w", "--width", default=400, type=int, help="Image width [400]")
     parser.add_argument("-f", "--flip", default=False, action="store_true", help="Flip image [false]")
+    parser.add_argument("-u", "--usb", default=False, action="store_true", help="User USB Raspi camera [false]")
     args = vars(parser.parse_args())
 
     logging.basicConfig(**LOGGING_ARGS)
