@@ -52,7 +52,7 @@ class ObjectTracker:
         self.__cam = camera.Camera(use_picamera=not usb_camera)
 
         if self.__leds:
-            from blinkt import set_pixel, show, clear
+            from blinkt import set_pixel, show
 
     def set_percent(self, percent):
         if 2 <= percent <= 98:
@@ -170,8 +170,8 @@ class ObjectTracker:
         self.__location_server.stop()
 
     def clear_leds(self):
-        if self.__leds:
-            clear()
+        self.set_left_leds([0,0,0])
+        self.set_right_leds([0,0,0])
 
     def set_left_leds(self, color):
         if self.__leds:
