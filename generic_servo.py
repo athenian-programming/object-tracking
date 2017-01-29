@@ -5,14 +5,16 @@ from threading import Thread
 
 
 class Servo(object):
-    def __init__(self, name, alternate, secs_per_180=0.50, pix_per_degree=6.5):
+    def __init__(self, name, alternate=False, secs_per_180=0.50, pix_per_degree=6.5):
         self.__name = name
         self.__alternate = alternate
         self.__secs_per_180 = secs_per_180
         self.__ppd = pix_per_degree
-        self.__stopped = False
         self.__ready_event = Event()
         self.__thread = None
+        self.__stopped = False
+        info("Created servo: {0} alternate={1} secs_per_180={2} pix_per_degree={3}"
+             .format(self.__name, self.__alternate, self.__secs_per_180, self.__ppd))
 
     @property
     def name(self):
@@ -29,6 +31,7 @@ class Servo(object):
         pass
 
     def run_servo(self, forward, loc_source, other_ready_event):
+        info("Started servo: {0}".format(self.__name))
         while not self.__stopped:
             try:
                 if self.__alternate:
