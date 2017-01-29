@@ -99,8 +99,6 @@ class ColorPicker(object):
                 self.__cam.close()
                 break
 
-        print("Exiting...")
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
