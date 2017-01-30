@@ -24,7 +24,7 @@ if is_raspi():
     from blinkt import set_pixel, show
 
 
-class ObjectTracker:
+class DualObjectTracker:
     def __init__(self,
                  bgr_color,
                  width,
@@ -46,7 +46,7 @@ class ObjectTracker:
         self.__leds = leds
         self.__stopped = False
 
-        self.__prev_x, self.__prev_y = -1, -1
+        self.__prev_x = -1
         self.__cnt = 0
         self.__lock = Lock()
         self.__currval = None
@@ -58,12 +58,12 @@ class ObjectTracker:
     def set_percent(self, percent):
         if 2 <= percent <= 98:
             self.__percent = percent
-            self.__prev_x, self.__prev_y = -1, -1
+            self.__prev_x = -1
 
     def set_width(self, width):
         if 200 <= width <= 4000:
             self.__width = width
-            self.__prev_x, self.__prev_y = -1, -1
+            self.__prev_x = -1
 
     # Do not run this in a background thread. cv2.waitKey has to run in main thread
     def start(self):
@@ -87,7 +87,7 @@ class ObjectTracker:
                 img_height, img_width = image.shape[:2]
 
                 mid_x, mid_y = img_width / 2, img_height / 2
-                img_x, img_y = -1, -1
+                img_x1, img_y1 = -1, -1
 
                 # The middle margin calculation is based on % of width for horizontal and vertical boundry
                 middle_inc = int(mid_x * middle_pct)
@@ -95,43 +95,59 @@ class ObjectTracker:
                 text = "#{0} ({1}, {2})".format(self.__cnt, img_width, img_height)
                 text += " {0}%".format(self.__percent)
 
-                contours = self.__contour_finder.get_max_contours(image, self.__minimum, count=1)
-                if contours is not None:
-                    max_contour = contours[0]
-                    moment = cv2.moments(max_contour)
-                    area = int(moment["m00"])
-                    img_x = int(moment["m10"] / area)
-                    img_y = int(moment["m01"] / area)
+                contours = self.__contour_finder.get_max_contours(image, self.__minimum, count=2)
+                # Check for > 2 in case one of the targets is divided.
+                # The calculation will be off, but something will be better than nothing
+                if contours is not None and len(contours) >= 2:
+                    max1 = contours[0]
+                    max2 = contours[1]
+
+                    moment1 = cv2.moments(max1)
+                    area1 = int(moment1["m00"])
+                    img_x1 = int(moment1["m10"] / area1)
+                    img_y1 = int(moment1["m01"] / area1)
+
+                    moment2 = cv2.moments(max2)
+                    area2 = int(moment2["m00"])
+                    img_x2 = int(moment2["m10"] / area2)
+                    img_y2 = int(moment2["m01"] / area2)
 
                     if self.__display:
-                        x, y, w, h = cv2.boundingRect(max_contour)
-                        cv2.rectangle(image, (x, y), (x + w, y + h), BLUE, 2)
-                        cv2.drawContours(image, [max_contour], -1, GREEN, 2)
-                        cv2.circle(image, (img_x, img_y), 4, RED, -1)
-                        text += " ({0}, {1})".format(img_x, img_y)
-                        text += " {0}".format(area)
+                        x1, y1, w1, h1 = cv2.boundingRect(max1)
+                        cv2.rectangle(image, (x1, y1), (x1 + w1, y1 + h1), BLUE, 2)
+                        cv2.drawContours(image, [max1], -1, GREEN, 2)
+                        cv2.circle(image, (img_x1, img_y1), 4, RED, -1)
+                        text += " ({0}, {1})".format(img_x1, img_y1)
+                        text += " {0}".format(area1)
 
-                x_in_middle = mid_x - middle_inc <= img_x <= mid_x + middle_inc
-                y_in_middle = mid_y - middle_inc <= img_y <= mid_y + middle_inc
-                x_missing = img_x == -1
-                y_missing = img_y == -1
+                        x2, y2, w2, h2 = cv2.boundingRect(max2)
+                        cv2.rectangle(image, (x2, y2), (x2 + w2, y2 + h2), BLUE, 2)
+                        cv2.drawContours(image, [max2], -1, GREEN, 2)
+                        cv2.circle(image, (img_x2, img_y2), 4, RED, -1)
+                        text += " ({0}, {1})".format(img_x2, img_y2)
+                        text += " {0}".format(area2)
+
+                x_in_middle = mid_x - middle_inc <= img_x1 <= mid_x + middle_inc
+                y_in_middle = mid_y - middle_inc <= img_y1 <= mid_y + middle_inc
+                x_missing = img_x1 == -1
+                y_missing = img_y1 == -1
 
                 self.set_left_leds(RED if x_missing else (GREEN if x_in_middle else BLUE))
                 self.set_right_leds(RED if y_missing else (GREEN if y_in_middle else BLUE))
 
                 # Write location if it is different from previous value written
-                if img_x != self.__prev_x or img_y != self.__prev_y:
-                    self.__location_server.write_location(img_x, img_y, img_width, img_height, middle_inc)
-                    self.__prev_x, self.__prev_y = img_x, img_y
+                if img_x1 != self.__prev_x:
+                    self.__location_server.write_location(img_x1, img_y1, img_width, img_height, middle_inc)
+                    self.__prev_x = img_x1
 
                 # Display images
                 if self.__display:
                     x_color = GREEN if x_in_middle else RED if x_missing else BLUE
-                    y_color = GREEN if y_in_middle else RED if y_missing else BLUE
+                    # y_color = GREEN if y_in_middle else RED if y_missing else BLUE
                     cv2.line(image, (mid_x - middle_inc, 0), (mid_x - middle_inc, img_height), x_color, 1)
                     cv2.line(image, (mid_x + middle_inc, 0), (mid_x + middle_inc, img_height), x_color, 1)
-                    cv2.line(image, (0, mid_y - middle_inc), (img_width, mid_y - middle_inc), y_color, 1)
-                    cv2.line(image, (0, mid_y + middle_inc), (img_width, mid_y + middle_inc), y_color, 1)
+                    # cv2.line(image, (0, mid_y - middle_inc), (img_width, mid_y - middle_inc), y_color, 1)
+                    # cv2.line(image, (0, mid_y + middle_inc), (img_width, mid_y + middle_inc), y_color, 1)
                     cv2.putText(image, text, defs.TEXT_LOC, defs.TEXT_FONT, defs.TEXT_SIZE, RED, 1)
 
                     cv2.imshow("Image", image)
@@ -206,16 +222,16 @@ if __name__ == "__main__":
 
     logging.basicConfig(**LOGGING_ARGS)
 
-    tracker = ObjectTracker(bgr_color=eval(args["bgr"] if "[" in args["bgr"] else "[{0}]".format(args["bgr"])),
-                            width=args["width"],
-                            percent=args["percent"],
-                            minimum=args["min"],
-                            hsv_range=args["range"],
-                            grpc_port=args["port"],
-                            display=args["display"],
-                            flip=args["flip"],
-                            usb_camera=args["usb"],
-                            leds=args["leds"] and is_raspi())
+    tracker = DualObjectTracker(bgr_color=eval(args["bgr"] if "[" in args["bgr"] else "[{0}]".format(args["bgr"])),
+                                width=args["width"],
+                                percent=args["percent"],
+                                minimum=args["min"],
+                                hsv_range=args["range"],
+                                grpc_port=args["port"],
+                                display=args["display"],
+                                flip=args["flip"],
+                                usb_camera=args["usb"],
+                                leds=args["leds"] and is_raspi())
 
     try:
         tracker.start()
