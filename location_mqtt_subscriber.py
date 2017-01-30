@@ -48,6 +48,8 @@ if __name__ == "__main__":
     try:
         sleep()
     except KeyboardInterrupt:
+        pass
+    finally:
         mqtt_conn.disconnect()
 
     print("Exiting...")
