@@ -112,6 +112,9 @@ class DualObjectTracker:
                     img_x2 = int(moment2["m10"] / area2)
                     img_y2 = int(moment2["m01"] / area2)
 
+                    calc_x = abs(img_x1 - img_x2)
+                    calc_y = abs(img_y1 - img_y2) / 2
+
                     if self.__display:
                         x1, y1, w1, h1 = cv2.boundingRect(max1)
                         cv2.rectangle(image, (x1, y1), (x1 + w1, y1 + h1), BLUE, 2)
