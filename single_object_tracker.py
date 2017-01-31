@@ -13,6 +13,7 @@ from generic_object_tracker import GenericObjectTracker
 from opencv_utils import BLUE
 from opencv_utils import GREEN
 from opencv_utils import RED
+from opencv_utils import get_list_arg
 from opencv_utils import get_moment
 
 
@@ -126,7 +127,7 @@ if __name__ == "__main__":
     # Setup logging
     logging.basicConfig(**LOGGING_ARGS)
 
-    tracker = SingleObjectTracker(eval(args["bgr"] if "[" in args["bgr"] else "[{0}]".format(args["bgr"])),
+    tracker = SingleObjectTracker(get_list_arg(args["bgr"]),
                                   args["width"],
                                   args["percent"],
                                   args["min"],
