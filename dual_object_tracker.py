@@ -98,6 +98,7 @@ class DualObjectTracker(GenericObjectTracker):
 
                 x_in_middle = mid_x - middle_inc <= avg_x <= mid_x + middle_inc
                 y_in_middle = mid_y - middle_inc <= avg_y <= mid_y + middle_inc
+
                 x_color = GREEN if x_in_middle else RED if avg_x == -1 else BLUE
                 y_color = GREEN if y_in_middle else RED if avg_y == -1 else BLUE
 

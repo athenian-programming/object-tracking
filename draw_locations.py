@@ -1,9 +1,9 @@
 #!/usr/bin/env python2
 
 import argparse
-import logging
 from threading import Thread
 
+from common_cli_args import *
 from common_constants import LOGGING_ARGS
 from common_utils import is_python3
 from location_client import LocationClient
@@ -61,7 +61,7 @@ class LocationSketch(object):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-g", "--grpc", required=True, help="gRPC location server hostname")
+    grpc(parser)
     args = vars(parser.parse_args())
 
     logging.basicConfig(**LOGGING_ARGS)

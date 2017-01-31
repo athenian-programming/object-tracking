@@ -1,13 +1,13 @@
 #!/usr/bin/env python2
 
 import argparse
-import logging
 import sys
 from logging import error
 from logging import info
 from threading import Thread
 
 import calibrate_servo
+from common_cli_args import *
 from common_constants import LOGGING_ARGS
 from common_utils import is_windows
 from firmata_servo import FirmataServo
@@ -18,14 +18,14 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-s", "--serial", default="ttyACM0", type=str,
                         help="Arduino serial port [ttyACM0] (OSX is cu.usbmodemXXXX)")
-    parser.add_argument("-g", "--grpc", required=True, help="gRPC location server hostname")
-    parser.add_argument("-a", "--alternate", default=False, action="store_true", help="Alternate servo actions [false]")
+    grpc(parser)
     parser.add_argument("-x", "--xservo", default=5, type=int, help="X servo PWM pin [5]")
     parser.add_argument("-y", "--yservo", default=6, type=int, help="Y servo PWM pin [6]")
-    parser.add_argument("-c", "--calib", default=False, action="store_true", help="Calibration mode [false]")
-    parser.add_argument("-v", "--verbose", default=logging.INFO, help="Include debugging info",
-                        action="store_const", dest="loglevel", const=logging.DEBUG)
+    alternate(parser)
+    calib(parser)
+    verbose(parser)
     args = vars(parser.parse_args())
+
     alternate = args["alternate"]
     calib = args["calib"]
     xservo = args["xservo"]

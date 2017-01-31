@@ -1,7 +1,7 @@
 import argparse
-import logging
 from threading import Thread
 
+from common_cli_args import *
 from common_constants import LOGGING_ARGS
 from flask import Flask
 from location_client import LocationClient
@@ -25,7 +25,7 @@ def read_values():
 if __name__ == "__main__":
     # Setup CLI
     parser = argparse.ArgumentParser()
-    parser.add_argument("-g", "--grpc", required=True, help="gRPC location server hostname")
+    grpc(parser)
     args = vars(parser.parse_args())
 
     # Setup logging

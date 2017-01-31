@@ -1,10 +1,10 @@
 import argparse
-import logging
 import sys
 
 import camera
 import cv2
 import opencv_utils as utils
+from common_cli_args import *
 from common_utils import is_raspi
 from contour_finder import ContourFinder
 from location_server import LocationServer
@@ -152,17 +152,15 @@ class GenericObjectTracker(object):
     @staticmethod
     def cli_args():
         parser = argparse.ArgumentParser()
-        parser.add_argument("-b", "--bgr", type=str, required=True, help="BGR target value, e.g., -b \"174, 56, 5\"")
-        parser.add_argument("-u", "--usb", default=False, action="store_true", help="Use USB Raspi camera [false]")
-        parser.add_argument("-f", "--flip", default=False, action="store_true", help="Flip image [false]")
-        parser.add_argument("-w", "--width", default=400, type=int, help="Image width [400]")
-        parser.add_argument("-e", "--percent", default=15, type=int, help="Middle percent [15]")
-        parser.add_argument("-m", "--min", default=100, type=int, help="Minimum pixel area [100]")
-        parser.add_argument("-r", "--range", default=20, type=int, help="HSV range")
-        parser.add_argument("-p", "--port", default=50051, type=int, help="gRPC port [50051]")
-        parser.add_argument("-l", "--leds", default=False, action="store_true",
-                            help="Enable Blinkt led feedback [false]")
-        parser.add_argument("-d", "--display", default=False, action="store_true", help="Display image [false]")
-        parser.add_argument("-v", "--verbose", default=logging.INFO, help="Include debugging info",
-                            action="store_const", dest="loglevel", const=logging.DEBUG)
+        bgr(parser)
+        usb(parser)
+        flip(parser)
+        width(parser)
+        percent(parser)
+        min(parser)
+        range(parser)
+        port(parser)
+        leds(parser)
+        display(parser)
+        verbose(parser)
         return vars(parser.parse_args())

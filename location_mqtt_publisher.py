@@ -1,10 +1,10 @@
 #!/usr/bin/env python2
 
 import argparse
-import logging
 from logging import info
 from threading import Thread
 
+from common_cli_args import *
 from common_constants import CAMERA_NAME
 from common_constants import LOGGING_ARGS
 from common_utils import mqtt_broker_info
@@ -15,9 +15,9 @@ from mqtt_connection import MqttConnection
 if __name__ == "__main__":
     # Parse CLI args
     parser = argparse.ArgumentParser()
-    parser.add_argument("-g", "--grpc", required=True, help="gRPC location server hostname")
-    parser.add_argument("-c", "--camera", required=True, help="Camera name")
-    parser.add_argument("-m", "--mqtt", required=True, help="MQTT server hostname")
+    grpc(parser)
+    mqtt(parser)
+    camera(parser)
     args = vars(parser.parse_args())
 
     # Setup logging

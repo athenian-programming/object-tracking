@@ -1,24 +1,24 @@
 #!/usr/bin/env python2
 
 import argparse
-import logging
 from logging import info
 from threading import Thread
 
 import calibrate_servo
 import pantilthat as pth
+from common_cli_args import *
 from common_constants import LOGGING_ARGS
 from hat_servo import HatServo
 from location_client import LocationClient
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-g", "--grpc", required=True, help="gRPC location server hostname")
-    parser.add_argument("-a", "--alternate", default=False, action="store_true", help="Alternate servo actions [false]")
-    parser.add_argument("-c", "--calib", default=False, action="store_true", help="Calibration mode [false]")
-    parser.add_argument("-v", "--verbose", default=logging.INFO, help="Include debugging info",
-                        action="store_const", dest="loglevel", const=logging.DEBUG)
+    grpc(parser)
+    alternate(parser)
+    calib(parser)
+    verbose(parser)
     args = vars(parser.parse_args())
+
     alternate = args["alternate"]
     calib = args["calib"]
 

@@ -1,13 +1,13 @@
 #!/usr/bin/env python2
 
 import argparse
-import logging
 
 import camera
 import cv2
 import imutils
 import numpy as np
 import opencv_defaults as defs
+from common_cli_args import *
 from common_constants import LOGGING_ARGS
 from opencv_utils import GREEN
 from opencv_utils import RED
@@ -102,9 +102,9 @@ class ColorPicker(object):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-w", "--width", default=400, type=int, help="Image width [400]")
-    parser.add_argument("-f", "--flip", default=False, action="store_true", help="Flip image [false]")
-    parser.add_argument("-u", "--usb", default=False, action="store_true", help="Use USB Raspi camera [false]")
+    width(parser)
+    usb(parser)
+    flip(parser)
     args = vars(parser.parse_args())
 
     logging.basicConfig(**LOGGING_ARGS)
