@@ -38,6 +38,7 @@ $ ./color_picker.py
 |:---------------|----------------------------------------------------|---------|
 | -u, --usb      | Use USB Raspi camera                               | false   |
 | -w, --width    | Image width                                        | 400     |
+| -h, --help     | Summary of options                                 |         |
 
 ### Display Keystrokes
 
