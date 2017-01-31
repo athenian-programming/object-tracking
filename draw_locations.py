@@ -1,12 +1,13 @@
 #!/usr/bin/env python2
 
+import logging
 from threading import Thread
 
 import common_cli_args  as cli
-from common_cli_args import *
 from common_cli_args import setup_cli_args
 from common_constants import LOGGING_ARGS
 from common_utils import is_python3
+
 from location_client import LocationClient
 
 if is_python3():

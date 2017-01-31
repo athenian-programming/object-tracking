@@ -1,6 +1,7 @@
 #!/usr/bin/env python2
 
 import logging
+import time
 import traceback
 from logging import info
 
@@ -10,11 +11,8 @@ import opencv_defaults as defs
 from common_constants import LOGGING_ARGS
 from common_utils import is_raspi
 from generic_object_tracker import GenericObjectTracker
-from opencv_utils import BLUE
-from opencv_utils import GREEN
-from opencv_utils import RED
-from opencv_utils import get_list_arg
-from opencv_utils import get_moment
+from opencv_utils import BLUE, GREEN, RED
+from opencv_utils import get_list_arg, get_moment
 
 
 class SingleObjectTracker(GenericObjectTracker):
@@ -28,7 +26,9 @@ class SingleObjectTracker(GenericObjectTracker):
                  display=False,
                  flip=False,
                  usb_camera=False,
-                 leds=False):
+                 leds=False,
+                 camera_name="",
+                 serve_images=False):
         super(SingleObjectTracker, self).__init__(bgr_color,
                                                   width,
                                                   percent,
@@ -38,7 +38,9 @@ class SingleObjectTracker(GenericObjectTracker):
                                                   display=display,
                                                   flip=flip,
                                                   usb_camera=usb_camera,
-                                                  leds=leds)
+                                                  leds=leds,
+                                                  camera_name=camera_name,
+                                                  serve_images=serve_images)
 
     # Do not run this in a background thread. cv2.waitKey has to run in main thread
     def start(self):
@@ -70,7 +72,7 @@ class SingleObjectTracker(GenericObjectTracker):
                 if contours is not None and len(contours) == 1:
                     contour, area, img_x, img_y = get_moment(contours[0])
 
-                    if self.display:
+                    if self.markup_image:
                         x, y, w, h = cv2.boundingRect(contour)
                         cv2.rectangle(image, (x, y), (x + w, y + h), BLUE, 2)
                         cv2.drawContours(image, [contour], -1, GREEN, 2)
@@ -93,8 +95,7 @@ class SingleObjectTracker(GenericObjectTracker):
                     self.location_server.write_location(img_x, img_y, img_width, img_height, middle_inc)
                     self._prev_x, self._prev_y = img_x, img_y
 
-                # Display images
-                if self.display:
+                if self.markup_image:
                     # Draw the alignment lines
                     cv2.line(image, (mid_x - middle_inc, 0), (mid_x - middle_inc, img_height), x_color, 1)
                     cv2.line(image, (mid_x + middle_inc, 0), (mid_x + middle_inc, img_height), x_color, 1)
@@ -103,18 +104,15 @@ class SingleObjectTracker(GenericObjectTracker):
 
                     cv2.putText(image, text, defs.TEXT_LOC, defs.TEXT_FONT, defs.TEXT_SIZE, RED, 1)
 
-                    cv2.imshow("Image", image)
-
-                    self.process_keystroke(image)
-                else:
-                    # Nap if display is not on
-                    # time.sleep(.01)
-                    pass
+                self.display_image(image)
+                self.serve_image(image)
 
                 self.cnt += 1
+
             except BaseException as e:
                 traceback.print_exc()
                 logging.error("Unexpected error in main loop [{0}]".format(e))
+                time.sleep(1)
 
         self.clear_leds()
         self.cam.close()
@@ -136,7 +134,9 @@ if __name__ == "__main__":
                                   display=args["display"],
                                   flip=args["flip"],
                                   usb_camera=args["usb"],
-                                  leds=args["leds"] and is_raspi())
+                                  leds=args["leds"] and is_raspi(),
+                                  camera_name=args["camera"],
+                                  serve_images=args["http"])
 
     try:
         tracker.start()

@@ -1,28 +1,31 @@
 #!/usr/bin/env python2
 
+import argparse
+import logging
 import sys
 from logging import error
 from logging import info
 from threading import Thread
 
-import calibrate_servo
-from common_cli_args import *
+import common_cli_args as cli
 from common_constants import LOGGING_ARGS
 from common_utils import is_windows
+from pyfirmata import Arduino
+
+import calibrate_servo
 from firmata_servo import FirmataServo
 from location_client import LocationClient
-from pyfirmata import Arduino
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-s", "--serial", default="ttyACM0", type=str,
                         help="Arduino serial port [ttyACM0] (OSX is cu.usbmodemXXXX)")
-    grpc(parser)
+    cli.grpc(parser)
     parser.add_argument("-x", "--xservo", default=5, type=int, help="X servo PWM pin [5]")
     parser.add_argument("-y", "--yservo", default=6, type=int, help="Y servo PWM pin [6]")
-    alternate(parser)
-    calib(parser)
-    verbose(parser)
+    cli.alternate(parser)
+    cli.calib(parser)
+    cli.verbose(parser)
     args = vars(parser.parse_args())
 
     alternate = args["alternate"]

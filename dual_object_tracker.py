@@ -1,6 +1,7 @@
 #!/usr/bin/env python2
 
 import logging
+import time
 import traceback
 from logging import info
 
@@ -10,12 +11,8 @@ import opencv_defaults as defs
 from common_constants import LOGGING_ARGS
 from common_utils import is_raspi
 from generic_object_tracker import GenericObjectTracker
-from opencv_utils import BLUE
-from opencv_utils import GREEN
-from opencv_utils import RED
-from opencv_utils import YELLOW
-from opencv_utils import get_list_arg
-from opencv_utils import get_moment
+from opencv_utils import BLUE, GREEN, RED, YELLOW
+from opencv_utils import get_list_arg, get_moment
 
 
 class DualObjectTracker(GenericObjectTracker):
@@ -29,7 +26,9 @@ class DualObjectTracker(GenericObjectTracker):
                  display=False,
                  flip=False,
                  usb_camera=False,
-                 leds=False):
+                 leds=False,
+                 camera_name="",
+                 serve_images=False):
         super(DualObjectTracker, self).__init__(bgr_color,
                                                 width,
                                                 percent,
@@ -39,7 +38,9 @@ class DualObjectTracker(GenericObjectTracker):
                                                 display=display,
                                                 flip=flip,
                                                 usb_camera=usb_camera,
-                                                leds=leds)
+                                                leds=leds,
+                                                camera_name=camera_name,
+                                                serve_images=serve_images)
 
     # Do not run this in a background thread. cv2.waitKey has to run in main thread
     def start(self):
@@ -78,7 +79,7 @@ class DualObjectTracker(GenericObjectTracker):
                     avg_x = (abs(img_x1 - img_x2) / 2) + min(img_x1, img_x2)
                     avg_y = (abs(img_y1 - img_y2) / 2) + min(img_y1, img_y2)
 
-                    if self.display:
+                    if self.markup_image:
                         x1, y1, w1, h1 = cv2.boundingRect(countour1)
                         cv2.rectangle(image, (x1, y1), (x1 + w1, y1 + h1), BLUE, 2)
                         cv2.drawContours(image, [countour1], -1, GREEN, 2)
@@ -113,7 +114,7 @@ class DualObjectTracker(GenericObjectTracker):
                     self._prev_x, self._prev_y = avg_x, avg_y
 
                 # Display images
-                if self.display:
+                if self.markup_image:
                     # Draw the alignment lines
                     cv2.line(image, (mid_x - middle_inc, 0), (mid_x - middle_inc, img_height), x_color, 1)
                     cv2.line(image, (mid_x + middle_inc, 0), (mid_x + middle_inc, img_height), x_color, 1)
@@ -122,18 +123,15 @@ class DualObjectTracker(GenericObjectTracker):
 
                     cv2.putText(image, text, defs.TEXT_LOC, defs.TEXT_FONT, defs.TEXT_SIZE, RED, 1)
 
-                    cv2.imshow("Image", image)
-
-                    self.process_keystroke(image)
-                else:
-                    # Nap if display is not on
-                    # time.sleep(.01)
-                    pass
+                self.display_image(image)
+                self.serve_image(image)
 
                 self.cnt += 1
+
             except BaseException as e:
                 traceback.print_exc()
                 logging.error("Unexpected error in main loop [{0}]".format(e))
+                time.sleep(1)
 
         self.clear_leds()
         self.cam.close()
@@ -155,7 +153,9 @@ if __name__ == "__main__":
                                 display=args["display"],
                                 flip=args["flip"],
                                 usb_camera=args["usb"],
-                                leds=args["leds"] and is_raspi())
+                                leds=args["leds"] and is_raspi(),
+                                camera_name=args["camera"],
+                                serve_images=args["http"])
 
     try:
         tracker.start()
