@@ -1,23 +1,20 @@
 #!/usr/bin/env python2
 
-import argparse
+import logging
 from logging import info
 from threading import Thread
 
 import calibrate_servo
+import common_cli_args  as cli
 import pantilthat as pth
-from common_cli_args import *
+from common_cli_args import setup_cli_args
 from common_constants import LOGGING_ARGS
 from hat_servo import HatServo
 from location_client import LocationClient
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    grpc(parser)
-    alternate(parser)
-    calib(parser)
-    verbose(parser)
-    args = vars(parser.parse_args())
+    # Setuo CLI args
+    args = setup_cli_args(cli.grpc, cli.alternate, cli.calib, cli.verbose)
 
     alternate = args["alternate"]
     calib = args["calib"]

@@ -1,16 +1,15 @@
 #!/usr/bin/env python3
 
-import argparse
+import logging
 
-from common_cli_args import *
+import common_cli_args  as cli
+from common_cli_args import setup_cli_args
 from common_constants import LOGGING_ARGS
 from location_client import LocationClient
 
 if __name__ == "__main__":
-    # Setup CLI
-    parser = argparse.ArgumentParser()
-    grpc(parser)
-    args = vars(parser.parse_args())
+    # Parse CLI args
+    args = setup_cli_args(cli.grpc)
 
     # Setup logging
     logging.basicConfig(**LOGGING_ARGS)

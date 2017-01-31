@@ -1,9 +1,10 @@
 #!/usr/bin/env python2
 
-import argparse
 from threading import Thread
 
+import common_cli_args  as cli
 from common_cli_args import *
+from common_cli_args import setup_cli_args
 from common_constants import LOGGING_ARGS
 from common_utils import is_python3
 from location_client import LocationClient
@@ -60,9 +61,8 @@ class LocationSketch(object):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    grpc(parser)
-    args = vars(parser.parse_args())
+    # Parse CLI args
+    args = setup_cli_args(cli.grpc)
 
     logging.basicConfig(**LOGGING_ARGS)
 

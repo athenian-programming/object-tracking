@@ -1,13 +1,14 @@
 #!/usr/bin/env python2
 
-import argparse
+import logging
 
 import camera
+import common_cli_args  as cli
 import cv2
 import imutils
 import numpy as np
 import opencv_defaults as defs
-from common_cli_args import *
+from common_cli_args import setup_cli_args
 from common_constants import LOGGING_ARGS
 from opencv_utils import GREEN
 from opencv_utils import RED
@@ -101,12 +102,10 @@ class ColorPicker(object):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    width(parser)
-    usb(parser)
-    flip(parser)
-    args = vars(parser.parse_args())
+    # Parse CLI args
+    args = setup_cli_args(cli.width, cli.usb, cli.flip)
 
+    # Setup logging
     logging.basicConfig(**LOGGING_ARGS)
 
     try:

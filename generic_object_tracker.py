@@ -1,10 +1,11 @@
-import argparse
+import logging
 import sys
 
 import camera
+import common_cli_args  as cli
 import cv2
 import opencv_utils as utils
-from common_cli_args import *
+from common_cli_args import setup_cli_args
 from common_utils import is_raspi
 from contour_finder import ContourFinder
 from location_server import LocationServer
@@ -134,13 +135,13 @@ class GenericObjectTracker(object):
         if key == 255:
             pass
         elif key == ord("w"):
-            self.width = self.width - 10
+            self.width -= 10
         elif key == ord("W"):
-            self.width = self.width + 10
+            self.width += 10
         elif key == ord("-") or key == ord("_") or key == 0:
-            self.percent = self.percent - 1
+            self.percent -= 1
         elif key == ord("+") or key == ord("=") or key == 1:
-            self.percent = self.percent + 1
+            self.percent += 1
         elif key == ord("r"):
             self.width = self.__orig_width
             self.percent = self.__orig_percent
@@ -151,16 +152,14 @@ class GenericObjectTracker(object):
 
     @staticmethod
     def cli_args():
-        parser = argparse.ArgumentParser()
-        bgr(parser)
-        usb(parser)
-        flip(parser)
-        width(parser)
-        percent(parser)
-        min(parser)
-        range(parser)
-        port(parser)
-        leds(parser)
-        display(parser)
-        verbose(parser)
-        return vars(parser.parse_args())
+        return setup_cli_args(cli.bgr,
+                              cli.usb,
+                              cli.flip,
+                              cli.width,
+                              cli.percent,
+                              cli.min,
+                              cli.range,
+                              cli.port,
+                              cli.leds,
+                              cli.display,
+                              cli.verbose)

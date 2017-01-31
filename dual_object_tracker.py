@@ -139,7 +139,7 @@ class DualObjectTracker(GenericObjectTracker):
 
 
 if __name__ == "__main__":
-    # Setup CLI args
+    # Parse CLI args
     args = GenericObjectTracker.cli_args()
 
     # Setup logging

@@ -1,6 +1,5 @@
 #!/usr/bin/env python2
 
-import argparse
 import sys
 from logging import error
 from logging import info
