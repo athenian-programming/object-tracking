@@ -1,6 +1,5 @@
 #!/usr/bin/env python2
 
-import argparse
 import logging
 from logging import info
 
@@ -14,6 +13,7 @@ from opencv_utils import BLUE
 from opencv_utils import GREEN
 from opencv_utils import RED
 from opencv_utils import YELLOW
+from opencv_utils import get_moment
 
 
 class DualObjectTracker(GenericObjectTracker):
@@ -38,7 +38,6 @@ class DualObjectTracker(GenericObjectTracker):
                                                 flip=flip,
                                                 usb_camera=usb_camera,
                                                 leds=leds)
-        self.__cnt = 0
 
 
     # Do not run this in a background thread. cv2.waitKey has to run in main thread
@@ -62,7 +61,7 @@ class DualObjectTracker(GenericObjectTracker):
                 # The middle margin calculation is based on % of width for horizontal and vertical boundry
                 middle_inc = int(mid_x * middle_pct)
 
-                text = "#{0} ({1}, {2})".format(self.__cnt, img_width, img_height)
+                text = "#{0} ({1}, {2})".format(self.cnt, img_width, img_height)
                 text += " {0}%".format(self.percent)
 
                 # Find the 2 largest contours
@@ -71,32 +70,23 @@ class DualObjectTracker(GenericObjectTracker):
                 # Check for > 2 in case one of the targets is divided.
                 # The calculation will be off, but something will be better than nothing
                 if contours is not None and len(contours) >= 2:
-                    max1 = contours[0]
-                    moment1 = cv2.moments(max1)
-                    area1 = int(moment1["m00"])
-                    img_x1 = int(moment1["m10"] / area1)
-                    img_y1 = int(moment1["m01"] / area1)
-
-                    max2 = contours[1]
-                    moment2 = cv2.moments(max2)
-                    area2 = int(moment2["m00"])
-                    img_x2 = int(moment2["m10"] / area2)
-                    img_y2 = int(moment2["m01"] / area2)
+                    countour1, area1, img_x1, img_y1 = get_moment(cv2.moments(contours[0]))
+                    countour2, area2, img_x2, img_y2 = get_moment(cv2.moments(contours[1]))
 
                     avg_x = (abs(img_x1 - img_x2) / 2) + min(img_x1, img_x2)
                     avg_y = (abs(img_y1 - img_y2) / 2) + min(img_y1, img_y2)
 
                     if self.display:
-                        x1, y1, w1, h1 = cv2.boundingRect(max1)
+                        x1, y1, w1, h1 = cv2.boundingRect(countour1)
                         cv2.rectangle(image, (x1, y1), (x1 + w1, y1 + h1), BLUE, 2)
-                        cv2.drawContours(image, [max1], -1, GREEN, 2)
+                        cv2.drawContours(image, [countour1], -1, GREEN, 2)
                         cv2.circle(image, (img_x1, img_y1), 4, RED, -1)
                         # text += " Obj1: ({0}, {1})".format(img_x1, img_y1)
                         # text += " {0}".format(area1)
 
-                        x2, y2, w2, h2 = cv2.boundingRect(max2)
+                        x2, y2, w2, h2 = cv2.boundingRect(countour2)
                         cv2.rectangle(image, (x2, y2), (x2 + w2, y2 + h2), BLUE, 2)
-                        cv2.drawContours(image, [max2], -1, GREEN, 2)
+                        cv2.drawContours(image, [countour2], -1, GREEN, 2)
                         cv2.circle(image, (img_x2, img_y2), 4, RED, -1)
                         # text += " Obj2: ({0}, {1})".format(img_x2, img_y2)
                         # text += " {0}".format(area2)
@@ -140,7 +130,7 @@ class DualObjectTracker(GenericObjectTracker):
                     # time.sleep(.01)
                     pass
 
-                self.__cnt += 1
+                self.cnt += 1
             except BaseException as e:
                 logging.error("Unexpected error in main loop [{0}]".format(e))
 
@@ -150,21 +140,10 @@ class DualObjectTracker(GenericObjectTracker):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-b", "--bgr", type=str, required=True, help="BGR target value, e.g., -b \"174, 56, 5\"")
-    parser.add_argument("-u", "--usb", default=False, action="store_true", help="Use USB Raspi camera [false]")
-    parser.add_argument("-f", "--flip", default=False, action="store_true", help="Flip image [false]")
-    parser.add_argument("-w", "--width", default=400, type=int, help="Image width [400]")
-    parser.add_argument("-e", "--percent", default=15, type=int, help="Middle percent [15]")
-    parser.add_argument("-m", "--min", default=100, type=int, help="Minimum pixel area [100]")
-    parser.add_argument("-r", "--range", default=20, type=int, help="HSV range")
-    parser.add_argument("-p", "--port", default=50051, type=int, help="gRPC port [50051]")
-    parser.add_argument("-l", "--leds", default=False, action="store_true", help="Enable Blinkt led feedback [false]")
-    parser.add_argument("-d", "--display", default=False, action="store_true", help="Display image [false]")
-    parser.add_argument("-v", "--verbose", default=logging.INFO, help="Include debugging info",
-                        action="store_const", dest="loglevel", const=logging.DEBUG)
-    args = vars(parser.parse_args())
+    # Setup CLI args
+    args = GenericObjectTracker.cli_args()
 
+    # Setup logging
     logging.basicConfig(**LOGGING_ARGS)
 
     tracker = DualObjectTracker(bgr_color=eval(args["bgr"] if "[" in args["bgr"] else "[{0}]".format(args["bgr"])),

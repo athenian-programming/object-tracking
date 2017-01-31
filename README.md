@@ -53,7 +53,7 @@ $ ./color_picker.py
 | q          | Quit                                               |
 
 
-## Object Tracker
+## Single Object Tracker
 
 The object_tracker.py script runs the LocationServer, which generates 
 the location of the object having the target BGR value. It supplies data to 
@@ -64,7 +64,7 @@ decreasing the minimum target pixel area.
 ### Usage 
 
 ```bash
-$ python object_tracker.py --bgr "174, 56, 5" --display 
+$ python single_object_tracker.py --bgr "174, 56, 5" --display 
 ```
 
 ### CLI Options
@@ -98,19 +98,19 @@ $ python object_tracker.py --bgr "174, 56, 5" --display
 | w          | Decrease image width                               |
 | W          | Increase image width                               |
 | r          | Reset center area and image width                  |
-| p          | Save current image to disk                         |
+| s          | Save current image to disk                         |
 | q          | Quit                                               |
 
 
-## Servo Controller
+## FirmataServo Controller
 
-The servo_controller.py script reads the location values provided by object_tracker.py
+The firmata_controller.py script reads the location values provided by single_object_tracker.py
 and adjusts the pan/tilt servos accordingly.
 
 ### Usage 
 
 ```bash
-$ servo_controller.py --port ttyACM0 --grpc localhost
+$ firmata_controller.py --port ttyACM0 --grpc localhost
 ```
 
 ### CLI Options

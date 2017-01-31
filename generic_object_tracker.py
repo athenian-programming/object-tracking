@@ -1,3 +1,4 @@
+import argparse
 import logging
 import sys
 
@@ -34,6 +35,7 @@ class GenericObjectTracker(object):
         self.__flip = flip
         self.__leds = leds
         self.__stopped = False
+        self.__cnt = 0
 
         self._prev_x, self._prev_y = -1, -1
 
@@ -45,9 +47,21 @@ class GenericObjectTracker(object):
     def width(self):
         return self.__width
 
+    @width.setter
+    def width(self, width):
+        if 200 <= width <= 4000:
+            self.__width = width
+            self._prev_x, self._prev_y = -1, -1
+
     @property
     def percent(self):
         return self.__percent
+
+    @percent.setter
+    def percent(self, percent):
+        if 2 <= percent <= 98:
+            self.__percent = percent
+            self._prev_x, self._prev_y = -1, -1
 
     @property
     def minimum(self):
@@ -77,15 +91,13 @@ class GenericObjectTracker(object):
     def cam(self):
         return self.__cam
 
-    def set_percent(self, percent):
-        if 2 <= percent <= 98:
-            self.__percent = percent
-            self._prev_x, self._prev_y = -1, -1
+    @property
+    def cnt(self):
+        return self.__cnt
 
-    def set_width(self, width):
-        if 200 <= width <= 4000:
-            self.__width = width
-            self._prev_x, self._prev_y = -1, -1
+    @cnt.setter
+    def cnt(self, val):
+        self.__cnt = val
 
     def stop(self):
         self.__stopped = True
@@ -122,17 +134,35 @@ class GenericObjectTracker(object):
         if key == 255:
             pass
         elif key == ord("w"):
-            self.set_width(self.width - 10)
+            self.width = self.width - 10
         elif key == ord("W"):
-            self.set_width(self.width + 10)
+            self.width = self.width + 10
         elif key == ord("-") or key == ord("_") or key == 0:
-            self.set_percent(self.percent - 1)
+            self.percent = self.percent - 1
         elif key == ord("+") or key == ord("=") or key == 1:
-            self.set_percent(self.percent + 1)
+            self.percent = self.percent + 1
         elif key == ord("r"):
-            self.set_width(self.__orig_width)
-            self.set_percent(self.__orig_percent)
-        elif key == ord("p"):
+            self.width = self.__orig_width
+            self.percent = self.__orig_percent
+        elif key == ord("s"):
             utils.save_image(image)
         elif key == ord("q"):
             self.stop()
+
+    @staticmethod
+    def cli_args():
+        parser = argparse.ArgumentParser()
+        parser.add_argument("-b", "--bgr", type=str, required=True, help="BGR target value, e.g., -b \"174, 56, 5\"")
+        parser.add_argument("-u", "--usb", default=False, action="store_true", help="Use USB Raspi camera [false]")
+        parser.add_argument("-f", "--flip", default=False, action="store_true", help="Flip image [false]")
+        parser.add_argument("-w", "--width", default=400, type=int, help="Image width [400]")
+        parser.add_argument("-e", "--percent", default=15, type=int, help="Middle percent [15]")
+        parser.add_argument("-m", "--min", default=100, type=int, help="Minimum pixel area [100]")
+        parser.add_argument("-r", "--range", default=20, type=int, help="HSV range")
+        parser.add_argument("-p", "--port", default=50051, type=int, help="gRPC port [50051]")
+        parser.add_argument("-l", "--leds", default=False, action="store_true",
+                            help="Enable Blinkt led feedback [false]")
+        parser.add_argument("-d", "--display", default=False, action="store_true", help="Display image [false]")
+        parser.add_argument("-v", "--verbose", default=logging.INFO, help="Include debugging info",
+                            action="store_const", dest="loglevel", const=logging.DEBUG)
+        return vars(parser.parse_args())

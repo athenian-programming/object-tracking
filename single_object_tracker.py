@@ -1,6 +1,5 @@
 #!/usr/bin/env python2
 
-import argparse
 import logging
 from logging import info
 
@@ -13,6 +12,7 @@ from generic_object_tracker import GenericObjectTracker
 from opencv_utils import BLUE
 from opencv_utils import GREEN
 from opencv_utils import RED
+from opencv_utils import get_moment
 
 
 class SingleObjectTracker(GenericObjectTracker):
@@ -37,8 +37,6 @@ class SingleObjectTracker(GenericObjectTracker):
                                                   flip=flip,
                                                   usb_camera=usb_camera,
                                                   leds=leds)
-        self.__cnt = 0
-
 
     # Do not run this in a background thread. cv2.waitKey has to run in main thread
     def start(self):
@@ -61,21 +59,19 @@ class SingleObjectTracker(GenericObjectTracker):
                 # The middle margin calculation is based on % of width for horizontal and vertical boundry
                 middle_inc = int(mid_x * middle_pct)
 
-                text = "#{0} ({1}, {2})".format(self.__cnt, img_width, img_height)
+                text = "#{0} ({1}, {2})".format(self.cnt, img_width, img_height)
                 text += " {0}%".format(self.percent)
 
+                # Find the largest contour
                 contours = self.contour_finder.get_max_contours(image, self.minimum, count=1)
-                if contours is not None:
-                    max_contour = contours[0]
-                    moment = cv2.moments(max_contour)
-                    area = int(moment["m00"])
-                    img_x = int(moment["m10"] / area)
-                    img_y = int(moment["m01"] / area)
+
+                if contours is not None and len(contours) == 1:
+                    contour, area, img_x, img_y = get_moment(cv2.moments(contours[0]))
 
                     if self.display:
-                        x, y, w, h = cv2.boundingRect(max_contour)
+                        x, y, w, h = cv2.boundingRect(contour)
                         cv2.rectangle(image, (x, y), (x + w, y + h), BLUE, 2)
-                        cv2.drawContours(image, [max_contour], -1, GREEN, 2)
+                        cv2.drawContours(image, [contour], -1, GREEN, 2)
                         cv2.circle(image, (img_x, img_y), 4, RED, -1)
                         text += " ({0}, {1})".format(img_x, img_y)
                         text += " {0}".format(area)
@@ -115,7 +111,7 @@ class SingleObjectTracker(GenericObjectTracker):
                     # time.sleep(.01)
                     pass
 
-                self.__cnt += 1
+                self.cnt += 1
             except BaseException as e:
                 logging.error("Unexpected error in main loop [{0}]".format(e))
 
@@ -124,21 +120,10 @@ class SingleObjectTracker(GenericObjectTracker):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-b", "--bgr", type=str, required=True, help="BGR target value, e.g., -b \"174, 56, 5\"")
-    parser.add_argument("-u", "--usb", default=False, action="store_true", help="Use USB Raspi camera [false]")
-    parser.add_argument("-f", "--flip", default=False, action="store_true", help="Flip image [false]")
-    parser.add_argument("-w", "--width", default=400, type=int, help="Image width [400]")
-    parser.add_argument("-e", "--percent", default=15, type=int, help="Middle percent [15]")
-    parser.add_argument("-m", "--min", default=100, type=int, help="Minimum pixel area [100]")
-    parser.add_argument("-r", "--range", default=20, type=int, help="HSV range")
-    parser.add_argument("-p", "--port", default=50051, type=int, help="gRPC port [50051]")
-    parser.add_argument("-l", "--leds", default=False, action="store_true", help="Enable Blinkt led feedback [false]")
-    parser.add_argument("-d", "--display", default=False, action="store_true", help="Display image [false]")
-    parser.add_argument("-v", "--verbose", default=logging.INFO, help="Include debugging info",
-                        action="store_const", dest="loglevel", const=logging.DEBUG)
-    args = vars(parser.parse_args())
+    # Setup CLI args
+    args = GenericObjectTracker.cli_args()
 
+    # Setup logging
     logging.basicConfig(**LOGGING_ARGS)
 
     tracker = SingleObjectTracker(bgr_color=eval(args["bgr"] if "[" in args["bgr"] else "[{0}]".format(args["bgr"])),
