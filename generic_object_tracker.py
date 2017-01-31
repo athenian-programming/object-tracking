@@ -33,7 +33,8 @@ class GenericObjectTracker(object):
                  usb_camera=False,
                  leds=False,
                  camera_name="",
-                 serve_images=False):
+                 serve_images=False,
+                 http_pause=0.5):
         self.__width = width
         self.__percent = percent
         self.__orig_width = width
@@ -57,9 +58,9 @@ class GenericObjectTracker(object):
         self.__cam = camera.Camera(use_picamera=not usb_camera)
 
         if serve_images:
-            NAME = "/image.jpg"
-            PAGE = "/image"
-            PAUSE = "pause"
+            IMG_NAME = "/image.jpg"
+            PAGE_NAME = "/image"
+            PAUSE_OPTION = "pause"
             flask = Flask(__name__)
 
             def get_image_page(pause):
@@ -67,22 +68,23 @@ class GenericObjectTracker(object):
                 name = self.__camera_name + " - " if self.__camera_name else ""
                 title = '<title>{0}{1} second pause</title>'.format(name, pause)
                 refresh = '<meta http-equiv="refresh" content="{0}">'.format(pause)
-                body = '<body><img src="{0}"></body>'.format(NAME)
+                body = '<body><img src="{0}"></body>'.format(IMG_NAME)
                 return '<!doctype html><html><head>{0}{1}{2}</head>{3}</html>'.format(title, refresh, no_cache, body)
 
             @flask.route('/')
             def index():
-                return redirect(PAGE + "/0")
+                return redirect(PAGE_NAME + "/{0}".format(http_pause))
 
-            @flask.route(PAGE)
+            @flask.route(PAGE_NAME)
             def image_query():
-                return get_image_page(request.args.get(PAUSE))
+                pause = request.args.get(PAUSE_OPTION)
+                return get_image_page(pause if pause else http_pause)
 
-            @flask.route(PAGE + "/<int:{0}>".format(PAUSE))
+            @flask.route(PAGE_NAME + "/<string:pause>")
             def image_path(pause):
                 return get_image_page(pause)
 
-            @flask.route(NAME)
+            @flask.route(IMG_NAME)
             def image_jpg():
                 with self.__current_image_lock:
                     retval, buf = utils.encode_image(self.__current_image)
@@ -90,7 +92,7 @@ class GenericObjectTracker(object):
                 return Response(bytes, mimetype="image/jpeg")
 
             # Run HTTP server in a thread
-            Thread(target=flask.run, kwargs={"port": 8080}).start()
+            Thread(target=flask.run, kwargs={"host": "pleiku.local", "port": 8080}).start()
 
     @property
     def width(self):
@@ -237,5 +239,6 @@ class GenericObjectTracker(object):
                               cli.leds,
                               cli.camera_optional,
                               cli.http,
+                              cli.pause,
                               cli.display,
                               cli.verbose)
