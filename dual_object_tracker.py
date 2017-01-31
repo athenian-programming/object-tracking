@@ -73,6 +73,7 @@ class DualObjectTracker(GenericObjectTracker):
                     countour1, area1, img_x1, img_y1 = get_moment(contours[0])
                     countour2, area2, img_x2, img_y2 = get_moment(contours[1])
 
+                    # Callculate the average location between the two midpoints
                     avg_x = (abs(img_x1 - img_x2) / 2) + min(img_x1, img_x2)
                     avg_y = (abs(img_y1 - img_y2) / 2) + min(img_y1, img_y2)
 
@@ -97,12 +98,12 @@ class DualObjectTracker(GenericObjectTracker):
 
                 x_in_middle = mid_x - middle_inc <= avg_x <= mid_x + middle_inc
                 y_in_middle = mid_y - middle_inc <= avg_y <= mid_y + middle_inc
-                x_missing = avg_x == -1
-                y_missing = avg_y == -1
+                x_color = GREEN if x_in_middle else RED if avg_x == -1 else BLUE
+                y_color = GREEN if y_in_middle else RED if avg_y == -1 else BLUE
 
                 # Set Blinkt leds
-                self.set_left_leds(RED if x_missing else (GREEN if x_in_middle else BLUE))
-                self.set_right_leds(RED if y_missing else (GREEN if y_in_middle else BLUE))
+                self.set_left_leds(x_color)
+                self.set_right_leds(y_color)
 
                 # Write location if it is different from previous value written
                 if avg_x != self._prev_x or avg_y != self._prev_y:
@@ -111,9 +112,6 @@ class DualObjectTracker(GenericObjectTracker):
 
                 # Display images
                 if self.display:
-                    x_color = GREEN if x_in_middle else RED if x_missing else BLUE
-                    y_color = GREEN if y_in_middle else RED if y_missing else BLUE
-
                     # Draw the alignment lines
                     cv2.line(image, (mid_x - middle_inc, 0), (mid_x - middle_inc, img_height), x_color, 1)
                     cv2.line(image, (mid_x + middle_inc, 0), (mid_x + middle_inc, img_height), x_color, 1)
@@ -146,11 +144,11 @@ if __name__ == "__main__":
     # Setup logging
     logging.basicConfig(**LOGGING_ARGS)
 
-    tracker = DualObjectTracker(bgr_color=eval(args["bgr"] if "[" in args["bgr"] else "[{0}]".format(args["bgr"])),
-                                width=args["width"],
-                                percent=args["percent"],
-                                minimum=args["min"],
-                                hsv_range=args["range"],
+    tracker = DualObjectTracker(eval(args["bgr"] if "[" in args["bgr"] else "[{0}]".format(args["bgr"])),
+                                args["width"],
+                                args["percent"],
+                                args["min"],
+                                args["range"],
                                 grpc_port=args["port"],
                                 display=args["display"],
                                 flip=args["flip"],
