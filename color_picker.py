@@ -24,7 +24,9 @@ class ColorPicker(object):
         self.__move_inc = 4
         self.__x_adj = 0
         self.__y_adj = 0
-        self.__mag_width = 400
+        self.__orig_width = self.__width
+        self.__orig_roi_size = self.__roi_size
+        self.__mag_width = 300
         self.__cam = camera.Camera(use_picamera=not usb_camera)
 
     # Do not run this in a background thread. cv2.waitKey has to run in main thread
@@ -96,6 +98,13 @@ class ColorPicker(object):
             elif self.__roi_size <= self.__roi_inc * 49 and (key == ord("+") or key == ord("=")):
                 self.__roi_size += self.__roi_inc
                 self.__x_adj, self.__y_adj = 0, 0
+            elif key == ord("r"):
+                self.__width = self.__orig_width
+                self.__roi_size = self.__orig_roi_size
+            elif key == ord("w"):
+                self.__width -= 10
+            elif key == ord("W"):
+                self.__width += 10
             elif key == ord("q"):
                 self.__cam.close()
                 break

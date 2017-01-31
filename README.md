@@ -50,6 +50,9 @@ $ ./color_picker.py
 | k          | Move ROI right                                     |
 | -          | Decrease ROI size                                  |
 | +          | Increase ROI size                                  |
+| w          | Decrease image size                                |
+| W          | Increase image size                                |
+| r          | Reset ROI size and image size                      |
 | q          | Quit                                               |
 
 
@@ -95,9 +98,9 @@ $ python single_object_tracker.py --bgr "174, 56, 5" --display
 |:----------:|----------------------------------------------------|
 | -          | Decrease center area                               |
 | +          | Increase center area                               |
-| w          | Decrease image width                               |
-| W          | Increase image width                               |
-| r          | Reset center area and image width                  |
+| w          | Decrease image size                                |
+| W          | Increase image size                                |
+| r          | Reset center area and image size                   |
 | s          | Save current image to disk                         |
 | q          | Quit                                               |
 
