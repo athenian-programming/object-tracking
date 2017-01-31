@@ -1,6 +1,7 @@
 #!/usr/bin/env python2
 
 import logging
+import traceback
 from logging import info
 
 import cv2
@@ -39,7 +40,6 @@ class DualObjectTracker(GenericObjectTracker):
                                                 usb_camera=usb_camera,
                                                 leds=leds)
 
-
     # Do not run this in a background thread. cv2.waitKey has to run in main thread
     def start(self):
         super(DualObjectTracker, self).start()
@@ -70,8 +70,8 @@ class DualObjectTracker(GenericObjectTracker):
                 # Check for > 2 in case one of the targets is divided.
                 # The calculation will be off, but something will be better than nothing
                 if contours is not None and len(contours) >= 2:
-                    countour1, area1, img_x1, img_y1 = get_moment(cv2.moments(contours[0]))
-                    countour2, area2, img_x2, img_y2 = get_moment(cv2.moments(contours[1]))
+                    countour1, area1, img_x1, img_y1 = get_moment(contours[0])
+                    countour2, area2, img_x2, img_y2 = get_moment(contours[1])
 
                     avg_x = (abs(img_x1 - img_x2) / 2) + min(img_x1, img_x2)
                     avg_y = (abs(img_y1 - img_y2) / 2) + min(img_y1, img_y2)
@@ -132,11 +132,11 @@ class DualObjectTracker(GenericObjectTracker):
 
                 self.cnt += 1
             except BaseException as e:
+                traceback.print_exc()
                 logging.error("Unexpected error in main loop [{0}]".format(e))
 
         self.clear_leds()
         self.cam.close()
-
 
 
 if __name__ == "__main__":

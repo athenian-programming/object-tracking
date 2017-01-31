@@ -1,6 +1,7 @@
 #!/usr/bin/env python2
 
 import logging
+import traceback
 from logging import info
 
 import cv2
@@ -66,7 +67,7 @@ class SingleObjectTracker(GenericObjectTracker):
                 contours = self.contour_finder.get_max_contours(image, self.minimum, count=1)
 
                 if contours is not None and len(contours) == 1:
-                    contour, area, img_x, img_y = get_moment(cv2.moments(contours[0]))
+                    contour, area, img_x, img_y = get_moment(contours[0])
 
                     if self.display:
                         x, y, w, h = cv2.boundingRect(contour)
@@ -113,6 +114,7 @@ class SingleObjectTracker(GenericObjectTracker):
 
                 self.cnt += 1
             except BaseException as e:
+                traceback.print_exc()
                 logging.error("Unexpected error in main loop [{0}]".format(e))
 
         self.clear_leds()
