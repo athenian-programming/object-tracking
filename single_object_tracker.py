@@ -116,6 +116,7 @@ class ObjectTracker:
                 x_missing = img_x == -1
                 y_missing = img_y == -1
 
+                # Set Blinkt leds
                 self.set_left_leds(RED if x_missing else (GREEN if x_in_middle else BLUE))
                 self.set_right_leds(RED if y_missing else (GREEN if y_in_middle else BLUE))
 
