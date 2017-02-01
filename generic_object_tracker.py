@@ -239,7 +239,7 @@ class GenericObjectTracker(object):
                               cli.port,
                               cli.leds,
                               cli.camera_optional,
-                              cli.http_enabled,
+                              cli.http_enable,
                               cli.http_host,
                               cli.http_pause,
                               cli.display,
