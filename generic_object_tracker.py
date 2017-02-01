@@ -33,7 +33,8 @@ class GenericObjectTracker(object):
                  usb_camera=False,
                  leds=False,
                  camera_name="",
-                 serve_images=False,
+                 http_enabled=False,
+                 http_host="localhost",
                  http_pause=0.5):
         self.__width = width
         self.__percent = percent
@@ -44,7 +45,7 @@ class GenericObjectTracker(object):
         self.__flip = flip
         self.__leds = leds
         self.__camera_name = camera_name
-        self.__serve_images = serve_images
+        self.__http_enabled = http_enabled
         self.__stopped = False
         self.__cnt = 0
         self.__last_write_millis = 0
@@ -57,7 +58,7 @@ class GenericObjectTracker(object):
         self.__location_server = LocationServer(grpc_port)
         self.__cam = camera.Camera(use_picamera=not usb_camera)
 
-        if serve_images:
+        if http_enabled:
             IMG_NAME = "/image.jpg"
             PAGE_NAME = "/image"
             PAUSE_OPTION = "pause"
@@ -92,7 +93,7 @@ class GenericObjectTracker(object):
                 return Response(bytes, mimetype="image/jpeg")
 
             # Run HTTP server in a thread
-            Thread(target=flask.run, kwargs={"host": "pleiku.local", "port": 8080}).start()
+            Thread(target=flask.run, kwargs={"host": http_host, "port": 8080}).start()
 
     @property
     def width(self):
@@ -143,8 +144,8 @@ class GenericObjectTracker(object):
         return self.__cam
 
     @property
-    def serve_images(self):
-        return self.__serve_images
+    def http_enabled(self):
+        return self.__http_enabled
 
     @property
     def cnt(self):
@@ -207,11 +208,11 @@ class GenericObjectTracker(object):
                 self.stop()
 
     def serve_image(self, image):
-        if self.serve_images:
+        if self.http_enabled:
             now = currentTimeMillis()
             if now - self.last_write_millis > 100:
                 with self.__current_image_lock:
-                    self.__current_image = image  # copy.deepcopy(image)
+                    self.__current_image = image
                 self.last_write_millis = now
 
     def start(self):
@@ -224,7 +225,7 @@ class GenericObjectTracker(object):
         self.location_server.write_location(-1, -1, 0, 0, 0)
 
     def markup_image(self):
-        return self.display or self.serve_images
+        return self.display or self.http_enabled
 
     @staticmethod
     def cli_args():
@@ -238,7 +239,8 @@ class GenericObjectTracker(object):
                               cli.port,
                               cli.leds,
                               cli.camera_optional,
-                              cli.http,
-                              cli.pause,
+                              cli.http_enabled,
+                              cli.http_host,
+                              cli.http_pause,
                               cli.display,
                               cli.verbose)

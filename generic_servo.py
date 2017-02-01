@@ -25,7 +25,7 @@ class Servo(object):
         return self.__ready_event
 
     def get_currpos(self):
-        pass
+        return -1
 
     def set_angle(self, val, pause=None):
         pass
