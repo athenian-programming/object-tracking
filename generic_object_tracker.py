@@ -12,8 +12,9 @@ from contour_finder import ContourFinder
 from flask import Flask
 from flask import redirect
 from flask import request
-from location_server import LocationServer
 from werkzeug.wrappers import Response
+
+from location_server import LocationServer
 
 # I tried to include this in the constructor and make it depedent on self.__leds, but it does not work
 if is_raspi():
