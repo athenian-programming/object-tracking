@@ -28,8 +28,7 @@ class DualObjectTracker(GenericObjectTracker):
                  usb_camera=False,
                  leds=False,
                  camera_name="",
-                 http_enabled=False,
-                 http_host="localhost",
+                 http_host="localhost:8080",
                  http_pause=0.5):
         super(DualObjectTracker, self).__init__(bgr_color,
                                                 width,
@@ -42,7 +41,6 @@ class DualObjectTracker(GenericObjectTracker):
                                                 usb_camera=usb_camera,
                                                 leds=leds,
                                                 camera_name=camera_name,
-                                                http_enabled=http_enabled,
                                                 http_host=http_host,
                                                 http_pause=http_pause)
 
@@ -159,8 +157,7 @@ if __name__ == "__main__":
                                 usb_camera=args["usb"],
                                 leds=args["leds"] and is_raspi(),
                                 camera_name=args["camera"],
-                                http_enabled=args["http"],
-                                http_host=args["host"],
+                                http_host=args["http"],
                                 http_pause=args["pause"])
 
     try:

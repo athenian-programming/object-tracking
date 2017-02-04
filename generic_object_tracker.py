@@ -12,9 +12,8 @@ from contour_finder import ContourFinder
 from flask import Flask
 from flask import redirect
 from flask import request
-from werkzeug.wrappers import Response
-
 from location_server import LocationServer
+from werkzeug.wrappers import Response
 
 # I tried to include this in the constructor and make it depedent on self.__leds, but it does not work
 if is_raspi():
@@ -34,8 +33,7 @@ class GenericObjectTracker(object):
                  usb_camera=False,
                  leds=False,
                  camera_name="",
-                 http_enabled=False,
-                 http_host="localhost",
+                 http_host="localhost:8080",
                  http_pause=0.5):
         self.__width = width
         self.__percent = percent
@@ -46,8 +44,8 @@ class GenericObjectTracker(object):
         self.__flip = flip
         self.__leds = leds
         self.__camera_name = camera_name
-        self.__http_enabled = http_enabled
         self.__stopped = False
+        self.__http_host = http_host
         self.__cnt = 0
         self.__last_write_millis = 0
         self.__current_image_lock = Lock()
@@ -59,7 +57,7 @@ class GenericObjectTracker(object):
         self.__location_server = LocationServer(grpc_port)
         self.__cam = camera.Camera(use_picamera=not usb_camera)
 
-        if http_enabled:
+        if len(http_host) > 0:
             IMG_NAME = "/image.jpg"
             PAGE_NAME = "/image"
             PAUSE_OPTION = "pause"
@@ -94,7 +92,11 @@ class GenericObjectTracker(object):
                 return Response(bytes, mimetype="image/jpeg")
 
             # Run HTTP server in a thread
-            Thread(target=flask.run, kwargs={"host": http_host, "port": 8080}).start()
+            vals = http_host.split(":")
+            host = vals[0]
+            port = vals[1] if len(vals) == 2 else 8080
+            Thread(target=flask.run, kwargs={"host": host, "port": port}).start()
+            logging.info("Started HTTP server listening on {0}:{1}".format(host, port))
 
     @property
     def width(self):
@@ -146,7 +148,7 @@ class GenericObjectTracker(object):
 
     @property
     def http_enabled(self):
-        return self.__http_enabled
+        return len(self.__http_host) > 0
 
     @property
     def cnt(self):
@@ -237,10 +239,9 @@ class GenericObjectTracker(object):
                               cli.percent,
                               cli.min,
                               cli.range,
-                              cli.port,
+                              cli.grpc_port,
                               cli.leds,
                               cli.camera_optional,
-                              cli.http_enable,
                               cli.http_host,
                               cli.http_pause,
                               cli.display,
