@@ -70,7 +70,7 @@ class GenericObjectTracker(object):
             def get_page(pause):
                 try:
                     pause_secs = float(pause) if pause else http_pause_secs
-                    with open("./html/image-reader.html") as file:
+                    with open("/home/pi/git/object-tracking/html/image-reader.html") as file:
                         html = file.read()
                         return html.replace("_PAUSE_SECS_", str(pause_secs)) \
                             .replace("_NAME_", self.__camera_name if self.__camera_name else "Unknown") \
