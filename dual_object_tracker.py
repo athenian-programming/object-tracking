@@ -29,7 +29,7 @@ class DualObjectTracker(GenericObjectTracker):
                  leds=False,
                  camera_name="",
                  http_host="localhost:8080",
-                 http_pause=0.5):
+                 http_pause_secs=0.5):
         super(DualObjectTracker, self).__init__(bgr_color,
                                                 width,
                                                 percent,
@@ -42,7 +42,7 @@ class DualObjectTracker(GenericObjectTracker):
                                                 leds=leds,
                                                 camera_name=camera_name,
                                                 http_host=http_host,
-                                                http_pause=http_pause)
+                                                http_pause_secs=http_pause_secs)
 
     # Do not run this in a background thread. cv2.waitKey has to run in main thread
     def start(self):
@@ -158,7 +158,7 @@ if __name__ == "__main__":
                                 leds=args["leds"] and is_raspi(),
                                 camera_name=args["camera"],
                                 http_host=args["http"],
-                                http_pause=args["pause"])
+                                http_pause_secs=args["pause"])
 
     try:
         tracker.start()

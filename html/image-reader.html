@@ -1,0 +1,99 @@
+<!doctype html>
+
+<html>
+
+<head>
+    <title>Camera Images</title>
+    <meta HTTP-EQUIV="Pragma" content="no-cache">
+    <META HTTP-EQUIV="Expires" CONTENT="-1">
+
+    <style>
+        body {background-color: steelblue;}
+
+        #image {
+            //border: 1px solid #4CAF50;
+            margin: 10px;
+        }
+
+        #buttons {
+            //border: 1px solid #4CAF50;
+            margin-top: 20px;
+            margin-left: 10px;
+        }
+
+        .button {
+            background-color: #4CAF50; /* Green */
+            border: 2px solid black;
+            border-radius: 5px;
+            padding: 15px 30px;
+            text-align: center;
+            text-decoration: none;
+            font-size: 16px;
+        }
+
+    </style>
+
+    <script>
+
+        function copyToCanvas(img) {
+            var canvas = document.getElementById('canvas');
+            var ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0);
+        }
+
+        var img;
+        var timer = 0;
+        var stopped = false;
+
+        function loadImage() {
+            if (stopped)
+                return
+
+            if (img)
+                copyToCanvas(img);
+
+            img = new Image();
+            img.src = "/image.jpg";
+            document.getElementById('title').innerHTML = "Refresh rate: _PAUSE_SECS_ secs";
+        }
+
+        window.onload = function () {
+            loadImage();
+            timer = setInterval(loadImage, _PAUSE_SECS_ * 1000);
+            setButton();
+        };
+
+        function setButton() {
+            document.getElementById('startstop').style.backgroundColor = stopped ? 'green' : 'red';
+            document.getElementById('startstop').value = stopped ? 'Start' : 'Stop';
+        }
+
+        function start() {
+            paused = false
+            setButtons();
+        }
+
+        function startStop() {
+            stopped = !stopped
+            setButton()
+        }
+
+    </script>
+</head>
+
+
+<body>
+
+<H2 id="title"></H2>
+
+<div id="image">
+    <canvas width="800px" height="450px" id="canvas"></canvas>
+</div>
+
+<div id="buttons">
+    <input type="button" class="button" id="startstop" value="Stop" onclick="startStop()">
+</div>
+
+</body>
+
+</html>

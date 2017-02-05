@@ -1,5 +1,6 @@
 import logging
 import sys
+import traceback
 from threading import Lock, Thread
 
 import camera
@@ -34,7 +35,7 @@ class GenericObjectTracker(object):
                  leds=False,
                  camera_name="",
                  http_host="localhost:8080",
-                 http_pause=0.5):
+                 http_pause_secs=0.5):
         self.__width = width
         self.__percent = percent
         self.__orig_width = width
@@ -58,37 +59,38 @@ class GenericObjectTracker(object):
         self.__cam = camera.Camera(use_picamera=not usb_camera)
 
         if len(http_host) > 0:
-            IMG_NAME = "/image.jpg"
-            PAGE_NAME = "/image"
-            PAUSE_OPTION = "pause"
             flask = Flask(__name__)
-
-            def get_image_page(pause):
-                no_cache = '<meta HTTP-EQUIV="Pragma" content="no-cache">'
-                name = self.__camera_name + " - " if self.__camera_name else ""
-                title = '<title>{0}{1} second pause</title>'.format(name, pause)
-                refresh = '<meta http-equiv="refresh" content="{0}">'.format(pause)
-                body = '<body><img src="{0}"></body>'.format(IMG_NAME)
-                return '<!doctype html><html><head>{0}{1}{2}</head>{3}</html>'.format(title, refresh, no_cache, body)
 
             @flask.route('/')
             def index():
-                return redirect(PAGE_NAME + "/{0}".format(http_pause))
+                return redirect("/image?pause=.5")
 
-            @flask.route(PAGE_NAME)
-            def image_query():
-                pause = request.args.get(PAUSE_OPTION)
-                return get_image_page(pause if pause else http_pause)
+            def get_page(pause):
+                try:
+                    pause_secs = float(pause) if pause else http_pause_secs
+                    with open("./html/image-reader.html") as file:
+                        contents = file.read()
+                        return contents.replace("_PAUSE_SECS_", str(pause_secs))
+                except BaseException:
+                    traceback.print_exc()
 
-            @flask.route(PAGE_NAME + "/<string:pause>")
+            @flask.route('/image')
+            def image_option():
+                pause = request.args.get("pause")
+                return get_page(pause)
+
+            @flask.route("/image" + "/<string:pause>")
             def image_path(pause):
-                return get_image_page(pause)
+                return get_page(pause)
 
-            @flask.route(IMG_NAME)
+            @flask.route("/image.jpg")
             def image_jpg():
                 with self.__current_image_lock:
-                    retval, buf = utils.encode_image(self.__current_image)
-                    bytes = buf.tobytes()
+                    if self.__current_image is None:
+                        bytes = []
+                    else:
+                        retval, buf = utils.encode_image(self.__current_image)
+                        bytes = buf.tobytes()
                 return Response(bytes, mimetype="image/jpeg")
 
             # Run HTTP server in a thread
