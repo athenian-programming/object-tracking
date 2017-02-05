@@ -35,42 +35,31 @@
 
     <script>
 
-        function copyToCanvas(img) {
-            var canvas = document.getElementById('canvas');
-            var ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0);
-        }
-
         var img;
         var timer = 0;
         var stopped = false;
 
         function loadImage() {
-            if (stopped)
-                return
-
-            if (img)
-                copyToCanvas(img);
-
-            img = new Image();
-            img.src = "/image.jpg";
-            document.getElementById('title').innerHTML = "Refresh rate: _PAUSE_SECS_ secs";
+            if (!stopped) {
+                if (img) {
+                    var ctx = document.getElementById('canvas').getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+                }
+                img = new Image();
+                img.src = "/image.jpg";
+            }
         }
 
         window.onload = function () {
             loadImage();
             timer = setInterval(loadImage, _PAUSE_SECS_ * 1000);
+            document.getElementById('header').innerHTML = "Refresh rate: _PAUSE_SECS_ secs";
             setButton();
         };
 
         function setButton() {
             document.getElementById('startstop').style.backgroundColor = stopped ? 'green' : 'red';
             document.getElementById('startstop').value = stopped ? 'Start' : 'Stop';
-        }
-
-        function start() {
-            paused = false
-            setButtons();
         }
 
         function startStop() {
@@ -84,7 +73,7 @@
 
 <body>
 
-<H2 id="title"></H2>
+<H2 id="header"></H2>
 
 <div id="image">
     <canvas width="800px" height="450px" id="canvas"></canvas>
