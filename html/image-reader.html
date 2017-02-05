@@ -63,7 +63,7 @@
             e.value = paused ? 'Resume' : 'Pause';
         }
 
-        function pauseResume() {
+        function togglePause() {
             paused = !paused
             setButton()
         }
@@ -77,11 +77,11 @@
 <H2 id="header"></H2>
 
 <div id="image">
-    <canvas width="800px" height="450px" id="canvas"></canvas>
+    <canvas id="canvas" width="800px" height="450px" onclick="togglePause()"></canvas>
 </div>
 
 <div id="buttons">
-    <input type="button" class="button" id="pauseresume" value="Pause" onclick="pauseResume()">
+    <input type="button" class="button" id="pauseresume" value="Pause" onclick="togglePause()">
 </div>
 
 </body>
