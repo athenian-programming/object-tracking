@@ -30,7 +30,8 @@ class GenericObjectTracker(object):
                  hsv_range,
                  grpc_port=50051,
                  display=False,
-                 flip=False,
+                 flip_x=False,
+                 flip_y=False,
                  usb_camera=False,
                  leds=False,
                  camera_name="",
@@ -42,7 +43,8 @@ class GenericObjectTracker(object):
         self.__orig_percent = percent
         self.__minimum = minimum
         self.__display = display
-        self.__flip = flip
+        self.__flip_x = flip_x
+        self.__flip_y = flip_y
         self.__leds = leds
         self.__camera_name = camera_name
         self.__stopped = False
@@ -70,7 +72,8 @@ class GenericObjectTracker(object):
                     pause_secs = float(pause) if pause else http_pause_secs
                     with open("./html/image-reader.html") as file:
                         contents = file.read()
-                        return contents.replace("_PAUSE_SECS_", str(pause_secs))
+                        contents = contents.replace("_PAUSE_SECS_", str(pause_secs))
+                        return contents.replace("_NAME_", self.__camera_name if self.__camera_name else "Unknown")
                 except BaseException:
                     traceback.print_exc()
 
@@ -129,8 +132,12 @@ class GenericObjectTracker(object):
         return self.__display
 
     @property
-    def flip(self):
-        return self.__flip
+    def flip_x(self):
+        return self.__flip_x
+
+    @property
+    def flip_y(self):
+        return self.__flip_y
 
     @property
     def stopped(self):
@@ -236,7 +243,8 @@ class GenericObjectTracker(object):
     def cli_args():
         return setup_cli_args(cli.bgr,
                               cli.usb,
-                              cli.flip,
+                              cli.flip_x,
+                              cli.flip_y,
                               cli.width,
                               cli.percent,
                               cli.min,

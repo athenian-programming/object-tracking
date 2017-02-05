@@ -24,7 +24,8 @@ class DualObjectTracker(GenericObjectTracker):
                  hsv_range,
                  grpc_port=50051,
                  display=False,
-                 flip=False,
+                 flip_x=False,
+                 flip_y=False,
                  usb_camera=False,
                  leds=False,
                  camera_name="",
@@ -37,7 +38,8 @@ class DualObjectTracker(GenericObjectTracker):
                                                 hsv_range,
                                                 grpc_port=grpc_port,
                                                 display=display,
-                                                flip=flip,
+                                                flip_x=flip_x,
+                                                flip_y=flip_y,
                                                 usb_camera=usb_camera,
                                                 leds=leds,
                                                 camera_name=camera_name,
@@ -53,8 +55,11 @@ class DualObjectTracker(GenericObjectTracker):
                 image = self.cam.read()
                 image = imutils.resize(image, width=self.width)
 
-                if self.flip:
+                if self.flip_x:
                     image = cv2.flip(image, 0)
+
+                if self.flip_y:
+                    image = cv2.flip(image, 1)
 
                 middle_pct = (self.percent / 100.0) / 2
                 img_height, img_width = image.shape[:2]
@@ -153,7 +158,8 @@ if __name__ == "__main__":
                                 args["range"],
                                 grpc_port=args["port"],
                                 display=args["display"],
-                                flip=args["flip"],
+                                flip_x=args["flipx"],
+                                flip_y=args["flipy"],
                                 usb_camera=args["usb"],
                                 leds=args["leds"] and is_raspi(),
                                 camera_name=args["camera"],

@@ -66,8 +66,10 @@ $ python single_object_tracker.py --bgr "174, 56, 5" --display
 | -r, --range    | HSV Range                                          | 20             |
 | -l, --leds     | Enable Blinkt led feedback                         | false          |
 | -d, --display  | Display image                                      | false          |
-| -p, --port     | gRPC server port                                   | 50051          |
+| -x, --flipx    | Flip image on X axis                               | false          |
+| -y, --flipy    | Flip image on Y axis                               | false          |
 | -t, --http     | HTTP hostname:port                                 | localhost:8080 |
+| -p, --port     | gRPC server port                                   | 50051          |
 | -v, --verbose  | Include debugging info                             | false          |
 | -h, --help     | Summary of options                                 |                |
 

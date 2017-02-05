@@ -112,7 +112,7 @@ class ColorPicker(object):
 
 if __name__ == "__main__":
     # Parse CLI args
-    args = setup_cli_args(cli.width, cli.usb, cli.flip)
+    args = setup_cli_args(cli.width, cli.usb, cli.flip_x, cli.flip_y)
 
     # Setup logging
     logging.basicConfig(**LOGGING_ARGS)

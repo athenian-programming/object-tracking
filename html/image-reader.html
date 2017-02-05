@@ -25,10 +25,10 @@
             background-color: #4CAF50; /* Green */
             border: 2px solid black;
             border-radius: 5px;
-            padding: 15px 30px;
+            padding: 10px 20px;
             text-align: center;
             text-decoration: none;
-            font-size: 16px;
+            font-size: 20px;
         }
 
     </style>
@@ -37,10 +37,10 @@
 
         var img;
         var timer = 0;
-        var stopped = false;
+        var paused = false;
 
         function loadImage() {
-            if (!stopped) {
+            if (!paused) {
                 if (img) {
                     var ctx = document.getElementById('canvas').getContext('2d');
                     ctx.drawImage(img, 0, 0);
@@ -53,17 +53,18 @@
         window.onload = function () {
             loadImage();
             timer = setInterval(loadImage, _PAUSE_SECS_ * 1000);
-            document.getElementById('header').innerHTML = "Refresh rate: _PAUSE_SECS_ secs";
+            document.getElementById('header').innerHTML = "Camera: _NAME_ (_PAUSE_SECS_ secs)";
             setButton();
         };
 
         function setButton() {
-            document.getElementById('startstop').style.backgroundColor = stopped ? 'green' : 'red';
-            document.getElementById('startstop').value = stopped ? 'Start' : 'Stop';
+            e = document.getElementById('pauseresume');
+            e.style.backgroundColor = paused ? 'green' : 'red';
+            e.value = paused ? 'Resume' : 'Pause';
         }
 
-        function startStop() {
-            stopped = !stopped
+        function pauseResume() {
+            paused = !paused
             setButton()
         }
 
@@ -80,7 +81,7 @@
 </div>
 
 <div id="buttons">
-    <input type="button" class="button" id="startstop" value="Stop" onclick="startStop()">
+    <input type="button" class="button" id="pauseresume" value="Pause" onclick="pauseResume()">
 </div>
 
 </body>
