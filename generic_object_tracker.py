@@ -71,9 +71,11 @@ class GenericObjectTracker(object):
                 try:
                     pause_secs = float(pause) if pause else http_pause_secs
                     with open("./html/image-reader.html") as file:
-                        contents = file.read()
-                        contents = contents.replace("_PAUSE_SECS_", str(pause_secs))
-                        return contents.replace("_NAME_", self.__camera_name if self.__camera_name else "Unknown")
+                        html = file.read()
+                        return html.replace("_PAUSE_SECS_", str(pause_secs)) \
+                            .replace("_NAME_", self.__camera_name if self.__camera_name else "Unknown") \
+                            .replace("_WIDTH_", str(self.__width)) \
+                            .replace("_HEIGHT_", str(self.__width * 0.5625))
                 except BaseException:
                     traceback.print_exc()
 
