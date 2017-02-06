@@ -49,7 +49,9 @@ class GenericObjectTracker(object):
         self.__leds = leds
         self.__camera_name = camera_name
         self.__stopped = False
+        self.__http_launched = False
         self.__http_host = http_host
+        self.__http_pause_secs = http_pause_secs
         self.__cnt = 0
         self.__last_write_millis = 0
         self.__current_image_lock = Lock()
@@ -61,8 +63,10 @@ class GenericObjectTracker(object):
         self.__location_server = LocationServer(grpc_port)
         self.__cam = camera.Camera(use_picamera=not usb_camera)
 
-        if len(http_host) > 0:
+    def setup_http(self, width, height):
+        if not self.__http_launched and len(self.__http_host) > 0:
             flask = Flask(__name__)
+            self.__http_launched = True
 
             @flask.route('/')
             def index():
@@ -70,14 +74,14 @@ class GenericObjectTracker(object):
 
             def get_page(pause):
                 try:
-                    pause_secs = float(pause) if pause else http_pause_secs
+                    pause_secs = float(pause) if pause else self.__http_pause_secs
                     prefix = "/home/pi/git/object-tracking" if is_raspi() else "."
                     with open("{0}/html/image-reader.html".format(prefix)) as file:
                         html = file.read()
                         return html.replace("_PAUSE_SECS_", str(pause_secs)) \
                             .replace("_NAME_", self.__camera_name if self.__camera_name else "Unknown") \
-                            .replace("_WIDTH_", str(self.__width)) \
-                            .replace("_HEIGHT_", str(self.__width * 0.65))
+                            .replace("_WIDTH_", str(width)) \
+                            .replace("_HEIGHT_", str(height))
                 except BaseException:
                     traceback.print_exc()
                     # width="_WIDTH_px" height="_HEIGHT_px"
@@ -103,21 +107,22 @@ class GenericObjectTracker(object):
                 response.headers['Pragma'] = 'no-cache'
                 return response
 
+            def run_http(flask, host, port):
+                while True:
+                    try:
+                        flask.run(host=host, port=port)
+                    except BaseException as e:
+                        traceback.print_exc()
+                        logging.error("Restarting HTTP server [{0}]".format(e))
+                        time.sleep(1)
+
             # Run HTTP server in a thread
-            vals = http_host.split(":")
+            vals = self.__http_host.split(":")
             host = vals[0]
             port = vals[1] if len(vals) == 2 else 8080
-            Thread(target=self.run_http, kwargs={"flask": flask, "host": host, "port": port}).start()
+            Thread(target=run_http, kwargs={"flask": flask, "host": host, "port": port}).start()
             logging.info("Started HTTP server listening on {0}:{1}".format(host, port))
 
-    def run_http(self, flask, host, port):
-        while True:
-            try:
-                flask.run(host=host, port=port)
-            except BaseException as e:
-                traceback.print_exc()
-                logging.error("Restarting HTTP server [{0}]".format(e))
-                time.sleep(1)
 
     @property
     def width(self):

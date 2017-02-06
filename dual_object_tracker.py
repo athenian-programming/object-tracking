@@ -64,6 +64,8 @@ class DualObjectTracker(GenericObjectTracker):
                 middle_pct = (self.percent / 100.0) / 2
                 img_height, img_width = image.shape[:2]
 
+                self.setup_http(img_width, img_height)
+
                 mid_x, mid_y = img_width / 2, img_height / 2
                 avg_x, avg_y = -1, -1
 
