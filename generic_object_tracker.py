@@ -1,8 +1,7 @@
 import logging
 import sys
-import time
 import traceback
-from threading import Lock, Thread
+from threading import Lock
 
 import camera
 import common_cli_args  as cli
@@ -11,11 +10,8 @@ import opencv_utils as utils
 from common_cli_args import setup_cli_args
 from common_utils import currentTimeMillis, is_raspi
 from contour_finder import ContourFinder
-from flask import Flask
-from flask import redirect
-from flask import request
+from http_server import HttpServer
 from location_server import LocationServer
-from werkzeug.wrappers import Response
 
 # I tried to include this in the constructor and make it depedent on self.__leds, but it does not work
 if is_raspi():
@@ -47,82 +43,18 @@ class GenericObjectTracker(object):
         self.__flip_x = flip_x
         self.__flip_y = flip_y
         self.__leds = leds
-        self.__camera_name = camera_name
         self.__stopped = False
         self.__http_launched = False
         self.__http_host = http_host
-        self.__http_delay_secs = http_delay_secs
         self.__cnt = 0
         self.__last_write_millis = 0
         self.__current_image_lock = Lock()
         self.__current_image = None
-
         self._prev_x, self._prev_y = -1, -1
-
         self.__contour_finder = ContourFinder(bgr_color, hsv_range)
         self.__location_server = LocationServer(grpc_port)
         self.__cam = camera.Camera(use_picamera=not usb_camera)
-
-    def setup_http(self, width, height):
-        if not self.__http_launched and len(self.__http_host) > 0:
-            flask = Flask(__name__)
-
-            @flask.route('/')
-            def index():
-                return redirect("/image?delay=.5")
-
-            def get_page(delay):
-                try:
-                    delay_secs = float(delay) if delay else self.__http_delay_secs
-                    prefix = "/home/pi/git/object-tracking" if is_raspi() else "."
-                    with open("{0}/html/image-reader.html".format(prefix)) as file:
-                        html = file.read()
-                        name = "Camera: " + self.__camera_name if self.__camera_name else "UNNAMED"
-                        return html.replace("_TITLE_", name) \
-                            .replace("_DELAY_SECS_", str(delay_secs)) \
-                            .replace("_NAME_", name) \
-                            .replace("_WIDTH_", str(width)) \
-                            .replace("_HEIGHT_", str(height))
-                except BaseException:
-                    traceback.print_exc()
-
-            @flask.route('/image')
-            def image_option():
-                return get_page(request.args.get("delay"))
-
-            @flask.route("/image" + "/<string:delay>")
-            def image_path(delay):
-                return get_page(delay)
-
-            @flask.route("/image.jpg")
-            def image_jpg():
-                with self.__current_image_lock:
-                    if self.__current_image is None:
-                        bytes = []
-                    else:
-                        retval, buf = utils.encode_image(self.__current_image)
-                        bytes = buf.tobytes()
-                response = Response(bytes, mimetype="image/jpeg")
-                response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-                response.headers['Pragma'] = 'no-cache'
-                return response
-
-            def run_http(flask, host, port):
-                while True:
-                    try:
-                        flask.run(host=host, port=port)
-                    except BaseException as e:
-                        traceback.print_exc()
-                        logging.error("Restarting HTTP server [{0}]".format(e))
-                        time.sleep(1)
-
-            # Run HTTP server in a thread
-            vals = self.__http_host.split(":")
-            host = vals[0]
-            port = vals[1] if len(vals) == 2 else 8080
-            Thread(target=run_http, kwargs={"flask": flask, "host": host, "port": port}).start()
-            self.__http_launched = True
-            logging.info("Started HTTP server listening on {0}:{1}".format(host, port))
+        self.__http_server = HttpServer(camera_name, self.__http_host, http_delay_secs, self.get_image)
 
     @property
     def width(self):
@@ -177,8 +109,8 @@ class GenericObjectTracker(object):
         return self.__cam
 
     @property
-    def http_enabled(self):
-        return len(self.__http_host) > 0
+    def http_server(self):
+        return self.__http_server
 
     @property
     def cnt(self):
@@ -240,8 +172,15 @@ class GenericObjectTracker(object):
             elif key == ord("q"):
                 self.stop()
 
+    def get_image(self):
+        with self.__current_image_lock:
+            if self.__current_image is None:
+                return []
+            retval, buf = utils.encode_image(self.__current_image)
+            return buf.tobytes()
+
     def serve_image(self, image):
-        if self.http_enabled:
+        if self.http_server.is_enabled():
             now = currentTimeMillis()
             if now - self.last_write_millis > 100:
                 with self.__current_image_lock:
@@ -252,14 +191,14 @@ class GenericObjectTracker(object):
         try:
             self.location_server.start()
         except BaseException as e:
-            traceback.print_exc()
             logging.error("Unable to start location server [{0}]".format(e))
+            traceback.print_exc()
             sys.exit(1)
 
         self.location_server.write_location(-1, -1, 0, 0, 0)
 
     def markup_image(self):
-        return self.display or self.http_enabled
+        return self.display or self.http_server.is_enabled()
 
     @staticmethod
     def cli_args():

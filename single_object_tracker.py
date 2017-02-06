@@ -64,7 +64,8 @@ class SingleObjectTracker(GenericObjectTracker):
                 middle_pct = (self.percent / 100.0) / 2
                 img_height, img_width = image.shape[:2]
 
-                self.setup_http(img_width, img_height)
+                # Called once we know the dimensions of the images
+                self.http_server.serve_images(img_width, img_height)
 
                 mid_x, mid_y = img_width / 2, img_height / 2
                 img_x, img_y = -1, -1
@@ -119,8 +120,8 @@ class SingleObjectTracker(GenericObjectTracker):
                 self.cnt += 1
 
             except BaseException as e:
-                traceback.print_exc()
                 logging.error("Unexpected error in main loop [{0}]".format(e))
+                traceback.print_exc()
                 time.sleep(1)
 
         self.clear_leds()
