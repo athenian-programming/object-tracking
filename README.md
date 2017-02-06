@@ -23,6 +23,29 @@ as described [here](http://www.athenian-robotics.org/mqtt-client/)
 as described [here](http://www.athenian-robotics.org/arduino/)
 
 
+## Color Picker 
+
+color_picker.py is used to choose a target BGR value.
+
+### Usage 
+
+```bash
+$ ./color_picker.py 
+```
+
+### CLI Options
+
+| Option         | Description                                        | Default |
+|:---------------|----------------------------------------------------|---------|
+| -u, --usb      | Use USB Raspi camera                               | false   |
+| -w, --width    | Image width                                        | 400     |
+| -d, --display  | Display image                                      | false          |
+| -x, --flipx    | Flip image on X axis                               | false          |
+| -y, --flipy    | Flip image on Y axis                               | false          |
+| -t, --http     | HTTP hostname:port                                 | localhost:8080 |
+| -s, --delay    | HTTP delay secs                                    | 0.25           |
+| -h, --help     | Summary of options                                 |         |
+
 ### Display Keystrokes
 
 | Keystroke  | Action                                             |
