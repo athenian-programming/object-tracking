@@ -18,6 +18,13 @@ from opencv_utils import RED
 
 
 class ColorPicker(object):
+    roi_size = 24
+    orig_roi_size = roi_size
+    roi_inc = 6
+    move_inc = 4
+    x_adj = 0
+    y_adj = 0
+
     def __init__(self,
                  width,
                  usb_camera=False,
@@ -30,14 +37,8 @@ class ColorPicker(object):
         self.__usb_camera = usb_camera
         self.__flip_x = flip_x
         self.__flip_y = flip_y
-        self.__roi_size = 24
-        self.__roi_inc = 6
-        self.__move_inc = 4
         self.__display = display
-        self.__x_adj = 0
-        self.__y_adj = 0
         self.__orig_width = self.__width
-        self.__orig_roi_size = self.__roi_size
         self.__current_image_lock = Lock()
         self.__current_image = None
         self.__cam = camera.Camera(use_picamera=not usb_camera)
@@ -68,24 +69,25 @@ class ColorPicker(object):
             # Called once we know the dimensions of the images
             self.__http_server.serve_images(img_width, img_height)
 
-            roi_x = (img_width / 2) - (self.__roi_size / 2) + self.__x_adj
-            roi_y = (img_height / 2) - (self.__roi_size / 2) + self.__y_adj
-            roi = image[roi_y:roi_y + self.__roi_size, roi_x:roi_x + self.__roi_size]
+            roi_x = (img_width / 2) - (self.roi_size / 2) + self.x_adj
+            roi_y = (img_height / 2) - (self.roi_size / 2) + self.y_adj
+            roi = image[roi_y:roi_y + self.roi_size, roi_x:roi_x + self.roi_size]
 
             roi_h, roi_w = roi.shape[:2]
             roi_canvas = np.zeros((roi_h, roi_w, 3), dtype="uint8")
             roi_canvas[0:roi_h, 0:roi_w] = roi
 
+            # Calculate averge color in ROI
             avg_color_per_row = np.average(roi_canvas, axis=0)
             avg_color = np.average(avg_color_per_row, axis=0)
             avg_color = np.uint8(avg_color)
 
             # Draw a rectangle around the sample area
-            cv2.rectangle(image, (roi_x, roi_y), (roi_x + self.__roi_size, roi_y + self.__roi_size), GREEN, 1)
+            cv2.rectangle(image, (roi_x, roi_y), (roi_x + self.roi_size, roi_y + self.roi_size), GREEN, 1)
 
             # Add text info
             bgr_text = "BGR value: [{0}, {1}, {2}]".format(avg_color[0], avg_color[1], avg_color[2])
-            roi_text = " ROI: {0}x{1} ".format(str(self.__roi_size), str(self.__roi_size))
+            roi_text = " ROI: {0}x{1} ".format(str(self.roi_size), str(self.roi_size))
             cv2.putText(image, bgr_text + roi_text, defs.TEXT_LOC, defs.TEXT_FONT, defs.TEXT_SIZE, RED, 1)
 
             # Overlay color swatch on image
@@ -110,24 +112,24 @@ class ColorPicker(object):
                     pass
                 elif key == ord("c") or key == ord(" "):
                     print(bgr_text)
-                elif roi_y >= self.__move_inc and (key == 0 or key == ord("k")):  # Up
-                    self.__y_adj -= self.__move_inc
-                elif roi_y <= img_height - self.__roi_size - self.__move_inc and (key == 1 or key == ord("j")):  # Down
-                    self.__y_adj += self.__move_inc
-                elif roi_x >= self.__move_inc and (key == 2 or key == ord("h")):  # Left
-                    self.__x_adj -= self.__move_inc
-                elif roi_x <= img_width - self.__roi_size - self.__move_inc - self.__move_inc \
+                elif roi_y >= self.move_inc and (key == 0 or key == ord("k")):  # Up
+                    self.y_adj -= self.move_inc
+                elif roi_y <= img_height - self.roi_size - self.move_inc and (key == 1 or key == ord("j")):  # Down
+                    self.y_adj += self.move_inc
+                elif roi_x >= self.move_inc and (key == 2 or key == ord("h")):  # Left
+                    self.x_adj -= self.move_inc
+                elif roi_x <= img_width - self.roi_size - self.move_inc - self.move_inc \
                         and (key == 3 or key == ord("l")):  # Right
-                    self.__x_adj += self.__move_inc
-                elif self.__roi_size >= self.__roi_inc * 2 and (key == ord("-") or key == ord("_")):
-                    self.__roi_size -= self.__roi_inc
-                    self.__x_adj, self.__y_adj = 0, 0
-                elif self.__roi_size <= self.__roi_inc * 49 and (key == ord("+") or key == ord("=")):
-                    self.__roi_size += self.__roi_inc
-                    self.__x_adj, self.__y_adj = 0, 0
+                    self.x_adj += self.move_inc
+                elif self.roi_size >= self.roi_inc * 2 and (key == ord("-") or key == ord("_")):
+                    self.roi_size -= self.roi_inc
+                    self.x_adj, self.y_adj = 0, 0
+                elif self.roi_size <= self.roi_inc * 49 and (key == ord("+") or key == ord("=")):
+                    self.roi_size += self.roi_inc
+                    self.x_adj, self.y_adj = 0, 0
                 elif key == ord("r"):
                     self.__width = self.__orig_width
-                    self.__roi_size = self.__orig_roi_size
+                    self.roi_size = self.orig_roi_size
                 elif key == ord("w"):
                     self.__width -= 10
                 elif key == ord("W"):
