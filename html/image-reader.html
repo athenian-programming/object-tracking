@@ -9,41 +9,67 @@
     <META HTTP-EQUIV="Expires" CONTENT="-1">
 
     <style>
-        body {background-color: steelblue;}
+        body {background-color: #996F51;}
 
-        #status_div {
-            font-size: 20px;
-            padding-top: 10px;
-            padding-bottom: 30px;
-            padding-left: 10px;
+        #header {
+            color: white;
+            font-size: 25px;
+            text-decoration: bold;
+            padding-top: 5px;
+            padding-bottom: 10px;
+            padding-right: 10px;
         }
 
-        #header_div {
-            font-size: 20px;
+        #status {
+            color: white;
+            font-size: 15px;
+            margin-left: 50px;
             padding-top: 10px;
             padding-bottom: 10px;
             padding-left: 10px;
+            padding-right: 10px;
         }
-
 
         #image {
             border: 4px solid red;
+            cursor: pointer;
         }
 
-        #pause_div {
-            //border: 1px solid #4CAF50;
-            padding-top: 10px;
-            padding-bottom: 30px;
-        }
-
-        .button {
-            //background-color: #4CAF50; /* Green */
+        .pause {
+            color: white;
             border: 2px solid black;
-            border-radius: 5px;
+            border-radius: 8px;
             padding: 10px 20px;
             text-align: center;
             text-decoration: none;
             font-size: 20px;
+            cursor: pointer;
+            #box-shadow: 0 3px #999;
+            margin-top: 10px;
+            margin-bottom: 30px;
+        }
+
+        .pause:active {
+          box-shadow: 0 5px #666;
+          transform: translateY(4px);
+        }
+
+        .change {
+            color: white;
+            background-color: #CC5706;
+            border: 2px solid black;
+            border-radius: 8px;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            font-size: 20px;
+            cursor: pointer;
+            #box-shadow: 0 3px #999;
+        }
+
+        .change:active {
+          box-shadow: 0 5px #666;
+          transform: translateY(4px);
         }
 
 
@@ -51,9 +77,11 @@
 
     <script>
         var paused = false;
+        var red = '#FF3B22'
+        var green = '#14CC06'
 
         window.onload = function () {
-            header = document.getElementById('header_div');
+            header = document.getElementById('header');
             header.innerHTML = "Camera: _NAME_ (_PAUSE_SECS_ secs)";
             setButton();
             loadImage();
@@ -61,18 +89,18 @@
 
         function loadImage() {
             if (!paused) {
-                warning = document.getElementById('status_div')
+                warning = document.getElementById('status')
                 img = new Image();
                 img.onload = function(){
                     warning.innerHTML = "Connected to image server";
-                    warning.style.backgroundColor = 'green'
+                    warning.style.backgroundColor = green
                     ctx = document.getElementById('image').getContext('2d');
                     ctx.drawImage(img, 0, 0);
                     setTimeout(loadImage, _PAUSE_SECS_ * 1000);
                 };
                 img.onerror = function(){
                     warning.innerHTML = "Disconnected from image server";
-                    warning.style.backgroundColor = 'red'
+                    warning.style.backgroundColor = red
                     setTimeout(loadImage, _PAUSE_SECS_ * 1000);
                 }
                 img.src = "/image.jpg";
@@ -81,11 +109,11 @@
 
         function setButton() {
             button = document.getElementById('pauseresume');
-            button.style.backgroundColor = paused ? 'red' : 'green';
+            button.style.backgroundColor = paused ? red : green;
             button.value = paused ? 'Resume' : 'Pause';
 
             img = document.getElementById('image');
-            img.style.borderColor = paused ? 'red' : 'green';
+            img.style.borderColor = paused ? red : green;
         }
 
         function togglePause() {
@@ -101,44 +129,46 @@
     </script>
 </head>
 
-
 <body>
 
-<div id="status_div">
-    <p id="status"></p>
-</div>
-
-<div id="header_div">
-    <p id="header"></p>
-</div>
+<table border="0">
+    <tr>
+        <td>
+            <p id="header"></p>
+        </td>
+        <td>
+            <p id="status"></p>
+        </td>
+    </tr>
+</table>
 
 <div id="image_div">
     <canvas id="image" width="_WIDTH_px" height="_HEIGHT_px" onclick="togglePause()"></canvas>
 </div>
 
 <div id="pause_div">
-    <input type="button" id="pauseresume" class="button" value="Pause" onclick="togglePause()">
+    <input type="button" id="pauseresume" class="pause" value="Pause" onclick="togglePause()">
 </div>
 
 <table border="0">
     <tr>
         <td>
-            <input type="button" id="pause0" class="button" value="0 secs" onclick="pauseChange('0')">
+            <input type="button" id="pause0" class="change" value="0 secs" onclick="pauseChange('0')">
         </td>
         <td>
-            <input type="button" id="pause0-1" class="button" value="0.1 secs" onclick="pauseChange('0.1')">
+            <input type="button" id="pause0-1" class="change" value="0.1 secs" onclick="pauseChange('0.1')">
         </td>
         <td>
-            <input type="button" id="pause0-25" class="button" value="0.25 secs" onclick="pauseChange('0.25')">
+            <input type="button" id="pause0-25" class="change" value="0.25 secs" onclick="pauseChange('0.25')">
         </td>
         <td>
-            <input type="button" id="pause0-5" class="button" value="0.5 secs" onclick="pauseChange('0.5')">
+            <input type="button" id="pause0-5" class="change" value="0.5 secs" onclick="pauseChange('0.5')">
         </td>
         <td>
-            <input type="button" id="pause1-0" class="button" value="1 secs" onclick="pauseChange('1')">
+            <input type="button" id="pause1-0" class="change" value="1 secs" onclick="pauseChange('1')">
         </td>
         <td>
-            <input type="button" id="pause5-0" class="button" value="5 secs" onclick="pauseChange('5')">
+            <input type="button" id="pause5-0" class="change" value="5 secs" onclick="pauseChange('5')">
         </td>
     </tr>
 </table>

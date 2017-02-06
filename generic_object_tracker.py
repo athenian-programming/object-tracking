@@ -66,7 +66,6 @@ class GenericObjectTracker(object):
     def setup_http(self, width, height):
         if not self.__http_launched and len(self.__http_host) > 0:
             flask = Flask(__name__)
-            self.__http_launched = True
 
             @flask.route('/')
             def index():
@@ -84,7 +83,6 @@ class GenericObjectTracker(object):
                             .replace("_HEIGHT_", str(height))
                 except BaseException:
                     traceback.print_exc()
-                    # width="_WIDTH_px" height="_HEIGHT_px"
 
             @flask.route('/image')
             def image_option():
@@ -121,6 +119,7 @@ class GenericObjectTracker(object):
             host = vals[0]
             port = vals[1] if len(vals) == 2 else 8080
             Thread(target=run_http, kwargs={"flask": flask, "host": host, "port": port}).start()
+            self.__http_launched = True
             logging.info("Started HTTP server listening on {0}:{1}".format(host, port))
 
 
