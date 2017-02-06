@@ -3,10 +3,11 @@
 <html>
 
 <head>
-    <title>Camera Images</title>
     <meta HTTP-EQUIV="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta HTTP-EQUIV="Pragma" content="no-cache">
     <META HTTP-EQUIV="Expires" CONTENT="-1">
+
+    <title>_TITLE_</title>
 
     <style>
         body {background-color: #996F51;}
@@ -31,6 +32,7 @@
         }
 
         #image {
+            align: left;
             border: 4px solid #FF3B22;
             cursor: pointer;
         }
@@ -42,14 +44,13 @@
 
         .pause {
             color: white;
-            border: 2px solid black;
+            border: 1px solid black;
             border-radius: 8px;
             padding: 10px 20px;
             text-align: center;
             text-decoration: none;
             font-size: 20px;
             cursor: pointer;
-            #box-shadow: 0 3px #999;
             margin-top: 10px;
             margin-bottom: 30px;
         }
@@ -62,22 +63,19 @@
         .change {
             color: white;
             background-color: #CC5706;
-            border: 2px solid black;
+            border: 1px solid black;
             border-radius: 8px;
             padding: 10px 20px;
             text-align: center;
             text-decoration: none;
             font-size: 20px;
             cursor: pointer;
-            #box-shadow: 0 3px #999;
         }
 
         .change:active {
           box-shadow: 0 5px #666;
           transform: translateY(4px);
         }
-
-
     </style>
 
     <script>
@@ -87,7 +85,7 @@
 
         window.onload = function () {
             header = document.getElementById('header');
-            header.innerHTML = "Camera: _NAME_ (_PAUSE_SECS_ secs)";
+            header.innerHTML = "_NAME_ (_PAUSE_SECS_ secs)";
             setButton();
             loadImage();
         };
@@ -130,32 +128,12 @@
         function pauseChange(time) {
             window.location.href = "/image?pause=" + time;
         }
-
     </script>
 </head>
 
 <body>
 
-<table border="0">
-    <tr>
-        <td>
-            <p id="header"></p>
-        </td>
-        <td>
-            <p id="status"></p>
-        </td>
-    </tr>
-</table>
-
-<div id="image_div">
-    <canvas id="image" width="_WIDTH_px" height="_HEIGHT_px" onclick="togglePause()"></canvas>
-</div>
-
-<div id="pause_div">
-    <input type="button" id="pauseresume" class="pause" value="Pause" onclick="togglePause()">
-</div>
-
-<table border="0">
+<table class="buttons" border="0">
     <tr>
         <td>
             <input type="button" id="pause0" class="change" value="0 secs" onclick="pauseChange('0')">
@@ -178,6 +156,26 @@
     </tr>
 </table>
 
+<table border="0">
+    <tr>
+        <td>
+            <p id="header"></p>
+        </td>
+        <td>
+            <p id="status"></p>
+        </td>
+    </tr>
+</table>
+
+<div id="lower">
+    <div id="image_div">
+        <canvas id="image" width="_WIDTH_px" height="_HEIGHT_px" onclick="togglePause()"></canvas>
+    </div>
+
+    <div id="pause_div">
+        <input type="button" id="pauseresume" class="pause" value="Pause" onclick="togglePause()">
+    </div>
+</div>
 
 </body>
 

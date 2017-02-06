@@ -77,8 +77,10 @@ class GenericObjectTracker(object):
                     prefix = "/home/pi/git/object-tracking" if is_raspi() else "."
                     with open("{0}/html/image-reader.html".format(prefix)) as file:
                         html = file.read()
-                        return html.replace("_PAUSE_SECS_", str(pause_secs)) \
-                            .replace("_NAME_", self.__camera_name if self.__camera_name else "Unknown") \
+                        name = "Camera: " + self.__camera_name if self.__camera_name else "UNNAMED"
+                        return html.replace("_TITLE_", name) \
+                            .replace("_PAUSE_SECS_", str(pause_secs)) \
+                            .replace("_NAME_", name) \
                             .replace("_WIDTH_", str(width)) \
                             .replace("_HEIGHT_", str(height))
                 except BaseException:
@@ -121,7 +123,6 @@ class GenericObjectTracker(object):
             Thread(target=run_http, kwargs={"flask": flask, "host": host, "port": port}).start()
             self.__http_launched = True
             logging.info("Started HTTP server listening on {0}:{1}".format(host, port))
-
 
     @property
     def width(self):
