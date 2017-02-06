@@ -77,14 +77,14 @@ class GenericObjectTracker(object):
                         return html.replace("_PAUSE_SECS_", str(pause_secs)) \
                             .replace("_NAME_", self.__camera_name if self.__camera_name else "Unknown") \
                             .replace("_WIDTH_", str(self.__width)) \
-                            .replace("_HEIGHT_", str(self.__width * 0.5625))
+                            .replace("_HEIGHT_", str(self.__width * 0.65))
                 except BaseException:
                     traceback.print_exc()
+                    # width="_WIDTH_px" height="_HEIGHT_px"
 
             @flask.route('/image')
             def image_option():
-                pause = request.args.get("pause")
-                return get_page(pause)
+                return get_page(request.args.get("pause"))
 
             @flask.route("/image" + "/<string:pause>")
             def image_path(pause):
@@ -98,7 +98,10 @@ class GenericObjectTracker(object):
                     else:
                         retval, buf = utils.encode_image(self.__current_image)
                         bytes = buf.tobytes()
-                return Response(bytes, mimetype="image/jpeg")
+                response = Response(bytes, mimetype="image/jpeg")
+                response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+                response.headers['Pragma'] = 'no-cache'
+                return response
 
             # Run HTTP server in a thread
             vals = http_host.split(":")

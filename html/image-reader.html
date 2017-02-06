@@ -4,25 +4,48 @@
 
 <head>
     <title>Camera Images</title>
+    <meta HTTP-EQUIV="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta HTTP-EQUIV="Pragma" content="no-cache">
     <META HTTP-EQUIV="Expires" CONTENT="-1">
 
     <style>
         body {background-color: steelblue;}
 
-        #image {
-            //border: 1px solid #4CAF50;
-            margin: 10px;
+        #status_div {
+            font-size: 20px;
+            padding-top: 10px;
+            padding-bottom: 10px;
+            padding-left: 10px;
         }
 
-        #buttons {
+        #header_div {
+            font-size: 20px;
+            padding-top: 10px;
+            padding-bottom: 10px;
+            padding-left: 10px;
+        }
+
+
+        #image_div {
+            //margin: 10px;
+            //height: 100%;
+            //width: 100%;
+        }
+
+        #image {
+            border: 1px solid red;
+            //height: 100%;
+            //width: 100%;
+        }
+
+        #pause_div {
             //border: 1px solid #4CAF50;
-            margin-top: 20px;
-            margin-left: 10px;
+            padding-top: 10px;
+            padding-left: 10px;
         }
 
         .button {
-            background-color: #4CAF50; /* Green */
+            //background-color: #4CAF50; /* Green */
             border: 2px solid black;
             border-radius: 5px;
             padding: 10px 20px;
@@ -31,57 +54,72 @@
             font-size: 20px;
         }
 
+
     </style>
 
     <script>
-
-        var img;
-        var timer = 0;
         var paused = false;
+
+        window.onload = function () {
+            header = document.getElementById('header_div');
+            header.innerHTML = "Camera: _NAME_ (_PAUSE_SECS_ secs)";
+            setButton();
+            loadImage();
+        };
 
         function loadImage() {
             if (!paused) {
-                if (img) {
-                    var ctx = document.getElementById('canvas').getContext('2d');
-                    ctx.drawImage(img, 0, 0);
-                }
+                warning = document.getElementById('status_div')
                 img = new Image();
+                img.onload = function(){
+                    warning.innerHTML = "Connected to image server";
+                    warning.style.backgroundColor = 'green'
+                    ctx = document.getElementById('image').getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+                    ctx.width = 900;
+                    ctx.height = 100;
+                    setTimeout(loadImage, _PAUSE_SECS_ * 1000);
+                };
+                img.onerror = function(){
+                    warning.innerHTML = "Disconnected from image server";
+                    warning.style.backgroundColor = 'red'
+                    setTimeout(loadImage, _PAUSE_SECS_ * 1000);
+                }
                 img.src = "/image.jpg";
             }
         }
 
-        window.onload = function () {
-            loadImage();
-            timer = setInterval(loadImage, _PAUSE_SECS_ * 1000);
-            document.getElementById('header').innerHTML = "Camera: _NAME_ (_PAUSE_SECS_ secs)";
-            setButton();
-        };
-
         function setButton() {
-            e = document.getElementById('pauseresume');
-            e.style.backgroundColor = paused ? 'green' : 'red';
-            e.value = paused ? 'Resume' : 'Pause';
+            button = document.getElementById('pauseresume');
+            button.style.backgroundColor = paused ? 'green' : 'red';
+            button.value = paused ? 'Resume' : 'Pause';
         }
 
         function togglePause() {
             paused = !paused
             setButton()
+            loadImage();
         }
-
     </script>
 </head>
 
 
 <body>
 
-<H2 id="header"></H2>
-
-<div id="image">
-    <canvas id="canvas" width="_WIDTH_px" height="_HEIGHT_px" onclick="togglePause()"></canvas>
+<div id="status_div">
+    <p id="status"></p>
 </div>
 
-<div id="buttons">
-    <input type="button" class="button" id="pauseresume" value="Pause" onclick="togglePause()">
+<div id="header_div">
+    <p id="header"></p>
+</div>
+
+<div id="image_div">
+    <canvas id="image" onclick="togglePause()"></canvas>
+</div>
+
+<div id="pause_div">
+    <input type="button" id="pauseresume" class="button" value="Pause" onclick="togglePause()">
 </div>
 
 </body>
