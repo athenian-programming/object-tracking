@@ -8,7 +8,7 @@ import common_cli_args  as cli
 import cv2
 import opencv_utils as utils
 from common_cli_args import setup_cli_args
-from common_utils import currentTimeMillis, is_raspi
+from common_utils import is_raspi
 from contour_finder import ContourFinder
 from http_server import HttpServer
 from location_server import LocationServer
@@ -45,7 +45,6 @@ class GenericObjectTracker(object):
         self.__leds = leds
         self.__stopped = False
         self.__http_launched = False
-        self.__http_host = http_host
         self.__cnt = 0
         self.__last_write_millis = 0
         self.__current_image_lock = Lock()
@@ -54,7 +53,7 @@ class GenericObjectTracker(object):
         self.__contour_finder = ContourFinder(bgr_color, hsv_range)
         self.__location_server = LocationServer(grpc_port)
         self.__cam = camera.Camera(use_picamera=not usb_camera)
-        self.__http_server = HttpServer(camera_name, self.__http_host, http_delay_secs, self.get_image)
+        self.__http_server = HttpServer(camera_name, http_host, http_delay_secs, image_src=self.get_image)
 
     @property
     def width(self):
@@ -120,14 +119,6 @@ class GenericObjectTracker(object):
     def cnt(self, val):
         self.__cnt = val
 
-    @property
-    def last_write_millis(self):
-        return self.__last_write_millis
-
-    @last_write_millis.setter
-    def last_write_millis(self, val):
-        self.__last_write_millis = val
-
     def stop(self):
         self.__stopped = True
         self.__location_server.stop()
@@ -181,11 +172,8 @@ class GenericObjectTracker(object):
 
     def serve_image(self, image):
         if self.http_server.is_enabled():
-            now = currentTimeMillis()
-            if now - self.last_write_millis > 100:
-                with self.__current_image_lock:
-                    self.__current_image = image
-                self.last_write_millis = now
+            with self.__current_image_lock:
+                self.__current_image = image
 
     def start(self):
         try:
