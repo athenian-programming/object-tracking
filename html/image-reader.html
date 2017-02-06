@@ -85,7 +85,7 @@
 
         window.onload = function () {
             header = document.getElementById('header');
-            header.innerHTML = "_NAME_ (_PAUSE_SECS_ secs)";
+            header.innerHTML = "_NAME_ (_DELAY_SECS_ secs)";
             setButton();
             loadImage();
         };
@@ -99,19 +99,19 @@
                     warning.style.backgroundColor = green
                     ctx = document.getElementById('image').getContext('2d');
                     ctx.drawImage(img, 0, 0);
-                    setTimeout(loadImage, _PAUSE_SECS_ * 1000);
+                    setTimeout(loadImage, _DELAY_SECS_ * 1000);
                 };
                 img.onerror = function(){
                     warning.innerHTML = "Disconnected from image server";
                     warning.style.backgroundColor = red
-                    setTimeout(loadImage, _PAUSE_SECS_ * 1000);
+                    setTimeout(loadImage, _DELAY_SECS_ * 1000);
                 }
                 img.src = "/image.jpg";
             }
         }
 
         function setButton() {
-            button = document.getElementById('pauseresume');
+            button = document.getElementById('pause');
             button.style.backgroundColor = paused ? red : green;
             button.value = paused ? 'Resume' : 'Pause';
 
@@ -125,8 +125,8 @@
             loadImage();
         }
 
-        function pauseChange(time) {
-            window.location.href = "/image?pause=" + time;
+        function delayChange(time) {
+            window.location.href = "/image?delay=" + time;
         }
     </script>
 </head>
@@ -136,22 +136,22 @@
 <table class="buttons" border="0">
     <tr>
         <td>
-            <input type="button" id="pause0" class="change" value="0 secs" onclick="pauseChange('0')">
+            <input type="button" class="change" value="0 secs" onclick="delayChange('0')">
         </td>
         <td>
-            <input type="button" id="pause0-1" class="change" value="0.1 secs" onclick="pauseChange('0.1')">
+            <input type="button" class="change" value="0.1 secs" onclick="delayChange('0.1')">
         </td>
         <td>
-            <input type="button" id="pause0-25" class="change" value="0.25 secs" onclick="pauseChange('0.25')">
+            <input type="button" class="change" value="0.25 secs" onclick="delayChange('0.25')">
         </td>
         <td>
-            <input type="button" id="pause0-5" class="change" value="0.5 secs" onclick="pauseChange('0.5')">
+            <input type="button" class="change" value="0.5 secs" onclick="delayChange('0.5')">
         </td>
         <td>
-            <input type="button" id="pause1-0" class="change" value="1 secs" onclick="pauseChange('1')">
+            <input type="button" class="change" value="1 secs" onclick="delayChange('1')">
         </td>
         <td>
-            <input type="button" id="pause5-0" class="change" value="5 secs" onclick="pauseChange('5')">
+            <input type="button" class="change" value="5 secs" onclick="delayChange('5')">
         </td>
     </tr>
 </table>
@@ -173,7 +173,7 @@
     </div>
 
     <div id="pause_div">
-        <input type="button" id="pauseresume" class="pause" value="Pause" onclick="togglePause()">
+        <input type="button" id="pause" class="pause" value="Pause" onclick="togglePause()">
     </div>
 </div>
 

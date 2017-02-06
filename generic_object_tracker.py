@@ -37,7 +37,7 @@ class GenericObjectTracker(object):
                  leds=False,
                  camera_name="",
                  http_host="localhost:8080",
-                 http_pause_secs=0.5):
+                 http_delay_secs=0.5):
         self.__width = width
         self.__percent = percent
         self.__orig_width = width
@@ -51,7 +51,7 @@ class GenericObjectTracker(object):
         self.__stopped = False
         self.__http_launched = False
         self.__http_host = http_host
-        self.__http_pause_secs = http_pause_secs
+        self.__http_delay_secs = http_delay_secs
         self.__cnt = 0
         self.__last_write_millis = 0
         self.__current_image_lock = Lock()
@@ -69,17 +69,17 @@ class GenericObjectTracker(object):
 
             @flask.route('/')
             def index():
-                return redirect("/image?pause=.5")
+                return redirect("/image?delay=.5")
 
-            def get_page(pause):
+            def get_page(delay):
                 try:
-                    pause_secs = float(pause) if pause else self.__http_pause_secs
+                    delay_secs = float(delay) if delay else self.__http_delay_secs
                     prefix = "/home/pi/git/object-tracking" if is_raspi() else "."
                     with open("{0}/html/image-reader.html".format(prefix)) as file:
                         html = file.read()
                         name = "Camera: " + self.__camera_name if self.__camera_name else "UNNAMED"
                         return html.replace("_TITLE_", name) \
-                            .replace("_PAUSE_SECS_", str(pause_secs)) \
+                            .replace("_DELAY_SECS_", str(delay_secs)) \
                             .replace("_NAME_", name) \
                             .replace("_WIDTH_", str(width)) \
                             .replace("_HEIGHT_", str(height))
@@ -88,11 +88,11 @@ class GenericObjectTracker(object):
 
             @flask.route('/image')
             def image_option():
-                return get_page(request.args.get("pause"))
+                return get_page(request.args.get("delay"))
 
-            @flask.route("/image" + "/<string:pause>")
-            def image_path(pause):
-                return get_page(pause)
+            @flask.route("/image" + "/<string:delay>")
+            def image_path(delay):
+                return get_page(delay)
 
             @flask.route("/image.jpg")
             def image_jpg():
@@ -275,6 +275,6 @@ class GenericObjectTracker(object):
                               cli.flip_y,
                               cli.camera_optional,
                               cli.http_host,
-                              cli.http_pause,
+                              cli.http_delay,
                               cli.display,
                               cli.verbose)
