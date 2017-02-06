@@ -1,5 +1,6 @@
 import socket
 import time
+import traceback
 from logging import error
 from logging import info
 from threading import Event
@@ -66,6 +67,7 @@ class LocationClient(GenericClient):
                 client_info = ClientInfo(info="{0} client".format(socket.gethostname()))
                 server_info = stub.registerClient(client_info)
             except BaseException as e:
+                traceback.print_exc()
                 error("Failed to connect to gRPC server at {0} [{1}]".format(self._hostname, e))
                 time.sleep(pause_secs)
                 continue

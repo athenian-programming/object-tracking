@@ -1,5 +1,6 @@
 import logging
 import sys
+import time
 import traceback
 from threading import Lock, Thread
 
@@ -103,8 +104,17 @@ class GenericObjectTracker(object):
             vals = http_host.split(":")
             host = vals[0]
             port = vals[1] if len(vals) == 2 else 8080
-            Thread(target=flask.run, kwargs={"host": host, "port": port}).start()
+            Thread(target=self.run_http, kwargs={"flask": flask, "host": host, "port": port}).start()
             logging.info("Started HTTP server listening on {0}:{1}".format(host, port))
+
+    def run_http(self, flask, host, port):
+        while True:
+            try:
+                flask.run(host=host, port=port)
+            except BaseException as e:
+                traceback.print_exc()
+                logging.error("Restarting HTTP server [{0}]".format(e))
+                time.sleep(1)
 
     @property
     def width(self):
@@ -234,6 +244,7 @@ class GenericObjectTracker(object):
         try:
             self.location_server.start()
         except BaseException as e:
+            traceback.print_exc()
             logging.error("Unable to start location server [{0}]".format(e))
             sys.exit(1)
 
