@@ -6,11 +6,13 @@ from threading import Lock
 import camera
 import common_cli_args  as cli
 import cv2
+import grpc_support
+import image_server
 import opencv_utils as utils
 from common_cli_args import setup_cli_args
 from common_utils import is_raspi
 from contour_finder import ContourFinder
-from http_server import HttpServer
+from image_server import ImageServer
 from location_server import LocationServer
 
 # I tried to include this in the constructor and make it depedent on self.__leds, but it does not work
@@ -25,15 +27,16 @@ class GenericObjectTracker(object):
                  percent,
                  minimum,
                  hsv_range,
-                 grpc_port=50051,
+                 grpc_port=grpc_support.grpc_port_default,
                  display=False,
                  flip_x=False,
                  flip_y=False,
                  usb_camera=False,
                  leds=False,
                  camera_name="",
-                 http_host="localhost:8080",
-                 http_delay_secs=0.5):
+                 http_host=image_server.http_host_default,
+                 http_delay_secs=image_server.http_delay_secs_default,
+                 http_path=image_server.http_path_default):
         self.__width = width
         self.__percent = percent
         self.__orig_width = width
@@ -43,6 +46,7 @@ class GenericObjectTracker(object):
         self.__flip_x = flip_x
         self.__flip_y = flip_y
         self.__leds = leds
+
         self.__stopped = False
         self.__http_launched = False
         self.__cnt = 0
@@ -53,7 +57,7 @@ class GenericObjectTracker(object):
         self.__contour_finder = ContourFinder(bgr_color, hsv_range)
         self.__location_server = LocationServer(grpc_port)
         self.__cam = camera.Camera(use_picamera=not usb_camera)
-        self.__http_server = HttpServer(camera_name, http_host, http_delay_secs, image_src=self.get_image)
+        self.__http_server = ImageServer(camera_name, http_host, http_delay_secs, http_path, self.get_image)
 
     @property
     def width(self):
@@ -122,6 +126,7 @@ class GenericObjectTracker(object):
     def stop(self):
         self.__stopped = True
         self.__location_server.stop()
+        self.__http_server.stop()
 
     def clear_leds(self):
         self.set_left_leds([0, 0, 0])
@@ -203,5 +208,6 @@ class GenericObjectTracker(object):
                               cli.camera_optional,
                               cli.http_host,
                               cli.http_delay,
+                              cli.http_path,
                               cli.display,
                               cli.verbose)

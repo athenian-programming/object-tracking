@@ -6,6 +6,8 @@ import traceback
 from logging import info
 
 import cv2
+import grpc_support
+import image_server
 import imutils
 import opencv_defaults as defs
 from common_constants import LOGGING_ARGS
@@ -22,15 +24,16 @@ class DualObjectTracker(GenericObjectTracker):
                  percent,
                  minimum,
                  hsv_range,
-                 grpc_port=50051,
+                 grpc_port=grpc_support.grpc_port_default,
                  display=False,
                  flip_x=False,
                  flip_y=False,
                  usb_camera=False,
                  leds=False,
                  camera_name="",
-                 http_host="localhost:8080",
-                 http_delay_secs=0.5):
+                 http_host=image_server.http_host_default,
+                 http_delay_secs=image_server.http_delay_secs_default,
+                 http_path=image_server.http_path_default):
         super(DualObjectTracker, self).__init__(bgr_color,
                                                 width,
                                                 percent,
@@ -44,7 +47,8 @@ class DualObjectTracker(GenericObjectTracker):
                                                 leds=leds,
                                                 camera_name=camera_name,
                                                 http_host=http_host,
-                                                http_delay_secs=http_delay_secs)
+                                                http_delay_secs=http_delay_secs,
+                                                http_path=http_path)
 
     # Do not run this in a background thread. cv2.waitKey has to run in main thread
     def start(self):
@@ -138,6 +142,8 @@ class DualObjectTracker(GenericObjectTracker):
 
                 self.cnt += 1
 
+            except KeyboardInterrupt as e:
+                raise e
             except BaseException as e:
                 logging.error("Unexpected error in main loop [{0}]".format(e))
                 traceback.print_exc()
@@ -154,26 +160,26 @@ if __name__ == "__main__":
     # Setup logging
     logging.basicConfig(**LOGGING_ARGS)
 
-    tracker = DualObjectTracker(get_list_arg(args["bgr"]),
-                                args["width"],
-                                args["percent"],
-                                args["min"],
-                                args["range"],
-                                grpc_port=args["port"],
-                                display=args["display"],
-                                flip_x=args["flipx"],
-                                flip_y=args["flipy"],
-                                usb_camera=args["usb"],
-                                leds=args["leds"] and is_raspi(),
-                                camera_name=args["camera"],
-                                http_host=args["http"],
-                                http_delay_secs=args["delay"])
-
+    object_tracker = DualObjectTracker(get_list_arg(args["bgr"]),
+                                       args["width"],
+                                       args["percent"],
+                                       args["min"],
+                                       args["range"],
+                                       grpc_port=args["port"],
+                                       display=args["display"],
+                                       flip_x=args["flipx"],
+                                       flip_y=args["flipy"],
+                                       usb_camera=args["usb"],
+                                       leds=args["leds"] and is_raspi(),
+                                       camera_name=args["camera"],
+                                       http_host=args["http"],
+                                       http_delay_secs=args["delay"],
+                                       http_path=args["path"])
     try:
-        tracker.start()
+        object_tracker.start()
     except KeyboardInterrupt:
         pass
     finally:
-        tracker.stop()
+        object_tracker.stop()
 
     info("Exiting...")

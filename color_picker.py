@@ -1,18 +1,20 @@
 #!/usr/bin/env python2
 
 import logging
+from logging import info
 from threading import Lock
 
 import camera
 import common_cli_args  as cli
 import cv2
+import image_server
 import imutils
 import numpy as np
 import opencv_defaults as defs
 import opencv_utils as utils
 from common_cli_args import setup_cli_args
 from common_constants import LOGGING_ARGS
-from http_server import HttpServer
+from image_server import ImageServer
 from opencv_utils import GREEN
 from opencv_utils import RED
 
@@ -31,8 +33,9 @@ class ColorPicker(object):
                  flip_x=False,
                  flip_y=False,
                  display=False,
-                 http_host="localhost:8080",
-                 http_delay_secs=0.5):
+                 http_host=image_server.http_host_default,
+                 http_delay_secs=image_server.http_delay_secs_default,
+                 http_path=image_server.http_path_default):
         self.__width = width
         self.__usb_camera = usb_camera
         self.__flip_x = flip_x
@@ -42,7 +45,7 @@ class ColorPicker(object):
         self.__current_image_lock = Lock()
         self.__current_image = None
         self.__cam = camera.Camera(use_picamera=not usb_camera)
-        self.__http_server = HttpServer("Color Picker", http_host, http_delay_secs, image_src=self.get_image)
+        self.__http_server = ImageServer("Color Picker", http_host, http_delay_secs, http_path, self.get_image)
 
     def get_image(self):
         with self.__current_image_lock:
@@ -100,7 +103,7 @@ class ColorPicker(object):
                 with self.__current_image_lock:
                     self.__current_image = image
                 if cnt % 30 == 0:
-                    logging.info(bgr_text)
+                    info(bgr_text)
 
             if self.__display:
                 # Display image
@@ -138,23 +141,36 @@ class ColorPicker(object):
                     self.__cam.close()
                     break
 
+    def stop(self):
+        self.__http_server.stop()
+
 
 if __name__ == "__main__":
     # Parse CLI args
-    args = setup_cli_args(cli.width, cli.usb, cli.display, cli.flip_x, cli.flip_y, cli.http_host, cli.http_delay)
+    args = setup_cli_args(cli.width,
+                          cli.usb,
+                          cli.display,
+                          cli.flip_x,
+                          cli.flip_y,
+                          cli.http_host,
+                          cli.http_delay,
+                          cli.http_path)
 
     # Setup logging
     logging.basicConfig(**LOGGING_ARGS)
 
+    color_picker = ColorPicker(args["width"],
+                               usb_camera=args["usb"],
+                               flip_x=args["flipx"],
+                               flip_y=args["flipy"],
+                               http_host=args["http"],
+                               http_delay_secs=args["delay"],
+                               http_path=args["path"],
+                               display=args["display"])
     try:
-        ColorPicker(args["width"],
-                    usb_camera=args["usb"],
-                    flip_x=args["flipx"],
-                    flip_y=args["flipy"],
-                    http_host=args["http"],
-                    http_delay_secs=args["delay"],
-                    display=args["display"]).start()
+        color_picker.start()
     except KeyboardInterrupt as e:
         pass
-
-    print("Exiting...")
+    finally:
+        color_picker.stop()
+    info("Exiting...")

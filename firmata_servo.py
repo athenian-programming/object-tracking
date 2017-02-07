@@ -41,7 +41,7 @@ class FirmataServo(Servo):
                     self.__ready_event.clear()
 
                 # Get latest location
-                img_pos, img_total, middle_inc, id = loc_source()
+                img_pos, img_total, middle_inc, id_val = loc_source()
 
                 # Skip if object is not seen
                 if img_pos == -1 or img_total == -1:
