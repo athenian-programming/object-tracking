@@ -7,7 +7,6 @@ import grpc_support
 import image_server
 import opencv_defaults as defs
 from common_constants import LOGGING_ARGS
-from common_utils import is_raspi
 from generic_object_tracker import GenericObjectTracker
 from opencv_utils import BLUE, GREEN, RED, YELLOW
 from opencv_utils import get_list_arg, get_moment
@@ -126,7 +125,7 @@ if __name__ == "__main__":
                                        flip_x=args["flipx"],
                                        flip_y=args["flipy"],
                                        usb_camera=args["usb"],
-                                       leds=args["leds"] and is_raspi(),
+                                       leds=args["leds"],
                                        camera_name=args["camera"],
                                        http_host=args["http"],
                                        http_delay_secs=args["delay"],

@@ -110,10 +110,9 @@ class GenericObjectTracker(object):
         self.__location_server.stop()
         self.__http_server.stop()
 
-    def clear_leds(self):
-        self.set_leds([0, 0, 0], [0, 0, 0])
-
     def set_leds(self, left_color, right_color):
+        if not is_raspi():
+            return
         if self.__leds:
             for i in range(0, 4):
                 set_pixel(i, left_color[2], left_color[1], left_color[0], brightness=0.05)
@@ -121,6 +120,9 @@ class GenericObjectTracker(object):
             for i in range(4, 8):
                 set_pixel(i, right_color[2], right_color[1], right_color[0], brightness=0.05)
             show()
+
+    def clear_leds(self):
+        self.set_leds([0, 0, 0], [0, 0, 0])
 
     def process_image(self, image, img_width, img_height):
         raise Exception("Implemented by subclass")
