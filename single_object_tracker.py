@@ -9,7 +9,7 @@ import opencv_defaults as defs
 from common_constants import LOGGING_ARGS
 from generic_object_tracker import GenericObjectTracker
 from opencv_utils import BLUE, GREEN, RED
-from opencv_utils import get_list_arg, get_moment
+from opencv_utils import get_moment
 
 logger = logging.getLogger(__name__)
 
@@ -101,7 +101,7 @@ if __name__ == "__main__":
     # Setup logging
     logging.basicConfig(**LOGGING_ARGS)
 
-    object_tracker = SingleObjectTracker(get_list_arg(args["bgr"]),
+    object_tracker = SingleObjectTracker(args["bgr"],
                                          args["width"],
                                          args["percent"],
                                          args["min"],
