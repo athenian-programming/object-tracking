@@ -1,11 +1,13 @@
 import logging
 import sys
+import time
 
 import camera
 import common_cli_args  as cli
 import cv2
 import grpc_support
 import image_server as img_server
+import imutils
 import opencv_utils as utils
 from common_cli_args import setup_cli_args
 from common_utils import is_raspi
@@ -125,6 +127,45 @@ class GenericObjectTracker(object):
                 set_pixel(i, right_color[2], right_color[1], right_color[0], brightness=0.05)
             show()
 
+    def process_image(self, image, img_width, img_height):
+        raise Exception("Implemented by subclass")
+
+    # Do not run this in a background thread. cv2.waitKey has to run in main thread
+    def start(self):
+        try:
+            self.location_server.start()
+        except BaseException as e:
+            logger.error("Unable to start location server [{0}]".format(e), exc_info=True)
+            sys.exit(1)
+
+        self.location_server.write_location(-1, -1, 0, 0, 0)
+
+        while self.cam.is_open() and not self.stopped:
+            try:
+                image = self.cam.read()
+                image = imutils.resize(image, width=self.width)
+                image = self.flip(image)
+
+                img_height, img_width = image.shape[:2]
+
+                # Called once the dimensions of the images are known
+                self.http_server.serve_images(img_width, img_height)
+
+                self.process_image(image, img_width, img_height)
+                self.http_server.image = image
+                self.display_image(image)
+
+                self.cnt += 1
+
+            except KeyboardInterrupt as e:
+                raise e
+            except BaseException as e:
+                logger.error("Unexpected error in main loop [{0}]".format(e), exc_info=True)
+                time.sleep(1)
+
+        self.clear_leds()
+        self.cam.close()
+
     def display_image(self, image):
         if self.__display:
             cv2.imshow("Image", image)
@@ -148,15 +189,6 @@ class GenericObjectTracker(object):
                 utils.write_image(image, log_info=True)
             elif key == ord("q"):
                 self.stop()
-
-    def start(self):
-        try:
-            self.location_server.start()
-        except BaseException as e:
-            logger.error("Unable to start location server [{0}]".format(e), exc_info=True)
-            sys.exit(1)
-
-        self.location_server.write_location(-1, -1, 0, 0, 0)
 
     @property
     def markup_image(self):
