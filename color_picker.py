@@ -1,7 +1,6 @@
 #!/usr/bin/env python2
 
 import logging
-from logging import info
 
 import camera
 import common_cli_args  as cli
@@ -15,6 +14,7 @@ from common_constants import LOGGING_ARGS
 from opencv_utils import GREEN
 from opencv_utils import RED
 
+logger = logging.getLogger(__name__)
 
 class ColorPicker(object):
     roi_size = 24
@@ -89,7 +89,7 @@ class ColorPicker(object):
             cnt += 1
 
             if self.__http_server.enabled and cnt % 30 == 0:
-                info(bgr_text)
+                logger.info(bgr_text)
 
             self.__http_server.image = image
 
@@ -161,4 +161,4 @@ if __name__ == "__main__":
         pass
     finally:
         color_picker.stop()
-    info("Exiting...")
+        logger.info("Exiting...")

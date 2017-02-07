@@ -3,7 +3,6 @@
 import logging
 import time
 import traceback
-from logging import info
 
 import cv2
 import grpc_support
@@ -15,6 +14,8 @@ from common_utils import is_raspi
 from generic_object_tracker import GenericObjectTracker
 from opencv_utils import BLUE, GREEN, RED
 from opencv_utils import get_list_arg, get_moment
+
+logger = logging.getLogger(__name__)
 
 
 class SingleObjectTracker(GenericObjectTracker):
@@ -126,7 +127,7 @@ class SingleObjectTracker(GenericObjectTracker):
             except KeyboardInterrupt as e:
                 raise e
             except BaseException as e:
-                logging.error("Unexpected error in main loop [{0}]".format(e))
+                logger.error("Unexpected error in main loop [{0}]".format(e))
                 traceback.print_exc()
                 time.sleep(1)
 
@@ -163,4 +164,4 @@ if __name__ == "__main__":
     finally:
         object_tracker.stop()
 
-    info("Exiting...")
+    logger.info("Exiting...")

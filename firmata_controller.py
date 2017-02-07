@@ -3,18 +3,17 @@
 import argparse
 import logging
 import sys
-from logging import error
-from logging import info
 from threading import Thread
 
+import calibrate_servo
 import common_cli_args as cli
 from common_constants import LOGGING_ARGS
 from common_utils import is_windows
-from pyfirmata import Arduino
-
-import calibrate_servo
 from firmata_servo import FirmataServo
 from location_client import LocationClient
+from pyfirmata import Arduino
+
+logger = logging.getLogger(__name__)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -39,9 +38,9 @@ if __name__ == "__main__":
     port = ("" if is_windows() else "/dev/") + args["serial"]
     try:
         board = Arduino(port)
-        info("Connected to Arduino at: {0}".format(port))
+        logger.info("Connected to Arduino at: {0}".format(port))
     except OSError as e:
-        error("Failed to connect to Arduino at {0} - [{1}]".format(port, e))
+        logger.error("Failed to connect to Arduino at {0} - [{1}]".format(port, e))
         sys.exit(0)
 
     locations = LocationClient(args["grpc"]).start()
@@ -76,4 +75,4 @@ if __name__ == "__main__":
         board.exit()
         locations.stop()
 
-    info("Exiting...")
+    logger.info("Exiting...")

@@ -1,5 +1,4 @@
 import logging
-from logging import info
 
 import common_cli_args  as cli
 from common_cli_args import setup_cli_args
@@ -8,6 +7,8 @@ from common_constants import LOGGING_ARGS
 from common_utils import mqtt_broker_info
 from common_utils import sleep
 from mqtt_connection import MqttConnection
+
+logger = logging.getLogger(__name__)
 
 if __name__ == "__main__":
     # Parse CLI args
@@ -22,12 +23,12 @@ if __name__ == "__main__":
 
     # Define MQTT callbacks
     def on_connect(client, userdata, flags, rc):
-        info("Connected with result code: {0}".format(rc))
+        logger.info("Connected with result code: {0}".format(rc))
         client.subscribe("{0}/#".format(userdata[CAMERA_NAME]))
 
 
     def on_disconnect(client, userdata, rc):
-        info("Disconnected with result code: {0}".format(rc))
+        logger.info("Disconnected with result code: {0}".format(rc))
 
 
     def on_message(client, userdata, msg):
@@ -49,4 +50,4 @@ if __name__ == "__main__":
     finally:
         mqtt_conn.disconnect()
 
-    info("Exiting...")
+    logger.info("Exiting...")

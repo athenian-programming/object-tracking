@@ -7,6 +7,8 @@ from common_cli_args import setup_cli_args
 from common_constants import LOGGING_ARGS
 from location_client import LocationClient
 
+logger = logging.getLogger(__name__)
+
 if __name__ == "__main__":
     # Parse CLI args
     args = setup_cli_args(cli.grpc)
@@ -24,4 +26,4 @@ if __name__ == "__main__":
     finally:
         locations.stop()
 
-    logging.info("Exiting...")
+    logger.info("Exiting...")

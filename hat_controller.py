@@ -1,7 +1,6 @@
 #!/usr/bin/env python2
 
 import logging
-from logging import info
 from threading import Thread
 
 import calibrate_servo
@@ -11,6 +10,8 @@ from common_cli_args import setup_cli_args
 from common_constants import LOGGING_ARGS
 from hat_servo import HatServo
 from location_client import LocationClient
+
+logger = logging.getLogger(__name__)
 
 if __name__ == "__main__":
     # Setuo CLI args
@@ -50,4 +51,4 @@ if __name__ == "__main__":
     finally:
         locations.stop()
 
-    info("Exiting...")
+    logger.info("Exiting...")

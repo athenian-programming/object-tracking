@@ -1,8 +1,9 @@
+import logging
 import time
-from logging import info
 from threading import Event
 from threading import Thread
 
+logger = logging.getLogger(__name__)
 
 class Servo(object):
     def __init__(self, name, alternate=False, secs_per_180=0.50, pix_per_degree=6.5):
@@ -13,8 +14,8 @@ class Servo(object):
         self.__ready_event = Event()
         self.__thread = None
         self.__stopped = False
-        info("Created servo: {0} alternate={1} secs_per_180={2} pix_per_degree={3}"
-             .format(self.__name, self.__alternate, self.__secs_per_180, self.__ppd))
+        logger.info("Created servo: {0} alternate={1} secs_per_180={2} pix_per_degree={3}"
+                    .format(self.__name, self.__alternate, self.__secs_per_180, self.__ppd))
 
     @property
     def name(self):
@@ -31,7 +32,7 @@ class Servo(object):
         pass
 
     def run_servo(self, forward, loc_source, other_ready_event):
-        info("Started servo: {0}".format(self.__name))
+        logger.info("Started servo: {0}".format(self.__name))
         while not self.__stopped:
             try:
                 if self.__alternate:
@@ -43,7 +44,7 @@ class Servo(object):
 
                 # Skip if object is not seen
                 if img_pos == -1 or img_total == -1:
-                    info("No target seen: {0}".format(self.__name))
+                    logger.info("No target seen: {0}".format(self.__name))
                     continue
 
                 midpoint = img_total / 2
@@ -88,5 +89,5 @@ class Servo(object):
         self.__thread.join()
 
     def stop(self):
-        info("Stopping servo {0}".format(self.name))
+        logger.info("Stopping servo {0}".format(self.name))
         self.__stopped = True

@@ -1,7 +1,6 @@
 #!/usr/bin/env python2
 
 import logging
-from logging import info
 from threading import Thread
 
 import common_cli_args  as cli
@@ -12,6 +11,8 @@ from common_utils import mqtt_broker_info
 from common_utils import sleep
 from location_client import LocationClient
 from mqtt_connection import MqttConnection
+
+logger = logging.getLogger(__name__)
 
 if __name__ == "__main__":
     # Parse CLI args
@@ -26,12 +27,12 @@ if __name__ == "__main__":
 
     # Define MQTT callbacks
     def on_connect(client, userdata, flags, rc):
-        info("Connected with result code: {0}".format(rc))
+        logger.info("Connected with result code: {0}".format(rc))
         Thread(target=publish_locations, args=(client, userdata)).start()
 
 
     def on_disconnect(client, userdata, rc):
-        info("Disconnected with result code: {0}".format(rc))
+        logger.info("Disconnected with result code: {0}".format(rc))
 
 
     def on_publish(client, userdata, mid):
@@ -62,4 +63,4 @@ if __name__ == "__main__":
         mqtt_conn.disconnect()
         locations.stop()
 
-    info("Exiting...")
+    logger.info("Exiting...")

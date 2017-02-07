@@ -17,6 +17,7 @@ from location_server import LocationServer
 if is_raspi():
     from blinkt import set_pixel, show
 
+logger = logging.getLogger(__name__)
 
 class GenericObjectTracker(object):
     def __init__(self,
@@ -168,7 +169,7 @@ class GenericObjectTracker(object):
         try:
             self.location_server.start()
         except BaseException as e:
-            logging.error("Unable to start location server [{0}]".format(e))
+            logger.error("Unable to start location server [{0}]".format(e))
             traceback.print_exc()
             sys.exit(1)
 

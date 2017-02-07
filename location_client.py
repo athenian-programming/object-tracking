@@ -1,7 +1,6 @@
+import logging
 import socket
 import time
-from logging import error
-from logging import info
 from threading import Event
 from threading import Thread
 
@@ -11,6 +10,7 @@ from gen.grpc_server_pb2 import ObjectLocationServerStub
 from grpc_support import GenericClient
 from grpc_support import TimeoutException
 
+logger = logging.getLogger(__name__)
 
 class LocationClient(GenericClient):
     def __init__(self, hostname):
@@ -61,16 +61,16 @@ class LocationClient(GenericClient):
         channel = grpc.insecure_channel(self._hostname)
         stub = ObjectLocationServerStub(channel)
         while not self._stopped:
-            info("Connecting to gRPC server at {0}...".format(self._hostname))
+            logger.info("Connecting to gRPC server at {0}...".format(self._hostname))
             try:
                 client_info = ClientInfo(info="{0} client".format(socket.gethostname()))
                 server_info = stub.registerClient(client_info)
             except BaseException as e:
-                error("Failed to connect to gRPC server at {0} [{1}]".format(self._hostname, e))
+                logger.error("Failed to connect to gRPC server at {0} [{1}]".format(self._hostname, e))
                 time.sleep(pause_secs)
                 continue
 
-            info("Connected to gRPC server at {0} [{1}]".format(self._hostname, server_info.info))
+            logger.info("Connected to gRPC server at {0} [{1}]".format(self._hostname, server_info.info))
 
             try:
                 for loc in stub.getObjectLocations(client_info):
@@ -84,7 +84,7 @@ class LocationClient(GenericClient):
                     self.__x_ready.set()
                     self.__y_ready.set()
             except BaseException as e:
-                info("Disconnected from gRPC server at {0} [{1}]".format(self._hostname, e))
+                logger.info("Disconnected from gRPC server at {0} [{1}]".format(self._hostname, e))
                 time.sleep(pause_secs)
 
     def start(self):
@@ -93,7 +93,7 @@ class LocationClient(GenericClient):
 
     def stop(self):
         if not self._stopped:
-            info("Stopping location client")
+            logger.info("Stopping location client")
             self._stopped = True
             self.__x_ready.set()
             self.__y_ready.set()

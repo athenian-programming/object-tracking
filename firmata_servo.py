@@ -1,8 +1,9 @@
+import logging
 import time
-from logging import info
 
 from generic_servo import Servo
 
+logger = logging.getLogger(__name__)
 
 class FirmataServo(Servo):
     def __init__(self, name, alternate, board, pin_args, secs_per_180, pix_per_degree):
@@ -45,7 +46,7 @@ class FirmataServo(Servo):
 
                 # Skip if object is not seen
                 if img_pos == -1 or img_total == -1:
-                    info("No target seen: {0}".format(self.__name))
+                    logger.info("No target seen: {0}".format(self.__name))
                     continue
 
                 midpoint = img_total / 2

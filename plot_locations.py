@@ -1,6 +1,5 @@
 import logging
 import time
-from logging import info
 
 import common_cli_args  as cli
 import plotly.graph_objs as go
@@ -9,6 +8,8 @@ import plotly.tools as tls
 from common_cli_args import setup_cli_args
 from common_constants import LOGGING_ARGS
 from location_client import LocationClient
+
+logger = logging.getLogger(__name__)
 
 if __name__ == "__main__":
     # Parse CLI args
@@ -34,7 +35,7 @@ if __name__ == "__main__":
     stream = py.Stream(stream_id)
     stream.open()
 
-    info("Opening plot.ly tab")
+    logger.info("Opening plot.ly tab")
     time.sleep(5)
 
     try:
@@ -56,4 +57,4 @@ if __name__ == "__main__":
         stream.close()
         locations.stop()
 
-    info("Exiting...")
+    logger.info("Exiting...")
