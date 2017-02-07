@@ -88,6 +88,7 @@ class LocationClient(GenericClient):
                 time.sleep(pause_secs)
 
     def start(self):
+        logger.info("Starting location client")
         Thread(target=self.read_locations).start()
         return self
 

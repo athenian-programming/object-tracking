@@ -54,9 +54,11 @@ class LocationServer(ObjectLocationServerServicer, GenericServer):
             self.stop()
 
     def start(self):
+        logger.info("Starting location server")
         Thread(target=self.start_location_server).start()
         time.sleep(1)
         return self
 
     def stop(self):
+        logger.info("Stopping location server")
         self._stopped = True
