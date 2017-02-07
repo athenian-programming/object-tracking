@@ -118,8 +118,8 @@ class SingleObjectTracker(GenericObjectTracker):
 
                     cv2.putText(image, text, defs.TEXT_LOC, defs.TEXT_FONT, defs.TEXT_SIZE, RED, 1)
 
+                self.http_server.image = image
                 self.display_image(image)
-                self.serve_image(image)
 
                 self.cnt += 1
 

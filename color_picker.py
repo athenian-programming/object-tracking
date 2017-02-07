@@ -2,7 +2,6 @@
 
 import logging
 from logging import info
-from threading import Lock
 
 import camera
 import common_cli_args  as cli
@@ -11,7 +10,6 @@ import image_server as img_server
 import imutils
 import numpy as np
 import opencv_defaults as defs
-import opencv_utils as utils
 from common_cli_args import setup_cli_args
 from common_constants import LOGGING_ARGS
 from opencv_utils import GREEN
@@ -42,17 +40,8 @@ class ColorPicker(object):
         self.__flip_y = flip_y
         self.__display = display
         self.__orig_width = self.__width
-        self.__current_image_lock = Lock()
-        self.__current_image = None
         self.__cam = camera.Camera(use_picamera=not usb_camera)
-        self.__http_server = img_server.ImageServer(self.name, http_host, http_delay_secs, http_file, self.get_image)
-
-    def get_image(self):
-        with self.__current_image_lock:
-            if self.__current_image is None:
-                return []
-            retval, buf = utils.encode_image(self.__current_image)
-            return buf.tobytes()
+        self.__http_server = img_server.ImageServer(self.name, http_host, http_delay_secs, http_file)
 
     # Do not run this in a background thread. cv2.waitKey has to run in main thread
     def start(self):
@@ -99,11 +88,10 @@ class ColorPicker(object):
 
             cnt += 1
 
-            if self.__http_server.is_enabled():
-                with self.__current_image_lock:
-                    self.__current_image = image
-                if cnt % 30 == 0:
-                    info(bgr_text)
+            if self.__http_server.enabled and cnt % 30 == 0:
+                info(bgr_text)
+
+            self.__http_server.image = image
 
             if self.__display:
                 # Display image

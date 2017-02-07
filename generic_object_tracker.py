@@ -1,7 +1,6 @@
 import logging
 import sys
 import traceback
-from threading import Lock
 
 import camera
 import common_cli_args  as cli
@@ -35,7 +34,7 @@ class GenericObjectTracker(object):
                  camera_name="",
                  http_host=img_server.http_host_default,
                  http_delay_secs=img_server.http_delay_secs_default,
-                 http_file=img_server.http_path_default):
+                 http_file=img_server.http_file_default):
         self.__width = width
         self.__percent = percent
         self.__orig_width = width
@@ -50,13 +49,11 @@ class GenericObjectTracker(object):
         self.__http_launched = False
         self.__cnt = 0
         self.__last_write_millis = 0
-        self.__current_image_lock = Lock()
-        self.__current_image = None
         self._prev_x, self._prev_y = -1, -1
         self.__contour_finder = ContourFinder(bgr_color, hsv_range)
         self.__location_server = LocationServer(grpc_port)
         self.__cam = camera.Camera(use_picamera=not usb_camera)
-        self.__http_server = img_server.ImageServer(camera_name, http_host, http_delay_secs, http_file, self.get_image)
+        self.__http_server = img_server.ImageServer(camera_name, http_host, http_delay_secs, http_file)
 
     @property
     def width(self):
@@ -167,18 +164,6 @@ class GenericObjectTracker(object):
             elif key == ord("q"):
                 self.stop()
 
-    def get_image(self):
-        with self.__current_image_lock:
-            if self.__current_image is None:
-                return []
-            retval, buf = utils.encode_image(self.__current_image)
-            return buf.tobytes()
-
-    def serve_image(self, image):
-        if self.http_server.is_enabled():
-            with self.__current_image_lock:
-                self.__current_image = image
-
     def start(self):
         try:
             self.location_server.start()
@@ -190,7 +175,7 @@ class GenericObjectTracker(object):
         self.location_server.write_location(-1, -1, 0, 0, 0)
 
     def markup_image(self):
-        return self.display or self.http_server.is_enabled()
+        return self.display or self.http_server.enabled
 
     @staticmethod
     def cli_args():
