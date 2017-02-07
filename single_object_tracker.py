@@ -58,12 +58,7 @@ class SingleObjectTracker(GenericObjectTracker):
             try:
                 image = self.cam.read()
                 image = imutils.resize(image, width=self.width)
-
-                if self.flip_x:
-                    image = cv2.flip(image, 0)
-
-                if self.flip_y:
-                    image = cv2.flip(image, 1)
+                image = self.flip(image)
 
                 middle_pct = (self.percent / 100.0) / 2
                 img_height, img_width = image.shape[:2]
@@ -73,9 +68,6 @@ class SingleObjectTracker(GenericObjectTracker):
 
                 mid_x, mid_y = img_width / 2, img_height / 2
                 img_x, img_y = -1, -1
-
-                # The middle margin calculation is based on % of width for horizontal and vertical boundry
-                middle_inc = int(mid_x * middle_pct)
 
                 text = "#{0} ({1}, {2})".format(self.cnt, img_width, img_height)
                 text += " {0}%".format(self.percent)
@@ -94,15 +86,15 @@ class SingleObjectTracker(GenericObjectTracker):
                         text += " ({0}, {1})".format(img_x, img_y)
                         text += " {0}".format(area)
 
+                # The middle margin calculation is based on % of width for horizontal and vertical boundary
+                middle_inc = int(mid_x * middle_pct)
                 x_in_middle = mid_x - middle_inc <= img_x <= mid_x + middle_inc
                 y_in_middle = mid_y - middle_inc <= img_y <= mid_y + middle_inc
-
                 x_color = GREEN if x_in_middle else RED if img_x == -1 else BLUE
                 y_color = GREEN if y_in_middle else RED if img_y == -1 else BLUE
 
                 # Set Blinkt leds
-                self.set_left_leds(x_color)
-                self.set_right_leds(y_color)
+                self.set_leds(x_color, y_color)
 
                 # Write location if it is different from previous value written
                 if img_x != self._prev_x or img_y != self._prev_y:

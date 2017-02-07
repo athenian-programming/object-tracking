@@ -18,6 +18,7 @@ if is_raspi():
 
 logger = logging.getLogger(__name__)
 
+
 class GenericObjectTracker(object):
     def __init__(self,
                  bgr_color,
@@ -80,18 +81,6 @@ class GenericObjectTracker(object):
         return self.__minimum
 
     @property
-    def display(self):
-        return self.__display
-
-    @property
-    def flip_x(self):
-        return self.__flip_x
-
-    @property
-    def flip_y(self):
-        return self.__flip_y
-
-    @property
     def stopped(self):
         return self.__stopped
 
@@ -125,23 +114,19 @@ class GenericObjectTracker(object):
         self.__http_server.stop()
 
     def clear_leds(self):
-        self.set_left_leds([0, 0, 0])
-        self.set_right_leds([0, 0, 0])
+        self.set_leds([0, 0, 0], [0, 0, 0])
 
-    def set_left_leds(self, color):
+    def set_leds(self, left_color, right_color):
         if self.__leds:
             for i in range(0, 4):
-                set_pixel(i, color[2], color[1], color[0], brightness=0.05)
-            show()
-
-    def set_right_leds(self, color):
+                set_pixel(i, left_color[2], left_color[1], left_color[0], brightness=0.05)
         if self.__leds:
             for i in range(4, 8):
-                set_pixel(i, color[2], color[1], color[0], brightness=0.05)
+                set_pixel(i, right_color[2], right_color[1], right_color[0], brightness=0.05)
             show()
 
     def display_image(self, image):
-        if self.display:
+        if self.__display:
             cv2.imshow("Image", image)
 
             key = cv2.waitKey(1) & 0xFF
@@ -173,8 +158,17 @@ class GenericObjectTracker(object):
 
         self.location_server.write_location(-1, -1, 0, 0, 0)
 
+    @property
     def markup_image(self):
-        return self.display or self.http_server.enabled
+        return self.__display or self.http_server.enabled
+
+    def flip(self, image):
+        img = image
+        if self.__flip_x:
+            img = cv2.flip(img, 0)
+        if self.__flip_y:
+            img = cv2.flip(img, 1)
+        return img
 
     @staticmethod
     def cli_args():
