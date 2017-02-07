@@ -56,7 +56,7 @@ class DualObjectTracker(GenericObjectTracker):
         text += " {0}%".format(self.percent)
 
         # Find the 2 largest contours
-        contours = self.contour_finder.get_max_contours(image, self.minimum, count=2)
+        contours = self.contour_finder.get_max_contours(image, count=2)
 
         # Check for > 2 in case one of the targets is divided.
         # The calculation will be off, but something will be better than nothing

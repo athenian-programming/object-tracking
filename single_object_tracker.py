@@ -56,7 +56,7 @@ class SingleObjectTracker(GenericObjectTracker):
         text += " {0}%".format(self.percent)
 
         # Find the largest contour
-        contours = self.contour_finder.get_max_contours(image, self.minimum, count=1)
+        contours = self.contour_finder.get_max_contours(image, count=1)
 
         if contours is not None and len(contours) == 1:
             contour, area, img_x, img_y = get_moment(contours[0])

@@ -42,7 +42,6 @@ class GenericObjectTracker(object):
         self.__percent = percent
         self.__orig_width = width
         self.__orig_percent = percent
-        self.__minimum = minimum
         self.__display = display
         self.__flip_x = flip_x
         self.__flip_y = flip_y
@@ -53,7 +52,7 @@ class GenericObjectTracker(object):
         self.__cnt = 0
         self.__last_write_millis = 0
         self._prev_x, self._prev_y = -1, -1
-        self.__contour_finder = ContourFinder(bgr_color, hsv_range)
+        self.__contour_finder = ContourFinder(bgr_color, hsv_range, minimum)
         self.__location_server = LocationServer(grpc_port)
         self.__cam = camera.Camera(use_picamera=not usb_camera)
         self.__http_server = img_server.ImageServer(camera_name, http_host, http_delay_secs, http_file)
@@ -77,10 +76,6 @@ class GenericObjectTracker(object):
         if 2 <= percent <= 98:
             self.__percent = percent
             self._prev_x, self._prev_y = -1, -1
-
-    @property
-    def minimum(self):
-        return self.__minimum
 
     @property
     def stopped(self):
