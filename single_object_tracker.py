@@ -2,7 +2,6 @@
 
 import logging
 import time
-import traceback
 
 import cv2
 import grpc_support
@@ -127,8 +126,7 @@ class SingleObjectTracker(GenericObjectTracker):
             except KeyboardInterrupt as e:
                 raise e
             except BaseException as e:
-                logger.error("Unexpected error in main loop [{0}]".format(e))
-                traceback.print_exc()
+                logger.error("Unexpected error in main loop [{0}]".format(e), exc_info=True)
                 time.sleep(1)
 
         self.clear_leds()

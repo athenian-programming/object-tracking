@@ -1,6 +1,5 @@
 import logging
 import sys
-import traceback
 
 import camera
 import common_cli_args  as cli
@@ -169,8 +168,7 @@ class GenericObjectTracker(object):
         try:
             self.location_server.start()
         except BaseException as e:
-            logger.error("Unable to start location server [{0}]".format(e))
-            traceback.print_exc()
+            logger.error("Unable to start location server [{0}]".format(e), exc_info=True)
             sys.exit(1)
 
         self.location_server.write_location(-1, -1, 0, 0, 0)
