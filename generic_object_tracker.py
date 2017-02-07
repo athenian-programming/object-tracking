@@ -7,12 +7,11 @@ import camera
 import common_cli_args  as cli
 import cv2
 import grpc_support
-import image_server
+import image_server as img_server
 import opencv_utils as utils
 from common_cli_args import setup_cli_args
 from common_utils import is_raspi
 from contour_finder import ContourFinder
-from image_server import ImageServer
 from location_server import LocationServer
 
 # I tried to include this in the constructor and make it depedent on self.__leds, but it does not work
@@ -34,9 +33,9 @@ class GenericObjectTracker(object):
                  usb_camera=False,
                  leds=False,
                  camera_name="",
-                 http_host=image_server.http_host_default,
-                 http_delay_secs=image_server.http_delay_secs_default,
-                 http_path=image_server.http_path_default):
+                 http_host=img_server.http_host_default,
+                 http_delay_secs=img_server.http_delay_secs_default,
+                 http_file=img_server.http_path_default):
         self.__width = width
         self.__percent = percent
         self.__orig_width = width
@@ -57,7 +56,7 @@ class GenericObjectTracker(object):
         self.__contour_finder = ContourFinder(bgr_color, hsv_range)
         self.__location_server = LocationServer(grpc_port)
         self.__cam = camera.Camera(use_picamera=not usb_camera)
-        self.__http_server = ImageServer(camera_name, http_host, http_delay_secs, http_path, self.get_image)
+        self.__http_server = img_server.ImageServer(camera_name, http_host, http_delay_secs, http_file, self.get_image)
 
     @property
     def width(self):
@@ -208,6 +207,6 @@ class GenericObjectTracker(object):
                               cli.camera_optional,
                               cli.http_host,
                               cli.http_delay,
-                              cli.http_path,
+                              cli.http_file,
                               cli.display,
                               cli.verbose)

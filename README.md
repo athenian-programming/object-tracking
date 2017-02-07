@@ -44,7 +44,7 @@ $ ./color_picker.py
 | -y, --flipy    | Flip image on Y axis                               | false          |
 | -t, --http     | HTTP hostname:port                                 | localhost:8080 |
 | -s, --delay    | HTTP delay secs                                    | 0.25           |
-| -i, --path     | HTTP template dir or file                          | ./html         |
+| -i, --file     | HTTP template file                                 |                |
 | -h, --help     | Summary of options                                 |                |
 
 ### Display Keystrokes
@@ -94,7 +94,7 @@ $ python single_object_tracker.py --bgr "174, 56, 5" --display
 | -y, --flipy    | Flip image on Y axis                               | false          |
 | -t, --http     | HTTP hostname:port                                 | localhost:8080 |
 | -s, --delay    | HTTP delay secs                                    | 0.25           |
-| -i, --path     | HTTP template dir or file                          | ./html         |
+| -i, --file     | HTTP template file                                 |                |
 | -p, --port     | gRPC server port                                   | 50051          |
 | -v, --verbose  | Include debugging info                             | false          |
 | -h, --help     | Summary of options                                 |                |

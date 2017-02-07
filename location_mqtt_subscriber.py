@@ -49,4 +49,4 @@ if __name__ == "__main__":
     finally:
         mqtt_conn.disconnect()
 
-    print("Exiting...")
+    info("Exiting...")

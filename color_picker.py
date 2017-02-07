@@ -7,14 +7,13 @@ from threading import Lock
 import camera
 import common_cli_args  as cli
 import cv2
-import image_server
+import image_server as img_server
 import imutils
 import numpy as np
 import opencv_defaults as defs
 import opencv_utils as utils
 from common_cli_args import setup_cli_args
 from common_constants import LOGGING_ARGS
-from image_server import ImageServer
 from opencv_utils import GREEN
 from opencv_utils import RED
 
@@ -26,6 +25,7 @@ class ColorPicker(object):
     move_inc = 4
     x_adj = 0
     y_adj = 0
+    name = "Color Picker"
 
     def __init__(self,
                  width,
@@ -33,9 +33,9 @@ class ColorPicker(object):
                  flip_x=False,
                  flip_y=False,
                  display=False,
-                 http_host=image_server.http_host_default,
-                 http_delay_secs=image_server.http_delay_secs_default,
-                 http_path=image_server.http_path_default):
+                 http_host=img_server.http_host_default,
+                 http_delay_secs=img_server.http_delay_secs_default,
+                 http_file=img_server.http_file_default):
         self.__width = width
         self.__usb_camera = usb_camera
         self.__flip_x = flip_x
@@ -45,7 +45,7 @@ class ColorPicker(object):
         self.__current_image_lock = Lock()
         self.__current_image = None
         self.__cam = camera.Camera(use_picamera=not usb_camera)
-        self.__http_server = ImageServer("Color Picker", http_host, http_delay_secs, http_path, self.get_image)
+        self.__http_server = img_server.ImageServer(self.name, http_host, http_delay_secs, http_file, self.get_image)
 
     def get_image(self):
         with self.__current_image_lock:
@@ -69,7 +69,7 @@ class ColorPicker(object):
 
             img_height, img_width = image.shape[:2]
 
-            # Called once we know the dimensions of the images
+            # Called once the dimensions of the images are known
             self.__http_server.serve_images(img_width, img_height)
 
             roi_x = (img_width / 2) - (self.roi_size / 2) + self.x_adj
@@ -154,7 +154,7 @@ if __name__ == "__main__":
                           cli.flip_y,
                           cli.http_host,
                           cli.http_delay,
-                          cli.http_path)
+                          cli.http_file)
 
     # Setup logging
     logging.basicConfig(**LOGGING_ARGS)
@@ -163,10 +163,10 @@ if __name__ == "__main__":
                                usb_camera=args["usb"],
                                flip_x=args["flipx"],
                                flip_y=args["flipy"],
+                               display=args["display"],
                                http_host=args["http"],
                                http_delay_secs=args["delay"],
-                               http_path=args["path"],
-                               display=args["display"])
+                               http_file=args["file"])
     try:
         color_picker.start()
     except KeyboardInterrupt as e:

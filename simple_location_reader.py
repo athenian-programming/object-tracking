@@ -24,4 +24,4 @@ if __name__ == "__main__":
     finally:
         locations.stop()
 
-    print("Exiting...")
+    logging.info("Exiting...")

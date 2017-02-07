@@ -33,7 +33,7 @@ class SingleObjectTracker(GenericObjectTracker):
                  camera_name="",
                  http_host=image_server.http_host_default,
                  http_delay_secs=image_server.http_delay_secs_default,
-                 http_path=image_server.http_path_default):
+                 http_file=image_server.http_file_default):
         super(SingleObjectTracker, self).__init__(bgr_color,
                                                   width,
                                                   percent,
@@ -48,7 +48,7 @@ class SingleObjectTracker(GenericObjectTracker):
                                                   camera_name=camera_name,
                                                   http_host=http_host,
                                                   http_delay_secs=http_delay_secs,
-                                                  http_path=http_path)
+                                                  http_file=http_file)
 
     # Do not run this in a background thread. cv2.waitKey has to run in main thread
     def start(self):
@@ -68,7 +68,7 @@ class SingleObjectTracker(GenericObjectTracker):
                 middle_pct = (self.percent / 100.0) / 2
                 img_height, img_width = image.shape[:2]
 
-                # Called once we know the dimensions of the images
+                # Called once the dimensions of the images are known
                 self.http_server.serve_images(img_width, img_height)
 
                 mid_x, mid_y = img_width / 2, img_height / 2
@@ -155,7 +155,7 @@ if __name__ == "__main__":
                                          camera_name=args["camera"],
                                          http_host=args["http"],
                                          http_delay_secs=args["delay"],
-                                         http_path=args["path"])
+                                         http_file=args["file"])
     try:
         object_tracker.start()
     except KeyboardInterrupt:

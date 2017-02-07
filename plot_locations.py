@@ -56,4 +56,4 @@ if __name__ == "__main__":
         stream.close()
         locations.stop()
 
-    print("Exiting...")
+    info("Exiting...")
