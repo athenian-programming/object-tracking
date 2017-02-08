@@ -16,13 +16,13 @@ logger = logging.getLogger(__name__)
 
 if __name__ == "__main__":
     # Parse CLI args
-    args = setup_cli_args(cli.grpc, cli.mqtt, cli.camera)
+    args = setup_cli_args(cli.grpc_host, cli.mqtt_host, cli.camera_name)
 
     # Setup logging
     logging.basicConfig(**LOGGING_ARGS)
 
     # Start location reader
-    locations = LocationClient(args["grpc"]).start()
+    locations = LocationClient(args["grpc_host"]).start()
 
 
     # Define MQTT callbacks
@@ -48,8 +48,8 @@ if __name__ == "__main__":
 
 
     # Setup MQTT client
-    hostname, port = mqtt_broker_info(args["mqtt"])
-    mqtt_conn = MqttConnection(hostname, port, userdata={CAMERA_NAME: args["camera"]})
+    hostname, port = mqtt_broker_info(args["mqtt_host"])
+    mqtt_conn = MqttConnection(hostname, port, userdata={CAMERA_NAME: args["camera_name"]})
     mqtt_conn.client.on_connect = on_connect
     mqtt_conn.client.on_disconnect = on_disconnect
     mqtt_conn.client.on_publish = on_publish

@@ -11,12 +11,12 @@ logger = logging.getLogger(__name__)
 
 if __name__ == "__main__":
     # Parse CLI args
-    args = setup_cli_args(cli.grpc)
+    args = setup_cli_args(cli.grpc_host)
 
     # Setup logging
     logging.basicConfig(**LOGGING_ARGS)
 
-    locations = LocationClient(args["grpc"]).start()
+    locations = LocationClient(args["grpc_host"]).start()
 
     try:
         while True:

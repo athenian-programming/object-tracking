@@ -7,7 +7,7 @@ from threading import Thread
 
 import calibrate_servo
 import common_cli_args as cli
-from common_constants import LOGGING_ARGS
+from common_constants import logging_args
 from common_utils import is_windows
 from firmata_servo import FirmataServo
 from location_client import LocationClient
@@ -19,7 +19,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-s", "--serial", default="ttyACM0", type=str,
                         help="Arduino serial port [ttyACM0] (OSX is cu.usbmodemXXXX)")
-    cli.grpc(parser)
+    cli.grpc_host(parser)
     parser.add_argument("-x", "--xservo", default=5, type=int, help="X servo PWM pin [5]")
     parser.add_argument("-y", "--yservo", default=6, type=int, help="Y servo PWM pin [6]")
     cli.alternate(parser)
@@ -32,7 +32,7 @@ if __name__ == "__main__":
     xservo = args["xservo"]
     yservo = args["yservo"]
 
-    logging.basicConfig(**LOGGING_ARGS)
+    logging.basicConfig(**logging_args(args["loglevel"]))
 
     # Setup firmata client
     port = ("" if is_windows() else "/dev/") + args["serial"]
@@ -43,7 +43,7 @@ if __name__ == "__main__":
         logger.error("Failed to connect to Arduino at {0} - [{1}]".format(port, e))
         sys.exit(0)
 
-    locations = LocationClient(args["grpc"]).start()
+    locations = LocationClient(args["grpc_host"]).start()
 
     # Create servos
     servo_x = FirmataServo("Pan", alternate, board, "d:{0}:s".format(xservo), 1.0, 8)

@@ -5,7 +5,6 @@ import time
 import camera
 import common_cli_args  as cli
 import cv2
-import grpc_support
 import image_server as img_server
 import imutils
 import opencv_utils as utils
@@ -25,23 +24,23 @@ class GenericObjectTracker(object):
     def __init__(self,
                  bgr_color,
                  width,
-                 percent,
-                 minimum,
+                 middle_percent,
+                 minimum_pixels,
                  hsv_range,
-                 grpc_port=grpc_support.grpc_port_default,
-                 display=False,
-                 flip_x=False,
-                 flip_y=False,
-                 usb_camera=False,
-                 leds=False,
-                 camera_name="",
-                 http_host=img_server.http_host_default,
-                 http_delay_secs=img_server.http_delay_secs_default,
-                 http_file=img_server.http_file_default):
+                 grpc_port,
+                 display,
+                 flip_x,
+                 flip_y,
+                 usb_camera,
+                 leds,
+                 camera_name,
+                 http_host,
+                 http_delay_secs,
+                 http_file):
         self.__width = width
-        self.__percent = percent
+        self.__middle_percent = middle_percent
         self.__orig_width = width
-        self.__orig_percent = percent
+        self.__orig_middle_percent = middle_percent
         self.__display = display
         self.__flip_x = flip_x
         self.__flip_y = flip_y
@@ -52,7 +51,7 @@ class GenericObjectTracker(object):
         self.__cnt = 0
         self.__last_write_millis = 0
         self._prev_x, self._prev_y = -1, -1
-        self.__contour_finder = ContourFinder(bgr_color, hsv_range, minimum)
+        self.__contour_finder = ContourFinder(bgr_color, hsv_range, minimum_pixels)
         self.__location_server = LocationServer(grpc_port)
         self.__cam = camera.Camera(use_picamera=not usb_camera)
         self.__http_server = img_server.ImageServer(camera_name, http_host, http_delay_secs, http_file)
@@ -69,12 +68,12 @@ class GenericObjectTracker(object):
 
     @property
     def percent(self):
-        return self.__percent
+        return self.__middle_percent
 
     @percent.setter
     def percent(self, percent):
         if 2 <= percent <= 98:
-            self.__percent = percent
+            self.__middle_percent = percent
             self._prev_x, self._prev_y = -1, -1
 
     @property
@@ -181,7 +180,7 @@ class GenericObjectTracker(object):
                 self.percent += 1
             elif key == ord("r"):
                 self.width = self.__orig_width
-                self.percent = self.__orig_percent
+                self.percent = self.__orig_middle_percent
             elif key == ord("s"):
                 utils.write_image(image, log_info=True)
             elif key == ord("q"):
@@ -204,16 +203,16 @@ class GenericObjectTracker(object):
         return setup_cli_args(cli.bgr,
                               cli.usb,
                               cli.width,
-                              cli.percent,
-                              cli.min,
-                              cli.range,
+                              cli.middle_percent,
+                              cli.minimum_pixels,
+                              cli.hsv_range,
                               cli.grpc_port,
                               cli.leds,
                               cli.flip_x,
                               cli.flip_y,
-                              cli.camera_optional,
+                              cli.camera_name_optional,
                               cli.http_host,
-                              cli.http_delay,
+                              cli.http_delay_secs,
                               cli.http_file,
                               cli.display,
                               cli.verbose)

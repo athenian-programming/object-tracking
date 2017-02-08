@@ -7,7 +7,7 @@ import calibrate_servo
 import common_cli_args  as cli
 import pantilthat as pth
 from common_cli_args import setup_cli_args
-from common_constants import LOGGING_ARGS
+from common_constants import logging_args
 from hat_servo import HatServo
 from location_client import LocationClient
 
@@ -15,14 +15,14 @@ logger = logging.getLogger(__name__)
 
 if __name__ == "__main__":
     # Setuo CLI args
-    args = setup_cli_args(cli.grpc, cli.alternate, cli.calib, cli.verbose)
+    args = setup_cli_args(cli.grpc_host, cli.alternate, cli.calib, cli.verbose)
 
     alternate = args["alternate"]
     calib = args["calib"]
 
-    logging.basicConfig(**LOGGING_ARGS)
+    logging.basicConfig(**logging_args(args["loglevel"]))
 
-    locations = LocationClient(args["grpc"]).start()
+    locations = LocationClient(args["grpc_host"]).start()
 
     # Create servos
     servo_x = HatServo("Pan", pth.pan, alternate, 1.0, 8)

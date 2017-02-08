@@ -11,6 +11,7 @@ import numpy as np
 import opencv_defaults as defs
 from common_cli_args import setup_cli_args
 from common_constants import LOGGING_ARGS
+from common_utils import strip_loglevel
 from opencv_utils import GREEN
 from opencv_utils import RED
 
@@ -25,15 +26,7 @@ class ColorPicker(object):
     y_adj = 0
     name = "Color Picker"
 
-    def __init__(self,
-                 width,
-                 usb_camera=False,
-                 flip_x=False,
-                 flip_y=False,
-                 display=False,
-                 http_host=img_server.http_host_default,
-                 http_delay_secs=img_server.http_delay_secs_default,
-                 http_file=img_server.http_file_default):
+    def __init__(self, width, usb_camera, flip_x, flip_y, display, http_host, http_delay_secs, http_file):
         self.__width = width
         self.__usb_camera = usb_camera
         self.__flip_x = flip_x
@@ -141,20 +134,13 @@ if __name__ == "__main__":
                           cli.flip_x,
                           cli.flip_y,
                           cli.http_host,
-                          cli.http_delay,
+                          cli.http_delay_secs,
                           cli.http_file)
 
     # Setup logging
     logging.basicConfig(**LOGGING_ARGS)
 
-    color_picker = ColorPicker(args["width"],
-                               usb_camera=args["usb"],
-                               flip_x=args["flipx"],
-                               flip_y=args["flipy"],
-                               display=args["display"],
-                               http_host=args["http"],
-                               http_delay_secs=args["delay"],
-                               http_file=args["file"])
+    color_picker = ColorPicker(**strip_loglevel(args))
     try:
         color_picker.start()
     except KeyboardInterrupt as e:

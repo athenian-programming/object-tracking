@@ -6,12 +6,11 @@ from common_cli_args import setup_cli_args
 from common_constants import LOGGING_ARGS
 from common_utils import sleep
 from flask import Flask
-
 from location_client import LocationClient
 
 if __name__ == "__main__":
     # Parse CLI args
-    args = setup_cli_args(cli.grpc)
+    args = setup_cli_args(cli.grpc_host)
 
     # Setup logging
     logging.basicConfig(**LOGGING_ARGS)
@@ -33,7 +32,7 @@ if __name__ == "__main__":
 
 
     # Start client
-    locations = LocationClient(args["grpc"]).start()
+    locations = LocationClient(args["grpc_host"]).start()
 
     # Run read_values in a thread
     count = 0

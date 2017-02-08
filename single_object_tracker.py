@@ -3,10 +3,9 @@
 import logging
 
 import cv2
-import grpc_support
-import image_server
 import opencv_defaults as defs
-from common_constants import LOGGING_ARGS
+from common_constants import logging_args
+from common_utils import strip_loglevel
 from generic_object_tracker import GenericObjectTracker
 from opencv_utils import BLUE, GREEN, RED
 from opencv_utils import get_moment
@@ -15,37 +14,8 @@ logger = logging.getLogger(__name__)
 
 
 class SingleObjectTracker(GenericObjectTracker):
-    def __init__(self,
-                 bgr_color,
-                 width,
-                 percent,
-                 minimum,
-                 hsv_range,
-                 grpc_port=grpc_support.grpc_port_default,
-                 display=False,
-                 flip_x=False,
-                 flip_y=False,
-                 usb_camera=False,
-                 leds=False,
-                 camera_name="",
-                 http_host=image_server.http_host_default,
-                 http_delay_secs=image_server.http_delay_secs_default,
-                 http_file=image_server.http_file_default):
-        super(SingleObjectTracker, self).__init__(bgr_color,
-                                                  width,
-                                                  percent,
-                                                  minimum,
-                                                  hsv_range,
-                                                  grpc_port=grpc_port,
-                                                  display=display,
-                                                  flip_x=flip_x,
-                                                  flip_y=flip_y,
-                                                  usb_camera=usb_camera,
-                                                  leds=leds,
-                                                  camera_name=camera_name,
-                                                  http_host=http_host,
-                                                  http_delay_secs=http_delay_secs,
-                                                  http_file=http_file)
+    def __init__(self, **kwargs):
+        super(SingleObjectTracker, self).__init__(**kwargs)
 
     def process_image(self, image, img_width, img_height):
         mid_x, mid_y = img_width / 2, img_height / 2
@@ -99,23 +69,10 @@ if __name__ == "__main__":
     args = GenericObjectTracker.cli_args()
 
     # Setup logging
-    logging.basicConfig(**LOGGING_ARGS)
+    logging.basicConfig(**logging_args(args["loglevel"]))
 
-    object_tracker = SingleObjectTracker(args["bgr"],
-                                         args["width"],
-                                         args["percent"],
-                                         args["min"],
-                                         args["range"],
-                                         grpc_port=args["port"],
-                                         display=args["display"],
-                                         flip_x=args["flipx"],
-                                         flip_y=args["flipy"],
-                                         usb_camera=args["usb"],
-                                         leds=args["leds"],
-                                         camera_name=args["camera"],
-                                         http_host=args["http"],
-                                         http_delay_secs=args["delay"],
-                                         http_file=args["file"])
+    object_tracker = SingleObjectTracker(**strip_loglevel(args))
+
     try:
         object_tracker.start()
     except KeyboardInterrupt:
