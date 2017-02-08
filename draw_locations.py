@@ -47,7 +47,7 @@ class LocationSketch(object):
                 prev_x, prev_y = None, None
                 continue
 
-            x = abs(x_val[1] - x_val[0])
+            x = x_val[1] - abs(x_val[1] - x_val[0])
             y = y_val[0]
 
             if self.__drawPoints:

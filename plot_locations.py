@@ -45,7 +45,7 @@ if __name__ == "__main__":
             if x_val[0] == -1 or y_val[0] == -1:
                 continue
 
-            x = abs(x_val[1] - x_val[0])
+            x = x_val[1] - abs(x_val[1] - x_val[0])
             y = abs(y_val[1] - y_val[0])
 
             stream.write(dict(x=x, y=y))

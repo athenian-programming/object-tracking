@@ -80,11 +80,6 @@ class GenericObjectTracker(object):
     def markup_image(self):
         return self.__display or self.http_server.enabled
 
-    def stop(self):
-        self.stopped = True
-        self.location_server.stop()
-        self.http_server.stop()
-
     def set_leds(self, left_color, right_color):
         if not is_raspi():
             return
@@ -137,6 +132,11 @@ class GenericObjectTracker(object):
 
         self.clear_leds()
         self.cam.close()
+
+    def stop(self):
+        self.stopped = True
+        self.location_server.stop()
+        self.http_server.stop()
 
     def display_image(self, image):
         if self.__display:
