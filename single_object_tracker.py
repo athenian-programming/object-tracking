@@ -17,7 +17,8 @@ class SingleObjectTracker(GenericObjectTracker):
     def __init__(self, **kwargs):
         super(SingleObjectTracker, self).__init__(**strip_loglevel(kwargs))
 
-    def process_image(self, image, img_width, img_height):
+    def process_image(self, image):
+        img_height, img_width = image.shape[:2]
         mid_x, mid_y = img_width / 2, img_height / 2
         img_x, img_y = -1, -1
 
@@ -74,7 +75,7 @@ if __name__ == "__main__":
     object_tracker = SingleObjectTracker(**args)
 
     try:
-        object_tracker.start()
+        object_tracker.start(object_tracker.process_image)
     except KeyboardInterrupt:
         pass
     finally:

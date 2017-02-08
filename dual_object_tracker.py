@@ -17,7 +17,8 @@ class DualObjectTracker(GenericObjectTracker):
     def __init__(self, **kwargs):
         super(DualObjectTracker, self).__init__(**strip_loglevel(kwargs))
 
-    def process_image(self, image, img_width, img_height):
+    def process_image(self, image):
+        img_height, img_width = image.shape[:2]
         mid_x, mid_y = img_width / 2, img_height / 2
         avg_x, avg_y = -1, -1
 
@@ -87,7 +88,7 @@ if __name__ == "__main__":
 
     object_tracker = DualObjectTracker(**args)
     try:
-        object_tracker.start()
+        object_tracker.start(object_tracker.process_image)
     except KeyboardInterrupt:
         pass
     finally:

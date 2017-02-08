@@ -94,11 +94,8 @@ class GenericObjectTracker(object):
     def clear_leds(self):
         self.set_leds([0, 0, 0], [0, 0, 0])
 
-    def process_image(self, image, img_width, img_height):
-        raise Exception("Implemented by subclass")
-
     # Do not run this in a background thread. cv2.waitKey has to run in main thread
-    def start(self):
+    def start(self, *process_funcs):
         try:
             self.location_server.start()
         except BaseException as e:
@@ -113,12 +110,12 @@ class GenericObjectTracker(object):
                 image = imutils.resize(image, width=self.width)
                 image = self.flip(image)
 
-                img_height, img_width = image.shape[:2]
-
                 # Called once the dimensions of the images are known
-                self.http_server.serve_images(img_width, img_height)
+                self.http_server.serve_images(image)
 
-                self.process_image(image, img_width, img_height)
+                for process_func in process_funcs:
+                    process_func(image)
+
                 self.http_server.image = image
                 self.display_image(image)
 
