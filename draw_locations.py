@@ -1,13 +1,12 @@
 #!/usr/bin/env python2
 
-import logging
 from threading import Thread
 
-import common_cli_args  as cli
-from common_cli_args import setup_cli_args
-from common_constants import LOGGING_ARGS
-from common_utils import is_python3
+import cli_args  as cli
+from cli_args import setup_cli_args
 from location_client import LocationClient
+from utils import is_python3
+from utils import setup_logging
 
 if is_python3():
     import tkinter as tk
@@ -62,9 +61,9 @@ class LocationSketch(object):
 
 if __name__ == "__main__":
     # Parse CLI args
-    args = setup_cli_args(cli.grpc_host)
+    args = setup_cli_args(cli.grpc_host, cli.verbose)
 
-    logging.basicConfig(**LOGGING_ARGS)
+    setup_logging(args["loglevel"])
 
     locations = LocationClient(args["grpc_host"]).start()
 

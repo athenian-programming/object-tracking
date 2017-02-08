@@ -4,12 +4,12 @@ import logging
 from threading import Thread
 
 import calibrate_servo
-import common_cli_args  as cli
+import cli_args  as cli
 import pantilthat as pth
-from common_cli_args import setup_cli_args
-from common_constants import logging_args
+from cli_args import setup_cli_args
 from hat_servo import HatServo
 from location_client import LocationClient
+from utils import setup_logging
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +20,7 @@ if __name__ == "__main__":
     alternate = args["alternate"]
     calib = args["calib"]
 
-    logging.basicConfig(**logging_args(args["loglevel"]))
+    setup_logging(args["loglevel"])
 
     locations = LocationClient(args["grpc_host"]).start()
 

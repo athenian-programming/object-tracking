@@ -3,15 +3,15 @@ import sys
 import time
 
 import camera
-import common_cli_args  as cli
+import cli_args  as cli
 import cv2
 import image_server as img_server
 import imutils
 import opencv_utils as utils
-from common_cli_args import setup_cli_args
-from common_utils import is_raspi
+from cli_args import setup_cli_args
 from contour_finder import ContourFinder
 from location_server import LocationServer
+from utils import is_raspi
 
 # I tried to include this in the constructor and make it depedent on self.__leds, but it does not work
 if is_raspi():

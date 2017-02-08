@@ -4,18 +4,18 @@ import logging
 
 import cv2
 import opencv_defaults as defs
-from common_constants import logging_args
-from common_utils import strip_loglevel
 from generic_object_tracker import GenericObjectTracker
 from opencv_utils import BLUE, GREEN, RED
 from opencv_utils import get_moment
+from utils import setup_logging
+from utils import strip_loglevel
 
 logger = logging.getLogger(__name__)
 
 
 class SingleObjectTracker(GenericObjectTracker):
     def __init__(self, **kwargs):
-        super(SingleObjectTracker, self).__init__(**kwargs)
+        super(SingleObjectTracker, self).__init__(**strip_loglevel(kwargs))
 
     def process_image(self, image, img_width, img_height):
         mid_x, mid_y = img_width / 2, img_height / 2
@@ -69,9 +69,9 @@ if __name__ == "__main__":
     args = GenericObjectTracker.cli_args()
 
     # Setup logging
-    logging.basicConfig(**logging_args(args["loglevel"]))
+    setup_logging(args["loglevel"])
 
-    object_tracker = SingleObjectTracker(**strip_loglevel(args))
+    object_tracker = SingleObjectTracker(**args)
 
     try:
         object_tracker.start()

@@ -3,23 +3,23 @@
 import logging
 from threading import Thread
 
-import common_cli_args  as cli
-from common_cli_args import setup_cli_args
-from common_constants import CAMERA_NAME
-from common_constants import LOGGING_ARGS
-from common_utils import mqtt_broker_info
-from common_utils import sleep
+import cli_args  as cli
+from cli_args import setup_cli_args
+from constants import CAMERA_NAME
 from location_client import LocationClient
 from mqtt_connection import MqttConnection
+from utils import mqtt_broker_info
+from utils import setup_logging
+from utils import sleep
 
 logger = logging.getLogger(__name__)
 
 if __name__ == "__main__":
     # Parse CLI args
-    args = setup_cli_args(cli.grpc_host, cli.mqtt_host, cli.camera_name)
+    args = setup_cli_args(cli.grpc_host, cli.mqtt_host, cli.camera_name, cli.verbose)
 
     # Setup logging
-    logging.basicConfig(**LOGGING_ARGS)
+    setup_logging(args["loglevel"])
 
     # Start location reader
     locations = LocationClient(args["grpc_host"]).start()

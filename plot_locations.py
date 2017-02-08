@@ -1,22 +1,22 @@
 import logging
 import time
 
-import common_cli_args  as cli
+import cli_args  as cli
 import plotly.graph_objs as go
 import plotly.plotly as py
 import plotly.tools as tls
-from common_cli_args import setup_cli_args
-from common_constants import LOGGING_ARGS
+from cli_args import setup_cli_args
 from location_client import LocationClient
+from utils import setup_logging
 
 logger = logging.getLogger(__name__)
 
 if __name__ == "__main__":
     # Parse CLI args
-    args = setup_cli_args(cli.grpc_host)
+    args = setup_cli_args(cli.grpc_host, cli.verbose)
 
     # Setup logging
-    logging.basicConfig(**LOGGING_ARGS)
+    setup_logging(args["loglevel"])
 
     # Start location client
     locations = LocationClient(args["grpc_host"]).start()

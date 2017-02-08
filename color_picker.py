@@ -3,17 +3,17 @@
 import logging
 
 import camera
-import common_cli_args  as cli
+import cli_args  as cli
 import cv2
 import image_server as img_server
 import imutils
 import numpy as np
 import opencv_defaults as defs
-from common_cli_args import setup_cli_args
-from common_constants import LOGGING_ARGS
-from common_utils import strip_loglevel
+from cli_args import setup_cli_args
 from opencv_utils import GREEN
 from opencv_utils import RED
+from utils import setup_logging
+from utils import strip_loglevel
 
 logger = logging.getLogger(__name__)
 
@@ -135,10 +135,11 @@ if __name__ == "__main__":
                           cli.flip_y,
                           cli.http_host,
                           cli.http_delay_secs,
-                          cli.http_file)
+                          cli.http_file,
+                          cli.verbose)
 
     # Setup logging
-    logging.basicConfig(**LOGGING_ARGS)
+    setup_logging(args["loglevel"])
 
     color_picker = ColorPicker(**strip_loglevel(args))
     try:

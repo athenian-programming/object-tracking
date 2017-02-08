@@ -6,12 +6,12 @@ import sys
 from threading import Thread
 
 import calibrate_servo
-import common_cli_args as cli
-from common_constants import logging_args
-from common_utils import is_windows
+import cli_args as cli
 from firmata_servo import FirmataServo
 from location_client import LocationClient
 from pyfirmata import Arduino
+from utils import is_windows
+from utils import setup_logging
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +32,7 @@ if __name__ == "__main__":
     xservo = args["xservo"]
     yservo = args["yservo"]
 
-    logging.basicConfig(**logging_args(args["loglevel"]))
+    setup_logging(args["loglevel"])
 
     # Setup firmata client
     port = ("" if is_windows() else "/dev/") + args["serial"]
