@@ -38,15 +38,15 @@ class FirmataServo(Servo):
         while not self.__stopped:
             try:
                 if self.__alternate:
-                    self.__ready_event.wait()
-                    self.__ready_event.clear()
+                    self.ready_event.wait()
+                    self.ready_event.clear()
 
                 # Get latest location
                 img_pos, img_total, middle_inc, id_val = loc_source()
 
                 # Skip if object is not seen
                 if img_pos == -1 or img_total == -1:
-                    logger.info("No target seen: {0}".format(self.__name))
+                    logger.info("No target seen: {0}".format(self.name))
                     continue
 
                 midpoint = img_total / 2
@@ -58,13 +58,13 @@ class FirmataServo(Servo):
                     adj = max(int(err / self.__ppd), 1)
                     new_pos = curr_pos + adj if forward else curr_pos - adj
                     print("{0} off by {1} pixels going from {2} to {3} adj {4}"
-                          .format(self.__name, err, new_pos, curr_pos, adj))
+                          .format(self.name, err, new_pos, curr_pos, adj))
                 elif img_pos > midpoint + middle_inc:
                     err = img_pos - midpoint
                     adj = max(int(err / self.__ppd), 1)
                     new_pos = curr_pos - adj if forward else curr_pos + adj
                     print("{0} off by {1} pixels going from {2} to {3} adj {4}"
-                          .format(self.__name, err, new_pos, curr_pos, adj))
+                          .format(self.name, err, new_pos, curr_pos, adj))
                 else:
                     continue
 

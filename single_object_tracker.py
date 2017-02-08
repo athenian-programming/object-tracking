@@ -22,7 +22,7 @@ class SingleObjectTracker(GenericObjectTracker):
         img_x, img_y = -1, -1
 
         text = "#{0} ({1}, {2})".format(self.cnt, img_width, img_height)
-        text += " {0}%".format(self.percent)
+        text += " {0}%".format(self.middle_percent)
 
         # Find the largest contour
         contours = self.contour_finder.get_max_contours(image, count=1)
@@ -39,7 +39,7 @@ class SingleObjectTracker(GenericObjectTracker):
                 text += " {0}".format(area)
 
         # The middle margin calculation is based on % of width for horizontal and vertical boundary
-        middle_pct = (self.percent / 100.0) / 2
+        middle_pct = (float(self.middle_percent) / 100.0) / 2
         middle_inc = int(mid_x * middle_pct)
         x_in_middle = mid_x - middle_inc <= img_x <= mid_x + middle_inc
         y_in_middle = mid_y - middle_inc <= img_y <= mid_y + middle_inc
