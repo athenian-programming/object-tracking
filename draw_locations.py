@@ -19,6 +19,7 @@ class LocationSketch(object):
         self.__canvas = canvas
         self.__drawLines = True
         self.__drawPoints = True
+        self.__stopped = False
 
     def toggle_lines(self):
         self.__drawLines = not self.__drawLines
@@ -32,7 +33,7 @@ class LocationSketch(object):
     def plot_vals(self, locations, w, h):
         prev_x, prev_y = None, None
         curr_w = w
-        while True:
+        while not self.__stopped:
             x_val, y_val = locations.get_xy()
 
             if x_val[0] == -1 or y_val[0] == -1:
@@ -58,12 +59,14 @@ class LocationSketch(object):
 
             prev_x, prev_y = x, y
 
+    def stop(self):
+        self.__stopped = True
 
 if __name__ == "__main__":
     # Parse CLI args
     args = setup_cli_args(cli.grpc_host, cli.verbose)
 
-    setup_logging(args["loglevel"])
+    setup_logging(level=args["loglevel"])
 
     locations = LocationClient(args["grpc_host"]).start()
 

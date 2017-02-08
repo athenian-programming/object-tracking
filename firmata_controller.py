@@ -32,7 +32,7 @@ if __name__ == "__main__":
     xservo = args["xservo"]
     yservo = args["yservo"]
 
-    setup_logging(args["loglevel"])
+    setup_logging(level=args["loglevel"])
 
     # Setup firmata client
     port = ("" if is_windows() else "/dev/") + args["serial"]

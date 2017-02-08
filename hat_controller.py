@@ -20,7 +20,7 @@ if __name__ == "__main__":
     alternate = args["alternate"]
     calib = args["calib"]
 
-    setup_logging(args["loglevel"])
+    setup_logging(level=args["loglevel"])
 
     locations = LocationClient(args["grpc_host"]).start()
 

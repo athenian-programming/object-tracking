@@ -19,7 +19,7 @@ if __name__ == "__main__":
     args = setup_cli_args(cli.grpc_host, cli.mqtt_host, cli.camera_name, cli.verbose)
 
     # Setup logging
-    setup_logging(args["loglevel"])
+    setup_logging(level=args["loglevel"])
 
     # Start location reader
     locations = LocationClient(args["grpc_host"]).start()

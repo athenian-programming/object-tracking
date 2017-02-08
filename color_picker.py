@@ -139,7 +139,7 @@ if __name__ == "__main__":
                           cli.verbose)
 
     # Setup logging
-    setup_logging(args["loglevel"])
+    setup_logging(level=args["loglevel"])
 
     color_picker = ColorPicker(**strip_loglevel(args))
     try:

@@ -83,7 +83,7 @@ if __name__ == "__main__":
     args = GenericObjectTracker.cli_args()
 
     # Setup logging
-    setup_logging(args["loglevel"])
+    setup_logging(level=args["loglevel"])
 
     object_tracker = DualObjectTracker(**args)
     try:

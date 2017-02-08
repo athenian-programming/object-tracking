@@ -16,7 +16,7 @@ if __name__ == "__main__":
     args = setup_cli_args(cli.grpc_host, cli.verbose)
 
     # Setup logging
-    setup_logging(args["loglevel"])
+    setup_logging(level=args["loglevel"])
 
     # Start location client
     locations = LocationClient(args["grpc_host"]).start()
