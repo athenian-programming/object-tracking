@@ -38,6 +38,7 @@ class ColorPicker(object):
 
     # Do not run this in a background thread. cv2.waitKey has to run in main thread
     def start(self):
+        self.__image_server.start()
         cnt = 0
         while self.__cam.is_open():
             image = self.__cam.read()
@@ -49,13 +50,10 @@ class ColorPicker(object):
             if self.__flip_y:
                 image = cv2.flip(image, 1)
 
-            img_height, img_width = image.shape[:2]
+            height, width = image.shape[:2]
 
-            # Called once the dimensions of the images are known
-            self.__image_server.start(image)
-
-            roi_x = (img_width / 2) - (self.roi_size / 2) + self.x_adj
-            roi_y = (img_height / 2) - (self.roi_size / 2) + self.y_adj
+            roi_x = (width / 2) - (self.roi_size / 2) + self.x_adj
+            roi_y = (height / 2) - (self.roi_size / 2) + self.y_adj
             roi = image[roi_y:roi_y + self.roi_size, roi_x:roi_x + self.roi_size]
 
             roi_h, roi_w = roi.shape[:2]
@@ -76,8 +74,8 @@ class ColorPicker(object):
             cv2.putText(image, bgr_text + roi_text, defs.TEXT_LOC, defs.TEXT_FONT, defs.TEXT_SIZE, RED, 1)
 
             # Overlay color swatch on image
-            size = int(img_width * 0.20)
-            image[img_height - size:img_height, img_width - size:img_width] = avg_color
+            size = int(width * 0.20)
+            image[height - size:height, width - size:width] = avg_color
 
             cnt += 1
 
@@ -98,11 +96,11 @@ class ColorPicker(object):
                     print(bgr_text)
                 elif roi_y >= self.move_inc and (key == 0 or key == ord("k")):  # Up
                     self.y_adj -= self.move_inc
-                elif roi_y <= img_height - self.roi_size - self.move_inc and (key == 1 or key == ord("j")):  # Down
+                elif roi_y <= height - self.roi_size - self.move_inc and (key == 1 or key == ord("j")):  # Down
                     self.y_adj += self.move_inc
                 elif roi_x >= self.move_inc and (key == 2 or key == ord("h")):  # Left
                     self.x_adj -= self.move_inc
-                elif roi_x <= img_width - self.roi_size - self.move_inc - self.move_inc \
+                elif roi_x <= width - self.roi_size - self.move_inc - self.move_inc \
                         and (key == 3 or key == ord("l")):  # Right
                     self.x_adj += self.move_inc
                 elif self.roi_size >= self.roi_inc * 2 and (key == ord("-") or key == ord("_")):

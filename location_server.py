@@ -55,6 +55,7 @@ class LocationServer(ObjectLocationServerServicer, GenericServer):
 
     def start(self):
         logger.info("Starting location server")
+        self.write_location(-1, -1, 0, 0, 0)
         Thread(target=self._start_location_server).start()
         time.sleep(1)
         return self

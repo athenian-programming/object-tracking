@@ -102,16 +102,13 @@ class GenericObjectTracker(object):
             logger.error("Unable to start location server [{0}]".format(e), exc_info=True)
             sys.exit(1)
 
-        self.location_server.write_location(-1, -1, 0, 0, 0)
+        self.image_server.start()
 
         while self.cam.is_open() and not self.stopped:
             try:
                 image = self.cam.read()
                 image = imutils.resize(image, width=self.width)
                 image = self.flip(image)
-
-                # Called once the dimensions of the images are known
-                self.image_server.start(image)
 
                 for process_func in process_funcs:
                     process_func(image)
