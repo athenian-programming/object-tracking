@@ -8,7 +8,6 @@ from cli_args import setup_cli_args
 from constants import CAMERA_NAME
 from location_client import LocationClient
 from mqtt_connection import MqttConnection
-from utils import mqtt_broker_info
 from utils import setup_logging
 from utils import sleep
 
@@ -48,11 +47,11 @@ if __name__ == "__main__":
 
 
     # Setup MQTT client
-    hostname, port = mqtt_broker_info(args["mqtt_host"])
-    mqtt_conn = MqttConnection(hostname, port, userdata={CAMERA_NAME: args["camera_name"]})
-    mqtt_conn.client.on_connect = on_connect
-    mqtt_conn.client.on_disconnect = on_disconnect
-    mqtt_conn.client.on_publish = on_publish
+    mqtt_conn = MqttConnection(args["mqtt_host"],
+                               userdata={CAMERA_NAME: args["camera_name"]},
+                               on_connect=on_connect,
+                               on_disconnect=on_disconnect,
+                               on_publish=on_publish)
     mqtt_conn.connect()
 
     try:
