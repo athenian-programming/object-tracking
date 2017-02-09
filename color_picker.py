@@ -34,7 +34,7 @@ class ColorPicker(object):
         self.__display = display
         self.__orig_width = self.__width
         self.__cam = camera.Camera(use_picamera=not usb_camera)
-        self.__http_server = img_server.ImageServer(self.name, http_host, http_delay_secs, http_file)
+        self.__image_server = img_server.ImageServer(self.name, http_host, http_delay_secs, http_file)
 
     # Do not run this in a background thread. cv2.waitKey has to run in main thread
     def start(self):
@@ -52,7 +52,7 @@ class ColorPicker(object):
             img_height, img_width = image.shape[:2]
 
             # Called once the dimensions of the images are known
-            self.__http_server.serve_images(img_width, img_height)
+            self.__image_server.start(image)
 
             roi_x = (img_width / 2) - (self.roi_size / 2) + self.x_adj
             roi_y = (img_height / 2) - (self.roi_size / 2) + self.y_adj
@@ -81,10 +81,10 @@ class ColorPicker(object):
 
             cnt += 1
 
-            if self.__http_server.enabled and cnt % 30 == 0:
+            if self.__image_server.enabled and cnt % 30 == 0:
                 logger.info(bgr_text)
 
-            self.__http_server.image = image
+            self.__image_server.image = image
 
             if self.__display:
                 # Display image
@@ -123,7 +123,7 @@ class ColorPicker(object):
                     break
 
     def stop(self):
-        self.__http_server.stop()
+        self.__image_server.stop()
 
 
 if __name__ == "__main__":

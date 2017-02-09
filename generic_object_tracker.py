@@ -54,7 +54,7 @@ class GenericObjectTracker(object):
         self.contour_finder = ContourFinder(bgr_color, hsv_range, minimum_pixels)
         self.location_server = LocationServer(grpc_port)
         self.cam = camera.Camera(use_picamera=not usb_camera)
-        self.http_server = img_server.ImageServer(camera_name, http_host, http_delay_secs, http_file)
+        self.image_server = img_server.ImageServer(camera_name, http_host, http_delay_secs, http_file)
 
     @property
     def width(self):
@@ -78,7 +78,7 @@ class GenericObjectTracker(object):
 
     @property
     def markup_image(self):
-        return self.__display or self.http_server.enabled
+        return self.__display or self.image_server.enabled
 
     def set_leds(self, left_color, right_color):
         if not is_raspi():
@@ -111,12 +111,12 @@ class GenericObjectTracker(object):
                 image = self.flip(image)
 
                 # Called once the dimensions of the images are known
-                self.http_server.serve_images(image)
+                self.image_server.start(image)
 
                 for process_func in process_funcs:
                     process_func(image)
 
-                self.http_server.image = image
+                self.image_server.image = image
                 self.display_image(image)
 
                 self.cnt += 1
@@ -133,7 +133,7 @@ class GenericObjectTracker(object):
     def stop(self):
         self.stopped = True
         self.location_server.stop()
-        self.http_server.stop()
+        self.image_server.stop()
 
     def display_image(self, image):
         if self.__display:
