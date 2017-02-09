@@ -36,7 +36,8 @@ class GenericObjectTracker(object):
                  camera_name,
                  http_host,
                  http_delay_secs,
-                 http_file):
+                 http_file,
+                 http_verbose):
         self.__width = width
         self.__middle_percent = middle_percent
         self.__orig_width = width
@@ -54,7 +55,7 @@ class GenericObjectTracker(object):
         self.contour_finder = ContourFinder(bgr_color, hsv_range, minimum_pixels)
         self.location_server = LocationServer(grpc_port)
         self.cam = camera.Camera(use_picamera=not usb_camera)
-        self.image_server = img_server.ImageServer(camera_name, http_host, http_delay_secs, http_file)
+        self.image_server = img_server.ImageServer(http_file, camera_name, http_host, http_delay_secs, http_verbose)
 
     @property
     def width(self):
@@ -177,8 +178,9 @@ class GenericObjectTracker(object):
                               cli.flip_x,
                               cli.flip_y,
                               cli.camera_name_optional,
+                              cli.display,
                               cli.http_host,
                               cli.http_delay_secs,
                               cli.http_file,
-                              cli.display,
+                              cli.verbose_http,
                               cli.verbose)

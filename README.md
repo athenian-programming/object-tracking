@@ -45,6 +45,8 @@ $ ./color_picker.py
 | -t, --http     | HTTP hostname:port                                 | localhost:8080 |
 | -s, --delay    | HTTP delay secs                                    | 0.25           |
 | -i, --file     | HTTP template file                                 |                |
+| -o, --verbose-http | Enable verbose HTTP log                        | false          |
+| -v, --verbose  | Enable debugging output                            | false          |
 | -h, --help     | Summary of options                                 |                |
 
 ### Display Keystrokes
@@ -96,7 +98,8 @@ $ python single_object_tracker.py --bgr "174, 56, 5" --display
 | -s, --delay    | HTTP delay secs                                    | 0.25           |
 | -i, --file     | HTTP template file                                 |                |
 | -p, --port     | gRPC server port                                   | 50051          |
-| -v, --verbose  | Include debugging info                             | false          |
+| -o, --verbose-http | Enable verbose HTTP log                        | false          |
+| -v, --verbose  | Enable debugging output                            | false          |
 | -h, --help     | Summary of options                                 |                |
 
 
@@ -138,7 +141,7 @@ $ firmata_controller.py --port ttyACM0 --grpc localhost
 | -x, --xservo   | X servo PWM pin                                    | 5       |
 | -y, --xyservo  | Y servo PWM pin                                    | 6       |
 | -c, --calib    | Calibration mode                                   | false   |
-| -v, --verbose  | Include debugging info                             | false   |
+| -v, --verbose  | Enable debugging output                            | false   |
 | -h, --help     | Summary of options                                 |         |
 
 

@@ -26,7 +26,7 @@ class ColorPicker(object):
     y_adj = 0
     name = "Color Picker"
 
-    def __init__(self, width, usb_camera, flip_x, flip_y, display, http_host, http_delay_secs, http_file):
+    def __init__(self, width, usb_camera, flip_x, flip_y, display, http_host, http_delay_secs, http_file, http_verbose):
         self.__width = width
         self.__usb_camera = usb_camera
         self.__flip_x = flip_x
@@ -34,7 +34,7 @@ class ColorPicker(object):
         self.__display = display
         self.__orig_width = self.__width
         self.__cam = camera.Camera(use_picamera=not usb_camera)
-        self.__image_server = img_server.ImageServer(self.name, http_host, http_delay_secs, http_file)
+        self.__image_server = img_server.ImageServer(http_file, self.name, http_host, http_delay_secs, http_verbose)
 
     # Do not run this in a background thread. cv2.waitKey has to run in main thread
     def start(self):
@@ -134,6 +134,7 @@ if __name__ == "__main__":
                           cli.http_host,
                           cli.http_delay_secs,
                           cli.http_file,
+                          cli.verbose_http,
                           cli.verbose)
 
     # Setup logging
