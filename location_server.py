@@ -39,7 +39,7 @@ class LocationServer(ObjectLocationServerServicer, GenericServer):
                                             middle_inc=middle_inc))
             self._id += 1
 
-    def start_location_server(self):
+    def _start_location_server(self):
         logger.info("Starting gRPC server listening on {0}".format(self._hostname))
         self._grpc_server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
         add_ObjectLocationServerServicer_to_server(self, self._grpc_server)
@@ -55,7 +55,7 @@ class LocationServer(ObjectLocationServerServicer, GenericServer):
 
     def start(self):
         logger.info("Starting location server")
-        Thread(target=self.start_location_server).start()
+        Thread(target=self._start_location_server).start()
         time.sleep(1)
         return self
 
