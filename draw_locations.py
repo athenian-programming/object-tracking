@@ -3,6 +3,7 @@
 from threading import Thread
 
 import cli_args  as cli
+from cli_args import LOG_LEVEL, GRPC_HOST
 from cli_args import setup_cli_args
 from location_client import LocationClient
 from utils import is_python3
@@ -66,9 +67,9 @@ if __name__ == "__main__":
     # Parse CLI args
     args = setup_cli_args(cli.grpc_host, cli.verbose)
 
-    setup_logging(level=args["loglevel"])
+    setup_logging(level=args[LOG_LEVEL])
 
-    locations = LocationClient(args["grpc_host"]).start()
+    locations = LocationClient(args[GRPC_HOST]).start()
 
     init_w, init_h = 800, 450
 

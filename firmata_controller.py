@@ -7,6 +7,7 @@ from threading import Thread
 
 import calibrate_servo
 import cli_args as cli
+from cli_args import LOG_LEVEL, GRPC_HOST
 from firmata_servo import FirmataServo
 from location_client import LocationClient
 from pyfirmata import Arduino
@@ -32,7 +33,7 @@ if __name__ == "__main__":
     xservo = args["xservo"]
     yservo = args["yservo"]
 
-    setup_logging(level=args["loglevel"])
+    setup_logging(level=args[LOG_LEVEL])
 
     # Setup firmata client
     port = ("" if is_windows() else "/dev/") + args["serial"]
@@ -43,7 +44,7 @@ if __name__ == "__main__":
         logger.error("Failed to connect to Arduino at {0} - [{1}]".format(port, e))
         sys.exit(0)
 
-    locations = LocationClient(args["grpc_host"]).start()
+    locations = LocationClient(args[GRPC_HOST]).start()
 
     # Create servos
     servo_x = FirmataServo("Pan", alternate, board, "d:{0}:s".format(xservo), 1.0, 8)

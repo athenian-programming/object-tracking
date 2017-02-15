@@ -6,6 +6,7 @@ from threading import Thread
 import calibrate_servo
 import cli_args  as cli
 import pantilthat as pth
+from cli_args import LOG_LEVEL, GRPC_HOST
 from cli_args import setup_cli_args
 from hat_servo import HatServo
 from location_client import LocationClient
@@ -20,9 +21,9 @@ if __name__ == "__main__":
     alternate = args["alternate"]
     calib = args["calib"]
 
-    setup_logging(level=args["loglevel"])
+    setup_logging(level=args[LOG_LEVEL])
 
-    locations = LocationClient(args["grpc_host"]).start()
+    locations = LocationClient(args[GRPC_HOST]).start()
 
     # Create servos
     servo_x = HatServo("Pan", pth.pan, alternate, 1.0, 8)

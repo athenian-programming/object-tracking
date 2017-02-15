@@ -5,6 +5,7 @@ import cli_args  as cli
 import plotly.graph_objs as go
 import plotly.plotly as py
 import plotly.tools as tls
+from cli_args import LOG_LEVEL, GRPC_HOST
 from cli_args import setup_cli_args
 from location_client import LocationClient
 from utils import setup_logging
@@ -16,10 +17,10 @@ if __name__ == "__main__":
     args = setup_cli_args(cli.grpc_host, cli.verbose)
 
     # Setup logging
-    setup_logging(level=args["loglevel"])
+    setup_logging(level=args[LOG_LEVEL])
 
     # Start location client
-    locations = LocationClient(args["grpc_host"]).start()
+    locations = LocationClient(args[GRPC_HOST]).start()
 
     stream_ids = tls.get_credentials_file()['stream_ids']
     stream_id = stream_ids[0]

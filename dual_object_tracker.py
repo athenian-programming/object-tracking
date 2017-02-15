@@ -4,6 +4,7 @@ import logging
 
 import cv2
 import opencv_defaults as defs
+from cli_args import LOG_LEVEL
 from generic_object_tracker import GenericObjectTracker
 from opencv_utils import BLUE, GREEN, RED, YELLOW
 from opencv_utils import get_moment
@@ -84,7 +85,7 @@ if __name__ == "__main__":
     args = GenericObjectTracker.cli_args()
 
     # Setup logging
-    setup_logging(level=args["loglevel"])
+    setup_logging(level=args[LOG_LEVEL])
 
     object_tracker = DualObjectTracker(**args)
     try:

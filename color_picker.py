@@ -9,6 +9,7 @@ import image_server as img_server
 import imutils
 import numpy as np
 import opencv_defaults as defs
+from cli_args import LOG_LEVEL
 from cli_args import setup_cli_args
 from opencv_utils import GREEN
 from opencv_utils import RED
@@ -16,6 +17,7 @@ from utils import setup_logging
 from utils import strip_loglevel
 
 logger = logging.getLogger(__name__)
+
 
 class ColorPicker(object):
     roi_size = 24
@@ -138,7 +140,7 @@ if __name__ == "__main__":
                           cli.verbose)
 
     # Setup logging
-    setup_logging(level=args["loglevel"])
+    setup_logging(level=args[LOG_LEVEL])
 
     color_picker = ColorPicker(**strip_loglevel(args))
     try:
