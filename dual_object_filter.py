@@ -5,6 +5,8 @@ import logging
 import cv2
 import opencv_defaults as defs
 from cli_args import LOG_LEVEL
+from constants import MINIMUM_PIXELS, GRPC_PORT, HSV_RANGE, LEDS, CAMERA_NAME, HTTP_HOST, USB_CAMERA, WIDTH, DISPLAY, \
+    BGR_COLOR, MIDDLE_PERCENT, FLIP_X, FLIP_Y
 from generic_filter import GenericFilter
 from object_tracker import ObjectTracker
 from opencv_utils import BLUE, GREEN, RED, YELLOW
@@ -41,8 +43,10 @@ class DualObjectFilter(GenericFilter):
 
             if self.tracker.markup_image:
                 x1, y1, w1, h1 = cv2.boundingRect(countour1)
-                cv2.rectangle(image, (x1, y1), (x1 + w1, y1 + h1), BLUE, 2)
-                cv2.drawContours(image, [countour1], -1, GREEN, 2)
+                if self.draw_box:
+                    cv2.rectangle(image, (x1, y1), (x1 + w1, y1 + h1), BLUE, 2)
+                if self.draw_contour:
+                    cv2.drawContours(image, [countour1], -1, GREEN, 2)
                 cv2.circle(image, (img_x1, img_y1), 4, RED, -1)
 
                 x2, y2, w2, h2 = cv2.boundingRect(countour2)
@@ -90,25 +94,27 @@ if __name__ == "__main__":
     # Setup logging
     setup_logging(level=args[LOG_LEVEL])
 
-    tracker = ObjectTracker(width=args["width"],
-                            middle_percent=args["middle_percent"],
-                            display=args["display"],
-                            flip_x=args["flip_x"],
-                            flip_y=args["flip_y"],
-                            usb_camera=args["usb_camera"],
-                            camera_name=args["camera_name"],
-                            http_host=args["http_host"],
+    tracker = ObjectTracker(width=args[WIDTH],
+                            middle_percent=args[MIDDLE_PERCENT],
+                            display=args[DISPLAY],
+                            flip_x=args[FLIP_X],
+                            flip_y=args[FLIP_Y],
+                            usb_camera=args[USB_CAMERA],
+                            camera_name=args[CAMERA_NAME],
+                            http_host=args[HTTP_HOST],
                             http_delay_secs=args["http_delay_secs"],
                             http_file=args["http_file"],
                             http_verbose=args["http_verbose"])
 
     filter = DualObjectFilter(tracker,
-                              bgr_color=args["bgr_color"],
-                              hsv_range=args["hsv_range"],
-                              minimum_pixels=args["minimum_pixels"],
-                              grpc_port=args["grpc_port"],
-                              leds=args["leds"],
+                              bgr_color=args[BGR_COLOR],
+                              hsv_range=args[HSV_RANGE],
+                              minimum_pixels=args[MINIMUM_PIXELS],
+                              grpc_port=args[GRPC_PORT],
+                              leds=args[LEDS],
                               display_text=True,
+                              draw_contour=True,
+                              draw_box=True,
                               vertical_lines=True,
                               horizontal_lines=True)
     try:

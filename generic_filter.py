@@ -22,11 +22,15 @@ class GenericFilter(object):
                  grpc_port=GRPC_PORT_DEFAULT,
                  leds=False,
                  display_text=False,
+                 draw_contour=False,
+                 draw_box=False,
                  vertical_lines=False,
                  horizontal_lines=False):
         self.tracker = tracker
         self.leds = leds
         self.display_text = display_text
+        self.draw_contour = draw_contour
+        self.draw_box = draw_box
         self.vertical_lines = vertical_lines
         self.horizontal_lines = horizontal_lines
         self._prev_x, self._prev_y = -1, -1

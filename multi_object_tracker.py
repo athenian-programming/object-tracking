@@ -4,6 +4,8 @@ import logging
 import cli_args as cli
 from cli_args import GRPC_PORT_DEFAULT
 from cli_args import LOG_LEVEL
+from constants import MINIMUM_PIXELS, CAMERA_NAME, HTTP_HOST, USB_CAMERA, DISPLAY, WIDTH, HSV_RANGE, MIDDLE_PERCENT, \
+    FLIP_X, FLIP_Y
 from dual_object_filter import DualObjectFilter
 from object_tracker import ObjectTracker
 from single_object_filter import SingleObjectFilter
@@ -40,22 +42,22 @@ if __name__ == "__main__":
     # Setup logging
     setup_logging(level=args[LOG_LEVEL])
 
-    tracker = ObjectTracker(width=args["width"],
-                            middle_percent=args["middle_percent"],
-                            display=args["display"],
-                            flip_x=args["flip_x"],
-                            flip_y=args["flip_y"],
-                            usb_camera=args["usb_camera"],
-                            camera_name=args["camera_name"],
-                            http_host=args["http_host"],
+    tracker = ObjectTracker(width=args[WIDTH],
+                            middle_percent=args[MIDDLE_PERCENT],
+                            display=args[DISPLAY],
+                            flip_x=args[FLIP_X],
+                            flip_y=args[FLIP_Y],
+                            usb_camera=args[USB_CAMERA],
+                            camera_name=args[CAMERA_NAME],
+                            http_host=args[HTTP_HOST],
                             http_delay_secs=args["http_delay_secs"],
                             http_file=args["http_file"],
                             http_verbose=args["http_verbose"])
 
     dual_filter = DualObjectFilter(tracker,
                                    bgr_color=args["dual_bgr"],
-                                   hsv_range=args["hsv_range"],
-                                   minimum_pixels=args["minimum_pixels"],
+                                   hsv_range=args[HSV_RANGE],
+                                   minimum_pixels=args[MINIMUM_PIXELS],
                                    grpc_port=args["dual_port"],
                                    leds=False,
                                    display_text=False,
@@ -64,11 +66,13 @@ if __name__ == "__main__":
 
     single_filter = SingleObjectFilter(tracker,
                                        bgr_color=args["single_bgr"],
-                                       hsv_range=args["hsv_range"],
-                                       minimum_pixels=args["minimum_pixels"],
+                                       hsv_range=args[HSV_RANGE],
+                                       minimum_pixels=args[MINIMUM_PIXELS],
                                        grpc_port=args["single_port"],
                                        leds=False,
                                        display_text=True,
+                                       draw_contour=True,
+                                       draw_box=True,
                                        vertical_lines=False,
                                        horizontal_lines=False)
 

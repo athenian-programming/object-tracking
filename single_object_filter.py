@@ -5,6 +5,9 @@ import logging
 import cv2
 import opencv_defaults as defs
 from cli_args import LOG_LEVEL
+from constants import MINIMUM_PIXELS, GRPC_PORT, LEDS, HSV_RANGE, CAMERA_NAME, USB_CAMERA, HTTP_HOST, DISPLAY, \
+    BGR_COLOR, \
+    WIDTH, MIDDLE_PERCENT, FLIP_X
 from generic_filter import GenericFilter
 from object_tracker import ObjectTracker
 from opencv_utils import BLUE, GREEN, RED
@@ -34,8 +37,10 @@ class SingleObjectFilter(GenericFilter):
 
             if self.tracker.markup_image:
                 x, y, w, h = cv2.boundingRect(contour)
-                cv2.rectangle(image, (x, y), (x + w, y + h), BLUE, 2)
-                cv2.drawContours(image, [contour], -1, GREEN, 2)
+                if self.draw_box:
+                    cv2.rectangle(image, (x, y), (x + w, y + h), BLUE, 2)
+                if self.draw_contour:
+                    cv2.drawContours(image, [contour], -1, GREEN, 2)
                 cv2.circle(image, (img_x, img_y), 4, RED, -1)
                 text += " ({0}, {1})".format(img_x, img_y)
                 text += " {0}".format(area)
@@ -69,6 +74,10 @@ class SingleObjectFilter(GenericFilter):
                 cv2.putText(image, text, defs.TEXT_LOC, defs.TEXT_FONT, defs.TEXT_SIZE, RED, 1)
 
 
+def FLIPY(args):
+    pass
+
+
 if __name__ == "__main__":
     # Parse CLI args
     args = ObjectTracker.cli_args()
@@ -76,25 +85,27 @@ if __name__ == "__main__":
     # Setup logging
     setup_logging(level=args[LOG_LEVEL])
 
-    tracker = ObjectTracker(width=args["width"],
-                            middle_percent=args["middle_percent"],
-                            display=args["display"],
-                            flip_x=args["flip_x"],
-                            flip_y=args["flip_y"],
-                            usb_camera=args["usb_camera"],
-                            camera_name=args["camera_name"],
-                            http_host=args["http_host"],
+    tracker = ObjectTracker(width=args[WIDTH],
+                            middle_percent=args[MIDDLE_PERCENT],
+                            display=args[DISPLAY],
+                            flip_x=args[FLIP_X],
+                            flip_y=args[FLIPY],
+                            usb_camera=args[USB_CAMERA],
+                            camera_name=args[CAMERA_NAME],
+                            http_host=args[HTTP_HOST],
                             http_delay_secs=args["http_delay_secs"],
                             http_file=args["http_file"],
                             http_verbose=args["http_verbose"])
 
     filter = SingleObjectFilter(tracker,
-                                bgr_color=args["bgr_color"],
-                                hsv_range=args["hsv_range"],
-                                minimum_pixels=args["minimum_pixels"],
-                                grpc_port=args["grpc_port"],
-                                leds=args["leds"],
+                                bgr_color=args[BGR_COLOR],
+                                hsv_range=args[HSV_RANGE],
+                                minimum_pixels=args[MINIMUM_PIXELS],
+                                grpc_port=args[GRPC_PORT],
+                                leds=args[LEDS],
                                 display_text=True,
+                                draw_contour=False,
+                                draw_box=True,
                                 vertical_lines=True,
                                 horizontal_lines=False)
     try:
