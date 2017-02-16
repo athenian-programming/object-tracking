@@ -2,6 +2,7 @@ import logging
 import sys
 
 from cli_args import GRPC_PORT_DEFAULT
+from constants import MINIMUM_PIXELS_DEFAULT
 from contour_finder import ContourFinder
 from location_server import LocationServer
 from utils import is_raspi
@@ -18,7 +19,7 @@ class GenericFilter(object):
                  tracker,
                  bgr_color,
                  hsv_range,
-                 minimum_pixels,
+                 minimum_pixels=MINIMUM_PIXELS_DEFAULT,
                  grpc_port=GRPC_PORT_DEFAULT,
                  leds=False,
                  display_text=False,

@@ -30,14 +30,6 @@ if __name__ == "__main__":
         Thread(target=publish_locations, args=(client, userdata)).start()
 
 
-    def on_disconnect(client, userdata, rc):
-        logger.info("Disconnected with result code: {0}".format(rc))
-
-
-    def on_publish(client, userdata, mid):
-        logger.debug("Published message id: {0}".format(mid))
-
-
     def publish_locations(client, userdata):
         while True:
             x_loc, y_loc = locations.get_xy()
@@ -49,9 +41,7 @@ if __name__ == "__main__":
     # Setup MQTT client
     mqtt_conn = MqttConnection(args[MQTT_HOST],
                                userdata={CAMERA_NAME: args[CAMERA_NAME]},
-                               on_connect=on_connect,
-                               on_disconnect=on_disconnect,
-                               on_publish=on_publish)
+                               on_connect=on_connect)
     mqtt_conn.connect()
 
     try:
