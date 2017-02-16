@@ -38,45 +38,47 @@ class SingleObjectFilter(GenericFilter):
 
         # Write location if it is different from previous value written
         if self.img_x != self.prev_x or self.img_y != self.prev_y:
-            self.location_server.write_location(self.img_x, self.img_y, self.width, self.height, self.middle_inc())
+            self.location_server.write_location(self.img_x, self.img_y, self.width, self.height, self.middle_inc)
             self.prev_x, self.prev_y = self.img_x, self.img_y
 
     def markup_image(self, image):
         mid_x, mid_y = self.width / 2, self.height / 2
-        middle_inc = self.middle_inc()
-
-        text = "#{0} ({1}, {2})".format(self.tracker.cnt, self.width, self.height)
-        text += " {0}%".format(self.tracker.middle_percent)
+        middle_inc = int(self.middle_inc)
 
         x_in_middle = mid_x - middle_inc <= self.img_x <= mid_x + middle_inc
         y_in_middle = mid_y - middle_inc <= self.img_y <= mid_y + middle_inc
         x_color = GREEN if x_in_middle else RED if self.img_x == -1 else BLUE
         y_color = GREEN if y_in_middle else RED if self.img_y == -1 else BLUE
 
-        if self.tracker.markup_image:
-            if self.contours is not None and len(self.contours) == 1:
-                x, y, w, h = cv2.boundingRect(self.contour)
-                if self.draw_box:
-                    cv2.rectangle(image, (x, y), (x + w, y + h), BLUE, 2)
-                if self.draw_contour:
-                    cv2.drawContours(image, [self.contour], -1, GREEN, 2)
-                cv2.circle(image, (self.img_x, self.img_y), 4, RED, -1)
-                text += " ({0}, {1})".format(self.img_x, self.img_y)
-                text += " {0}".format(self.area)
-
-            # Draw the alignment lines
-            if self.vertical_lines:
-                cv2.line(image, (mid_x - middle_inc, 0), (mid_x - middle_inc, self.height), x_color, 1)
-                cv2.line(image, (mid_x + middle_inc, 0), (mid_x + middle_inc, self.height), x_color, 1)
-            if self.horizontal_lines:
-                cv2.line(image, (0, mid_y - middle_inc), (self.width, mid_y - middle_inc), y_color, 1)
-                cv2.line(image, (0, mid_y + middle_inc), (self.width, mid_y + middle_inc), y_color, 1)
-            if self.display_text:
-                cv2.putText(image, text, defs.TEXT_LOC, defs.TEXT_FONT, defs.TEXT_SIZE, RED, 1)
-
         # Set Blinkt leds
         if self.leds:
             self.set_leds(x_color, y_color)
+
+        if not self.tracker.markup_image:
+            return
+
+        text = "#{0} ({1}, {2})".format(self.tracker.cnt, self.width, self.height)
+        text += " {0}%".format(self.tracker.middle_percent)
+
+        if self.contours is not None and len(self.contours) == 1:
+            x, y, w, h = cv2.boundingRect(self.contour)
+            if self.draw_box:
+                cv2.rectangle(image, (x, y), (x + w, y + h), BLUE, 2)
+            if self.draw_contour:
+                cv2.drawContours(image, [self.contour], -1, GREEN, 2)
+            cv2.circle(image, (self.img_x, self.img_y), 4, RED, -1)
+            text += " ({0}, {1})".format(self.img_x, self.img_y)
+            text += " {0}".format(self.area)
+
+        # Draw the alignment lines
+        if self.vertical_lines:
+            cv2.line(image, (mid_x - middle_inc, 0), (mid_x - middle_inc, self.height), x_color, 1)
+            cv2.line(image, (mid_x + middle_inc, 0), (mid_x + middle_inc, self.height), x_color, 1)
+        if self.horizontal_lines:
+            cv2.line(image, (0, mid_y - middle_inc), (self.width, mid_y - middle_inc), y_color, 1)
+            cv2.line(image, (0, mid_y + middle_inc), (self.width, mid_y + middle_inc), y_color, 1)
+        if self.display_text:
+            cv2.putText(image, text, defs.TEXT_LOC, defs.TEXT_FONT, defs.TEXT_SIZE, RED, 1)
 
 
 if __name__ == "__main__":

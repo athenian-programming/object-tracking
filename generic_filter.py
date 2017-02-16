@@ -57,6 +57,7 @@ class GenericFilter(object):
     def prev_y(self, val):
         self._prev_y = val
 
+    @property
     def middle_inc(self):
         # The middle margin calculation is based on % of width for horizontal and vertical boundary
         mid_x = self.width / 2
