@@ -7,7 +7,7 @@ import opencv_defaults as defs
 from cli_args import LOG_LEVEL
 from constants import MINIMUM_PIXELS, GRPC_PORT, LEDS, HSV_RANGE, CAMERA_NAME, USB_CAMERA, HTTP_HOST, DISPLAY, \
     BGR_COLOR, \
-    WIDTH, MIDDLE_PERCENT, FLIP_X
+    WIDTH, MIDDLE_PERCENT, FLIP_X, DRAW_CONTOUR, DRAW_BOX
 from generic_filter import GenericFilter
 from object_tracker import ObjectTracker
 from opencv_utils import BLUE, GREEN, RED
@@ -104,8 +104,8 @@ if __name__ == "__main__":
                                 grpc_port=args[GRPC_PORT],
                                 leds=args[LEDS],
                                 display_text=True,
-                                draw_contour=False,
-                                draw_box=True,
+                                draw_contour=args[DRAW_CONTOUR],
+                                draw_box=args[DRAW_BOX],
                                 vertical_lines=True,
                                 horizontal_lines=False)
     try:

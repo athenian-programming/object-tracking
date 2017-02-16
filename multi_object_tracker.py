@@ -5,7 +5,7 @@ import cli_args as cli
 from cli_args import GRPC_PORT_DEFAULT
 from cli_args import LOG_LEVEL
 from constants import MINIMUM_PIXELS, CAMERA_NAME, HTTP_HOST, USB_CAMERA, DISPLAY, WIDTH, HSV_RANGE, MIDDLE_PERCENT, \
-    FLIP_X, FLIP_Y
+    FLIP_X, FLIP_Y, DRAW_CONTOUR, DRAW_BOX
 from dual_object_filter import DualObjectFilter
 from object_tracker import ObjectTracker
 from single_object_filter import SingleObjectFilter
@@ -26,6 +26,8 @@ if __name__ == "__main__":
     cli.flip_y(p),
     cli.camera_name_optional(p),
     cli.display(p),
+    cli.draw_contour(p),
+    cli.draw_box(p),
     cli.http_host(p),
     cli.http_delay_secs(p),
     cli.http_file(p),
@@ -61,6 +63,8 @@ if __name__ == "__main__":
                                    grpc_port=args["dual_port"],
                                    leds=False,
                                    display_text=False,
+                                   draw_contour=args[DRAW_CONTOUR],
+                                   draw_box=args[DRAW_BOX],
                                    vertical_lines=True,
                                    horizontal_lines=False)
 
@@ -71,8 +75,8 @@ if __name__ == "__main__":
                                        grpc_port=args["single_port"],
                                        leds=False,
                                        display_text=True,
-                                       draw_contour=True,
-                                       draw_box=True,
+                                       draw_contour=args[DRAW_CONTOUR],
+                                       draw_box=args[DRAW_BOX],
                                        vertical_lines=False,
                                        horizontal_lines=False)
 

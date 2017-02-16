@@ -155,6 +155,8 @@ class ObjectTracker(object):
                               cli.flip_y,
                               cli.camera_name_optional,
                               cli.display,
+                              cli.draw_contour,
+                              cli.draw_box,
                               cli.http_host,
                               cli.http_delay_secs,
                               cli.http_file,
