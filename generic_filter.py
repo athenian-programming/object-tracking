@@ -36,6 +36,9 @@ class GenericFilter(object):
         self._prev_x, self._prev_y = -1, -1
         self.contour_finder = ContourFinder(bgr_color, hsv_range, minimum_pixels)
         self.location_server = LocationServer(grpc_port)
+        self.height = -1
+        self.width = -1
+        self.contours = None
 
     @property
     def prev_x(self):
@@ -52,6 +55,12 @@ class GenericFilter(object):
     @prev_y.setter
     def prev_y(self, val):
         self._prev_y = val
+
+    def middle_inc(self):
+        # The middle margin calculation is based on % of width for horizontal and vertical boundary
+        mid_x = self.width / 2
+        middle_pct = (float(self.tracker.middle_percent) / 100.0) / 2
+        return int(mid_x * middle_pct)
 
     def start(self):
         try:
@@ -71,6 +80,9 @@ class GenericFilter(object):
         self.prev_x, self.prev_y = -1, -1
 
     def process_image(self, image):
+        raise Exception("Should be implemented by sub-class")
+
+    def markup_image(self, image):
         raise Exception("Should be implemented by sub-class")
 
     def set_leds(self, left_color, right_color):

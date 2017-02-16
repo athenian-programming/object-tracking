@@ -86,6 +86,8 @@ class ObjectTracker(object):
                 if self.__filters:
                     for filter in self.__filters:
                         filter.process_image(image)
+                    for filter in self.__filters:
+                        filter.markup_image(image)
 
                 self.image_server.image = image
                 self.display_image(image)
