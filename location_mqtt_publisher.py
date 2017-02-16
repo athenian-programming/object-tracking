@@ -35,7 +35,7 @@ if __name__ == "__main__":
 
 
     def on_publish(client, userdata, mid):
-        print("Published message id: {0}".format(mid))
+        logger.debug("Published message id: {0}".format(mid))
 
 
     def publish_locations(client, userdata):

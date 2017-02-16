@@ -28,7 +28,7 @@ if __name__ == "__main__":
 
 
     def on_message(client, userdata, msg):
-        print("{0} {1}".format(msg.topic, msg.payload))
+        logger.info("{0} {1}".format(msg.topic, msg.payload))
 
 
     # Setup MQTT client
