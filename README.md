@@ -39,13 +39,13 @@ $ ./color_picker.py
 |:---------------|----------------------------------------------------|----------------|
 | -u, --usb      | Use USB Raspi camera                               | false          |
 | -w, --width    | Image width                                        | 400            |
-| -d, --display  | Display image                                      | false          |
+| --display      | Display image                                      | false          |
 | -x, --flipx    | Flip image on X axis                               | false          |
 | -y, --flipy    | Flip image on Y axis                               | false          |
-| -t, --http     | HTTP hostname:port                                 | localhost:8080 |
-| -s, --delay    | HTTP delay secs                                    | 0.25           |
+| --http         | HTTP hostname:port                                 | localhost:8080 |
+| --delay        | HTTP delay secs                                    | 0.25           |
 | -i, --file     | HTTP template file                                 |                |
-| -o, --verbose-http | Enable verbose HTTP log                        | false          |
+| --verbose-http | Enable verbose HTTP log                            | false          |
 | -v, --verbose  | Enable debugging output                            | false          |
 | -h, --help     | Summary of options                                 |                |
 
@@ -84,21 +84,21 @@ $ python single_object_tracker.py --bgr "174, 56, 5" --display
 
 | Option         | Description                                        | Default        |
 |:---------------|----------------------------------------------------|----------------|
-| -b, --bgr      | BGR target value                                   |                |
+| --bgr          | BGR target value                                   |                |
 | -u, --usb      | Use USB Raspi camera                               | false          |
 | -w, --width    | Image width                                        | 400            |
 | -e, --percent  | Middle percent                                     | 15             |
-| -m, --min      | Minimum target pixel area                          | 100            |
-| -r, --range    | HSV Range                                          | 20             |
-| -l, --leds     | Enable Blinkt led feedback                         | false          |
-| -d, --display  | Display image                                      | false          |
+| --min          | Minimum target pixel area                          | 100            |
+| --range        | HSV Range                                          | 20             |
+| --leds         | Enable Blinkt led feedback                         | false          |
+| --display      | Display image                                      | false          |
 | -x, --flipx    | Flip image on X axis                               | false          |
 | -y, --flipy    | Flip image on Y axis                               | false          |
 | -t, --http     | HTTP hostname:port                                 | localhost:8080 |
-| -s, --delay    | HTTP delay secs                                    | 0.25           |
+| --delay        | HTTP delay secs                                    | 0.25           |
 | -i, --file     | HTTP template file                                 |                |
 | -p, --port     | gRPC server port                                   | 50051          |
-| -o, --verbose-http | Enable verbose HTTP log                        | false          |
+| --verbose-http | Enable verbose HTTP log                        | false          |
 | -v, --verbose  | Enable debugging output                            | false          |
 | -h, --help     | Summary of options                                 |                |
 
@@ -140,7 +140,7 @@ $ firmata_controller.py --port ttyACM0 --grpc localhost
 | -g, --grpc     | Object Tracker gRPC server hostname                |         |
 | -x, --xservo   | X servo PWM pin                                    | 5       |
 | -y, --xyservo  | Y servo PWM pin                                    | 6       |
-| -c, --calib    | Calibration mode                                   | false   |
+| --calib        | Calibration mode                                   | false   |
 | -v, --verbose  | Enable debugging output                            | false   |
 | -h, --help     | Summary of options                                 |         |
 
