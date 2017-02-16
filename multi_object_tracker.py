@@ -4,12 +4,18 @@ import logging
 import cli_args as cli
 from cli_args import GRPC_PORT_DEFAULT
 from cli_args import LOG_LEVEL
-from constants import MINIMUM_PIXELS, CAMERA_NAME, HTTP_HOST, USB_CAMERA, DISPLAY, WIDTH, HSV_RANGE, MIDDLE_PERCENT, \
-    FLIP_X, FLIP_Y, DRAW_CONTOUR, DRAW_BOX
+from constants import HSV_RANGE, MIDDLE_PERCENT, FLIP_X, FLIP_Y, DRAW_CONTOUR, DRAW_BOX
+from constants import HTTP_DELAY_SECS, HTTP_FILE, HTTP_VERBOSE
+from constants import MINIMUM_PIXELS, CAMERA_NAME, HTTP_HOST, USB_CAMERA, DISPLAY, WIDTH
 from dual_object_filter import DualObjectFilter
 from object_tracker import ObjectTracker
 from single_object_filter import SingleObjectFilter
 from utils import setup_logging
+
+DUAL_BGR = "dual_bgr"
+SINGLE_BGR = "single_bgr"
+DUAL_PORT = "dual_port"
+SINGLE_PORT = "single_port"
 
 logger = logging.getLogger(__name__)
 
@@ -32,11 +38,11 @@ if __name__ == "__main__":
     cli.http_delay_secs(p),
     cli.http_file(p),
     cli.verbose_http(p),
-    p.add_argument("--dualbgr", dest="dual_bgr", required=True, help="Dual color BGR value")
-    p.add_argument("--singlebgr", dest="single_bgr", required=True, help="Single color BGR value")
-    p.add_argument("--dualport", dest="dual_port", default=GRPC_PORT_DEFAULT, type=int,
+    p.add_argument("--dualbgr", dest=DUAL_BGR, required=True, help="Dual color BGR value")
+    p.add_argument("--singlebgr", dest=SINGLE_BGR, required=True, help="Single color BGR value")
+    p.add_argument("--dualport", dest=DUAL_PORT, default=GRPC_PORT_DEFAULT, type=int,
                    help="Dual gRPC port [{0}]".format(GRPC_PORT_DEFAULT))
-    p.add_argument("--singleport", dest="single_port", default=GRPC_PORT_DEFAULT + 1, type=int,
+    p.add_argument("--singleport", dest=SINGLE_PORT, default=GRPC_PORT_DEFAULT + 1, type=int,
                    help="Dual gRPC port [{0}]".format(GRPC_PORT_DEFAULT + 1))
     cli.verbose(p)
     args = vars(p.parse_args())
@@ -52,15 +58,15 @@ if __name__ == "__main__":
                             usb_camera=args[USB_CAMERA],
                             camera_name=args[CAMERA_NAME],
                             http_host=args[HTTP_HOST],
-                            http_delay_secs=args["http_delay_secs"],
-                            http_file=args["http_file"],
-                            http_verbose=args["http_verbose"])
+                            http_delay_secs=args[HTTP_DELAY_SECS],
+                            http_file=args[HTTP_FILE],
+                            http_verbose=args[HTTP_VERBOSE])
 
     dual_filter = DualObjectFilter(tracker,
-                                   bgr_color=args["dual_bgr"],
+                                   bgr_color=args[DUAL_BGR],
                                    hsv_range=args[HSV_RANGE],
                                    minimum_pixels=args[MINIMUM_PIXELS],
-                                   grpc_port=args["dual_port"],
+                                   grpc_port=args[DUAL_PORT],
                                    leds=False,
                                    display_text=False,
                                    draw_contour=args[DRAW_CONTOUR],
@@ -69,10 +75,10 @@ if __name__ == "__main__":
                                    horizontal_lines=False)
 
     single_filter = SingleObjectFilter(tracker,
-                                       bgr_color=args["single_bgr"],
+                                       bgr_color=args[SINGLE_BGR],
                                        hsv_range=args[HSV_RANGE],
                                        minimum_pixels=args[MINIMUM_PIXELS],
-                                       grpc_port=args["single_port"],
+                                       grpc_port=args[SINGLE_PORT],
                                        leds=False,
                                        display_text=True,
                                        draw_contour=args[DRAW_CONTOUR],
