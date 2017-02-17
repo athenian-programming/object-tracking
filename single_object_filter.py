@@ -22,13 +22,13 @@ class SingleObjectFilter(GenericFilter):
         super(SingleObjectFilter, self).__init__(tracker, *args, **kwargs)
         self.contour = None
         self.area = None
-        self.img_x = -1
-        self.img_y = -1
+        self.img_x, self.img_y = -1, -1
+        self.height, self.width = None, None
 
     def process_image(self, image):
-        self.height, self.width = image.shape[:2]
-        self.img_x, self.img_y = -1, -1
         self.contour = None
+        self.img_x, self.img_y = -1, -1
+        self.height, self.width = image.shape[:2]
 
         # Find the largest contour
         self.contours = self.contour_finder.get_max_contours(image, count=1)

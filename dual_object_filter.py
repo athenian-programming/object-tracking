@@ -20,18 +20,16 @@ logger = logging.getLogger(__name__)
 class DualObjectFilter(GenericFilter):
     def __init__(self, tracker, *args, **kwargs):
         super(DualObjectFilter, self).__init__(tracker, *args, **kwargs)
-        self.contour1 = None
-        self.contour2 = None
-        self.img_x1 = -1
-        self.img_y1 = -1
-        self.img_x2 = -1
-        self.img_y2 = -1
-        self.avg_x = -1
-        self.avg_y = -1
+        self.contour1, self.contour2 = None, None
+        self.img_x1, self.img_y1 = -1, -1
+        self.img_x2, self.img_y2 = -1, -1
+        self.avg_x, self.avg_y = -1, -1
+        self.height, self.width = None, None
 
     def process_image(self, image):
-        self.height, self.width = image.shape[:2]
+        self.contour1, self.contour2 = None, None
         self.avg_x, self.avg_y = -1, -1
+        self.height, self.width = image.shape[:2]
 
         # Find the 2 largest contours
         self.contours = self.contour_finder.get_max_contours(image, count=2)
@@ -98,7 +96,6 @@ class DualObjectFilter(GenericFilter):
             cv2.line(image, (0, mid_y + middle_inc), (self.width, mid_y + middle_inc), y_color, 1)
         if self.display_text:
             cv2.putText(image, text, defs.TEXT_LOC, defs.TEXT_FONT, defs.TEXT_SIZE, RED, 1)
-
 
 
 if __name__ == "__main__":
