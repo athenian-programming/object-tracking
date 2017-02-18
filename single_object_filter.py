@@ -25,9 +25,12 @@ class SingleObjectFilter(GenericFilter):
         self.img_x, self.img_y = -1, -1
         self.height, self.width = None, None
 
+    def reset_data(self):
+        self.img_x, self.img_y = -1, -1
+
     def process_image(self, image):
         self.contour = None
-        self.img_x, self.img_y = -1, -1
+        self.reset_data()
         self.height, self.width = image.shape[:2]
 
         # Find the largest contour
@@ -36,6 +39,7 @@ class SingleObjectFilter(GenericFilter):
         if self.contours is not None and len(self.contours) == 1:
             self.contour, self.area, self.img_x, self.img_y = get_moment(self.contours[0])
 
+    def publish_data(self):
         # Write location if it is different from previous value written
         if self.img_x != self.prev_x or self.img_y != self.prev_y:
             self.location_server.write_location(self.img_x, self.img_y, self.width, self.height, self.middle_inc)

@@ -87,6 +87,9 @@ class ObjectTracker(object):
                     for filter in self.__filters:
                         filter.process_image(image)
                     for filter in self.__filters:
+                        if filter.predicate:
+                            filter.predicate(filter)
+                        filter.publish_data()
                         filter.markup_image(image)
 
                 self.image_server.image = image

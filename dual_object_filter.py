@@ -26,9 +26,12 @@ class DualObjectFilter(GenericFilter):
         self.avg_x, self.avg_y = -1, -1
         self.height, self.width = None, None
 
+    def reset_data(self):
+        self.avg_x, self.avg_y = -1, -1
+
     def process_image(self, image):
         self.contour1, self.contour2 = None, None
-        self.avg_x, self.avg_y = -1, -1
+        self.reset_data()
         self.height, self.width = image.shape[:2]
 
         # Find the 2 largest contours
@@ -44,6 +47,7 @@ class DualObjectFilter(GenericFilter):
             self.avg_x = (abs(self.img_x1 - self.img_x2) / 2) + min(self.img_x1, self.img_x2)
             self.avg_y = (abs(self.img_y1 - self.img_y2) / 2) + min(self.img_y1, self.img_y2)
 
+    def publish_data(self):
         # Write location if it is different from previous value written
         if self.avg_x != self.prev_x or self.avg_y != self.prev_y:
             self.location_server.write_location(self.avg_x, self.avg_y, self.width, self.height, self.middle_inc)

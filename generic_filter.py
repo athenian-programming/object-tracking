@@ -26,7 +26,8 @@ class GenericFilter(object):
                  draw_contour=False,
                  draw_box=False,
                  vertical_lines=False,
-                 horizontal_lines=False):
+                 horizontal_lines=False,
+                 predicate=None):
         self.tracker = tracker
         self.leds = leds
         self.display_text = display_text
@@ -34,6 +35,7 @@ class GenericFilter(object):
         self.draw_box = draw_box
         self.vertical_lines = vertical_lines
         self.horizontal_lines = horizontal_lines
+        self.predicate = predicate
         self._prev_x, self._prev_y = -1, -1
         self.contour_finder = ContourFinder(bgr_color, hsv_range, minimum_pixels)
         self.location_server = LocationServer(grpc_port)
@@ -81,7 +83,13 @@ class GenericFilter(object):
     def reset(self):
         self.prev_x, self.prev_y = -1, -1
 
+    def reset_data(self):
+        raise Exception("Should be implemented by sub-class")
+
     def process_image(self, image):
+        raise Exception("Should be implemented by sub-class")
+
+    def publish_data(self):
         raise Exception("Should be implemented by sub-class")
 
     def markup_image(self, image):
