@@ -1,16 +1,15 @@
 #!/usr/bin/env python2
 
 import logging
-import math
 
-import cv2
 from cli_args import LOG_LEVEL
 from constants import DISPLAY, BGR_COLOR, WIDTH, MIDDLE_PERCENT, FLIP_X, DRAW_CONTOUR, DRAW_BOX
 from constants import FLIP_Y, HTTP_DELAY_SECS, HTTP_FILE, HTTP_VERBOSE
 from constants import MINIMUM_PIXELS, GRPC_PORT, LEDS, HSV_RANGE, CAMERA_NAME, USB_CAMERA, HTTP_HOST
 from object_tracker import ObjectTracker
+from opencv_utils import contour_slope_degrees
 from single_object_filter import SingleObjectFilter
-from utils import setup_logging, distance
+from utils import setup_logging
 
 logger = logging.getLogger(__name__)
 
@@ -21,45 +20,12 @@ def test_for_rope(filter):
         filter.reset_data()
         return
 
-    rect = cv2.minAreaRect(filter.contour)
-    box = cv2.boxPoints(rect)
+    slope, degrees = contour_slope_degrees(filter.contour)
 
-    point_lr = box[0]
-    point_ll = box[1]
-    point_ul = box[2]
-    point_ur = box[3]
-
-    line1 = distance(point_lr, point_ur)
-    line2 = distance(point_ur, point_ul)
-
-    if line1 < line2:
-        point_lr = box[1]
-        point_ll = box[2]
-        point_ul = box[3]
-        point_ur = box[0]
-        line_width = line1
-    else:
-        line_width = line2
-
-    delta_y = point_lr[1] - point_ur[1]
-    delta_x = point_lr[0] - point_ur[0]
-
-    # Calculate angle of line
-    if delta_x == 0:
-        # Vertical line
-        degrees = 90
-        ratio = 100
-    else:
-        # Non-vertical line
-        slope = delta_y / delta_x
-        radians = math.atan(slope)
-        degrees = int(math.degrees(radians)) * -1
-        ratio = abs(delta_y / delta_x)
-
-    # logger.info("Ratio: {0}".format(ratio))
+    # logger.info("Slope: {0}".format(slope))
     # logger.info("Degrees: {0}".format(degrees))
 
-    if abs(degrees) < 80 or ratio < 20:
+    if abs(degrees) < 80 or (slope is not None and abs(slope) < 20):
         filter.reset_data()
 
 
