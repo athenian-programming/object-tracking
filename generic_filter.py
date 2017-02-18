@@ -37,11 +37,10 @@ class GenericFilter(object):
         self.horizontal_lines = horizontal_lines
         self.predicate = predicate
         self._prev_x, self._prev_y = -1, -1
+        self.height, self.width = -1, -1
+        self.contours = None
         self.contour_finder = ContourFinder(bgr_color, hsv_range, minimum_pixels)
         self.location_server = LocationServer(grpc_port)
-        self.height = -1
-        self.width = -1
-        self.contours = None
 
     @property
     def prev_x(self):
