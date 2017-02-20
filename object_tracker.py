@@ -4,12 +4,15 @@ import time
 import cli_args  as cli
 import cv2
 import imutils
+import numpy as np
 import opencv_utils as utils
 from camera import Camera
 from cli_args import setup_cli_args
 from image_server import ImageServer
 
 logger = logging.getLogger(__name__)
+
+BLACK = np.uint8((0, 0, 0))
 
 
 class ObjectTracker(object):
@@ -19,6 +22,8 @@ class ObjectTracker(object):
                  display,
                  flip_x,
                  flip_y,
+                 mask_x,
+                 mask_y,
                  usb_camera,
                  camera_name,
                  http_host,
@@ -33,6 +38,8 @@ class ObjectTracker(object):
         self.__display = display
         self.__flip_x = flip_x
         self.__flip_y = flip_y
+        self.__mask_x = mask_x
+        self.__mask_y = mask_y
         self.__filters = None
 
         self.stopped = False
@@ -88,6 +95,23 @@ class ObjectTracker(object):
                 image = self.cam.read()
                 image = imutils.resize(image, width=self.width)
                 image = self.flip(image)
+
+                # Apply masks
+                if self.__mask_y != 0:
+                    height, width = image.shape[:2]
+                    mask_height = abs(int((self.__mask_y / 100.0) * height))
+                    if self.__mask_y < 0:
+                        image[0: mask_height, 0: width] = BLACK
+                    else:
+                        image[height - mask_height: height, 0: width] = BLACK
+
+                if self.__mask_x != 0:
+                    height, width = image.shape[:2]
+                    mask_width = abs(int((self.__mask_x / 100.0) * width))
+                    if self.__mask_x < 0:
+                        image[0: height, 0: mask_width] = BLACK
+                    else:
+                        image[0: height, width - mask_width: width] = BLACK
 
                 if self.__filters:
                     for filter in self.__filters:
@@ -165,6 +189,8 @@ class ObjectTracker(object):
                               cli.leds,
                               cli.flip_x,
                               cli.flip_y,
+                              cli.mask_x,
+                              cli.mask_y,
                               cli.vertical_lines,
                               cli.horizontal_lines,
                               cli.camera_name_optional,
