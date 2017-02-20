@@ -22,8 +22,9 @@ class ObjectTracker(object):
                  usb_camera,
                  camera_name,
                  http_host,
-                 http_delay_secs,
                  http_file,
+                 http_delay_secs,
+                 http_startup_sleep_secs,
                  http_verbose):
         self.__width = width
         self.__middle_percent = middle_percent
@@ -37,7 +38,12 @@ class ObjectTracker(object):
         self.stopped = False
         self.cnt = 0
         self.cam = Camera(use_picamera=not usb_camera)
-        self.image_server = ImageServer(http_file, camera_name, http_host, http_delay_secs, http_verbose)
+        self.image_server = ImageServer(http_file,
+                                        camera_name=camera_name,
+                                        http_host=http_host,
+                                        http_delay_secs=http_delay_secs,
+                                        http_startup_sleep_secs=http_startup_sleep_secs,
+                                        http_verbose=http_verbose)
 
     @property
     def width(self):
@@ -117,27 +123,27 @@ class ObjectTracker(object):
         self.image_server.stop()
 
     def display_image(self, image):
-            cv2.imshow("Image", image)
+        cv2.imshow("Image", image)
 
-            key = cv2.waitKey(1) & 0xFF
+        key = cv2.waitKey(1) & 0xFF
 
-            if key == 255:
-                pass
-            elif key == ord("w"):
-                self.width -= 10
-            elif key == ord("W"):
-                self.width += 10
-            elif key == ord("-") or key == ord("_") or key == 0:
-                self.middle_percent -= 1
-            elif key == ord("+") or key == ord("=") or key == 1:
-                self.middle_percent += 1
-            elif key == ord("r"):
-                self.width = self.__orig_width
-                self.middle_percent = self.__orig_middle_percent
-            elif key == ord("s"):
-                utils.write_image(image, log_info=True)
-            elif key == ord("q"):
-                self.stop()
+        if key == 255:
+            pass
+        elif key == ord("w"):
+            self.width -= 10
+        elif key == ord("W"):
+            self.width += 10
+        elif key == ord("-") or key == ord("_") or key == 0:
+            self.middle_percent -= 1
+        elif key == ord("+") or key == ord("=") or key == 1:
+            self.middle_percent += 1
+        elif key == ord("r"):
+            self.width = self.__orig_width
+            self.middle_percent = self.__orig_middle_percent
+        elif key == ord("s"):
+            utils.write_image(image, log_info=True)
+        elif key == ord("q"):
+            self.stop()
 
     def flip(self, image):
         img = image
@@ -166,7 +172,8 @@ class ObjectTracker(object):
                               cli.draw_contour,
                               cli.draw_box,
                               cli.http_host,
-                              cli.http_delay_secs,
                               cli.http_file,
-                              cli.verbose_http,
+                              cli.http_delay_secs,
+                              cli.http_startup_sleep_secs,
+                              cli.http_verbose,
                               cli.verbose)

@@ -5,7 +5,9 @@ import logging
 import cv2
 import opencv_defaults as defs
 from cli_args import LOG_LEVEL
-from constants import DRAW_CONTOUR, DRAW_BOX, HTTP_DELAY_SECS, HTTP_VERBOSE, HTTP_FILE, VERTICAL_LINES, HORIZONTAL_LINES
+from constants import DRAW_CONTOUR, DRAW_BOX, HTTP_DELAY_SECS, HTTP_VERBOSE, HTTP_FILE, VERTICAL_LINES, \
+    HORIZONTAL_LINES, \
+    HTTP_STARTUP_SLEEP_SECS
 from constants import MINIMUM_PIXELS, GRPC_PORT, HSV_RANGE, LEDS, CAMERA_NAME, HTTP_HOST, USB_CAMERA
 from constants import WIDTH, DISPLAY, BGR_COLOR, MIDDLE_PERCENT, FLIP_X, FLIP_Y
 from generic_filter import GenericFilter
@@ -117,8 +119,9 @@ if __name__ == "__main__":
                             usb_camera=args[USB_CAMERA],
                             camera_name=args[CAMERA_NAME],
                             http_host=args[HTTP_HOST],
-                            http_delay_secs=args[HTTP_DELAY_SECS],
                             http_file=args[HTTP_FILE],
+                            http_delay_secs=args[HTTP_DELAY_SECS],
+                            http_startup_sleep_secs=args[HTTP_STARTUP_SLEEP_SECS],
                             http_verbose=args[HTTP_VERBOSE])
 
     filter = DualObjectFilter(tracker,

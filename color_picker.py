@@ -5,12 +5,12 @@ import logging
 import camera
 import cli_args  as cli
 import cv2
-import image_server as img_server
 import imutils
 import numpy as np
 import opencv_defaults as defs
 from cli_args import LOG_LEVEL
 from cli_args import setup_cli_args
+from image_server import ImageServer
 from opencv_utils import GREEN
 from opencv_utils import RED
 from utils import setup_logging
@@ -26,9 +26,18 @@ class ColorPicker(object):
     move_inc = 4
     x_adj = 0
     y_adj = 0
-    name = "Color Picker"
 
-    def __init__(self, width, usb_camera, flip_x, flip_y, display, http_host, http_delay_secs, http_file, http_verbose):
+    def __init__(self,
+                 width,
+                 usb_camera,
+                 flip_x,
+                 flip_y,
+                 display,
+                 http_host,
+                 http_file,
+                 http_delay_secs,
+                 http_startup_sleep_secs,
+                 http_verbose):
         self.__width = width
         self.__usb_camera = usb_camera
         self.__flip_x = flip_x
@@ -36,7 +45,12 @@ class ColorPicker(object):
         self.__display = display
         self.__orig_width = self.__width
         self.__cam = camera.Camera(use_picamera=not usb_camera)
-        self.__image_server = img_server.ImageServer(http_file, self.name, http_host, http_delay_secs, http_verbose)
+        self.__image_server = ImageServer(http_file,
+                                          camera_name="Color Picker",
+                                          http_host=http_host,
+                                          http_delay_secs=http_delay_secs,
+                                          http_startup_sleep_secs=http_startup_sleep_secs,
+                                          http_verbose=http_verbose)
 
     # Do not run this in a background thread. cv2.waitKey has to run in main thread
     def start(self):
@@ -134,9 +148,10 @@ if __name__ == "__main__":
                           cli.flip_x,
                           cli.flip_y,
                           cli.http_host,
-                          cli.http_delay_secs,
                           cli.http_file,
-                          cli.verbose_http,
+                          cli.http_delay_secs,
+                          cli.http_startup_sleep_secs,
+                          cli.http_verbose,
                           cli.verbose)
 
     # Setup logging
