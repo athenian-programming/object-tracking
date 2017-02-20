@@ -1,13 +1,13 @@
 import logging
 import time
 
-import camera
 import cli_args  as cli
 import cv2
-import image_server as img_server
 import imutils
 import opencv_utils as utils
+from camera import Camera
 from cli_args import setup_cli_args
+from image_server import ImageServer
 
 logger = logging.getLogger(__name__)
 
@@ -36,8 +36,8 @@ class ObjectTracker(object):
 
         self.stopped = False
         self.cnt = 0
-        self.cam = camera.Camera(use_picamera=not usb_camera)
-        self.image_server = img_server.ImageServer(http_file, camera_name, http_host, http_delay_secs, http_verbose)
+        self.cam = Camera(use_picamera=not usb_camera)
+        self.image_server = ImageServer(http_file, camera_name, http_host, http_delay_secs, http_verbose)
 
     @property
     def width(self):
@@ -93,7 +93,9 @@ class ObjectTracker(object):
                         filter.markup_image(image)
 
                 self.image_server.image = image
-                self.display_image(image)
+
+                if self.__display:
+                    self.display_image(image)
 
                 self.cnt += 1
 
@@ -115,7 +117,6 @@ class ObjectTracker(object):
         self.image_server.stop()
 
     def display_image(self, image):
-        if self.__display:
             cv2.imshow("Image", image)
 
             key = cv2.waitKey(1) & 0xFF
@@ -158,6 +159,8 @@ class ObjectTracker(object):
                               cli.leds,
                               cli.flip_x,
                               cli.flip_y,
+                              cli.vertical_lines,
+                              cli.horizontal_lines,
                               cli.camera_name_optional,
                               cli.display,
                               cli.draw_contour,

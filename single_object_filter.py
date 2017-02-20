@@ -5,7 +5,8 @@ import logging
 import cv2
 import opencv_defaults as defs
 from cli_args import LOG_LEVEL
-from constants import DISPLAY, BGR_COLOR, WIDTH, MIDDLE_PERCENT, FLIP_X, DRAW_CONTOUR, DRAW_BOX
+from constants import DISPLAY, BGR_COLOR, WIDTH, MIDDLE_PERCENT, FLIP_X
+from constants import DRAW_CONTOUR, DRAW_BOX, VERTICAL_LINES, HORIZONTAL_LINES
 from constants import FLIP_Y, HTTP_DELAY_SECS, HTTP_FILE, HTTP_VERBOSE
 from constants import MINIMUM_PIXELS, GRPC_PORT, LEDS, HSV_RANGE, CAMERA_NAME, USB_CAMERA, HTTP_HOST
 from generic_filter import GenericFilter
@@ -113,8 +114,8 @@ if __name__ == "__main__":
                                 display_text=True,
                                 draw_contour=args[DRAW_CONTOUR],
                                 draw_box=args[DRAW_BOX],
-                                vertical_lines=True,
-                                horizontal_lines=False)
+                                vertical_lines=args[VERTICAL_LINES],
+                                horizontal_lines=args[HORIZONTAL_LINES])
     try:
         tracker.start(filter)
     except KeyboardInterrupt:

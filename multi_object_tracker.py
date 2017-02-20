@@ -4,7 +4,8 @@ import logging
 import cli_args as cli
 from cli_args import GRPC_PORT_DEFAULT
 from cli_args import LOG_LEVEL
-from constants import HSV_RANGE, MIDDLE_PERCENT, FLIP_X, FLIP_Y, DRAW_CONTOUR, DRAW_BOX
+from constants import DRAW_CONTOUR, DRAW_BOX, VERTICAL_LINES, HORIZONTAL_LINES
+from constants import HSV_RANGE, MIDDLE_PERCENT, FLIP_X, FLIP_Y
 from constants import HTTP_DELAY_SECS, HTTP_FILE, HTTP_VERBOSE
 from constants import MINIMUM_PIXELS, CAMERA_NAME, HTTP_HOST, USB_CAMERA, DISPLAY, WIDTH
 from dual_object_filter import DualObjectFilter
@@ -30,6 +31,8 @@ if __name__ == "__main__":
     cli.leds(p),
     cli.flip_x(p),
     cli.flip_y(p),
+    cli.vertical_lines(p),
+    cli.horizontal_lines(p),
     cli.camera_name_optional(p),
     cli.display(p),
     cli.draw_contour(p),
@@ -71,8 +74,8 @@ if __name__ == "__main__":
                                    display_text=False,
                                    draw_contour=args[DRAW_CONTOUR],
                                    draw_box=args[DRAW_BOX],
-                                   vertical_lines=True,
-                                   horizontal_lines=False)
+                                   vertical_lines=args[VERTICAL_LINES],
+                                   horizontal_lines=args[HORIZONTAL_LINES])
 
     single_filter = SingleObjectFilter(tracker,
                                        bgr_color=args[SINGLE_BGR],

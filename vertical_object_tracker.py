@@ -3,7 +3,8 @@
 import logging
 
 from cli_args import LOG_LEVEL
-from constants import DISPLAY, BGR_COLOR, WIDTH, MIDDLE_PERCENT, FLIP_X, DRAW_CONTOUR, DRAW_BOX
+from constants import DISPLAY, BGR_COLOR, WIDTH, MIDDLE_PERCENT
+from constants import FLIP_X, DRAW_CONTOUR, DRAW_BOX, VERTICAL_LINES, HORIZONTAL_LINES
 from constants import FLIP_Y, HTTP_DELAY_SECS, HTTP_FILE, HTTP_VERBOSE
 from constants import MINIMUM_PIXELS, GRPC_PORT, LEDS, HSV_RANGE, CAMERA_NAME, USB_CAMERA, HTTP_HOST
 from object_tracker import ObjectTracker
@@ -57,8 +58,8 @@ if __name__ == "__main__":
                                 display_text=True,
                                 draw_contour=args[DRAW_CONTOUR],
                                 draw_box=args[DRAW_BOX],
-                                vertical_lines=True,
-                                horizontal_lines=False,
+                                vertical_lines=args[VERTICAL_LINES],
+                                horizontal_lines=args[HORIZONTAL_LINES],
                                 predicate=test_for_rope)
     try:
         tracker.start(filter)
