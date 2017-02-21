@@ -4,20 +4,20 @@
 
 Install the following Python packages: 
 
-* [gRPC](http://www.grpc.io/docs/guides/index.html) 
-as described [here](http://www.athenian-robotics.org/grpc/)
-
 * [OpenCV](http://opencv.org) 
 as described [here](http://www.athenian-robotics.org/opencv/)
+
+* [gRPC](http://www.grpc.io/docs/guides/index.html) 
+as described [here](http://www.athenian-robotics.org/grpc/)
 
 * [imutils](https://github.com/jrosebr1/imutils)
 as described [here](http://www.athenian-robotics.org/imutils/)
 
-* [numpy](http://www.numpy.org)
-as described [here](http://www.athenian-robotics.org/numpy/)
-
 * [MQTT](http://mqtt.org) client 
 as described [here](http://www.athenian-robotics.org/mqtt-client/)
+
+* [numpy](http://www.numpy.org)
+as described [here](http://www.athenian-robotics.org/numpy/)
 
 * [pyFirmata](https://github.com/tino/pyFirmata) client 
 as described [here](http://www.athenian-robotics.org/arduino/)
