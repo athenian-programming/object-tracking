@@ -44,7 +44,7 @@ class ColorPicker(object):
         self.__flip_y = flip_y
         self.__display = display
         self.__orig_width = self.__width
-        self.__cam = camera.Camera(use_picamera=not usb_camera)
+        self.__cam = camera.Camera(usb_camera=usb_camera)
         self.__image_server = ImageServer(http_file,
                                           camera_name="Color Picker",
                                           http_host=http_host,

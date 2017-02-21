@@ -44,7 +44,7 @@ class ObjectTracker(object):
 
         self.stopped = False
         self.cnt = 0
-        self.cam = Camera(use_picamera=not usb_camera)
+        self.cam = Camera(usb_camera=usb_camera)
         self.image_server = ImageServer(http_file,
                                         camera_name=camera_name,
                                         http_host=http_host,
