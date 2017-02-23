@@ -25,6 +25,7 @@ class ObjectTracker(object):
                  mask_x,
                  mask_y,
                  usb_camera,
+                 usb_port,
                  camera_name,
                  http_host,
                  http_file,
@@ -44,7 +45,7 @@ class ObjectTracker(object):
 
         self.stopped = False
         self.cnt = 0
-        self.cam = Camera(usb_camera=usb_camera)
+        self.cam = Camera(usb_camera=usb_camera, usb_port=usb_port)
         self.image_server = ImageServer(http_file,
                                         camera_name=camera_name,
                                         http_host=http_host,
@@ -89,6 +90,9 @@ class ObjectTracker(object):
                 filter.start()
 
         self.image_server.start()
+
+        if not self.cam.is_open():
+            logger.error("Camera is closed")
 
         while self.cam.is_open() and not self.stopped:
             try:
@@ -181,6 +185,7 @@ class ObjectTracker(object):
     def cli_args():
         return setup_cli_args(cli.bgr,
                               cli.usb,
+                              cli.usb_port,
                               cli.width,
                               cli.middle_percent,
                               cli.minimum_pixels,

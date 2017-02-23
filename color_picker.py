@@ -144,6 +144,7 @@ if __name__ == "__main__":
     # Parse CLI args
     args = setup_cli_args(cli.width,
                           cli.usb,
+                          cli.usb_port,
                           cli.display,
                           cli.flip_x,
                           cli.flip_y,

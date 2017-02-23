@@ -3,7 +3,7 @@
 import logging
 
 from cli_args import LOG_LEVEL
-from constants import DISPLAY, BGR_COLOR, WIDTH, MIDDLE_PERCENT, HTTP_STARTUP_SLEEP_SECS, MASK_X, MASK_Y
+from constants import DISPLAY, BGR_COLOR, WIDTH, MIDDLE_PERCENT, HTTP_STARTUP_SLEEP_SECS, MASK_X, MASK_Y, USB_PORT
 from constants import FLIP_X, DRAW_CONTOUR, DRAW_BOX, VERTICAL_LINES, HORIZONTAL_LINES
 from constants import FLIP_Y, HTTP_DELAY_SECS, HTTP_FILE, HTTP_VERBOSE
 from constants import MINIMUM_PIXELS, GRPC_PORT, LEDS, HSV_RANGE, CAMERA_NAME, USB_CAMERA, HTTP_HOST
@@ -45,6 +45,7 @@ if __name__ == "__main__":
                             mask_x=args[MASK_X],
                             mask_y=args[MASK_Y],
                             usb_camera=args[USB_CAMERA],
+                            usb_port=args[USB_PORT],
                             camera_name=args[CAMERA_NAME],
                             http_host=args[HTTP_HOST],
                             http_file=args[HTTP_FILE],

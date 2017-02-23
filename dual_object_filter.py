@@ -7,7 +7,7 @@ import opencv_defaults as defs
 from cli_args import LOG_LEVEL
 from constants import DRAW_CONTOUR, DRAW_BOX, HTTP_DELAY_SECS, HTTP_VERBOSE, HTTP_FILE, VERTICAL_LINES, \
     HORIZONTAL_LINES, \
-    HTTP_STARTUP_SLEEP_SECS, MASK_X, MASK_Y
+    HTTP_STARTUP_SLEEP_SECS, MASK_X, MASK_Y, USB_PORT
 from constants import MINIMUM_PIXELS, GRPC_PORT, HSV_RANGE, LEDS, CAMERA_NAME, HTTP_HOST, USB_CAMERA
 from constants import WIDTH, DISPLAY, BGR_COLOR, MIDDLE_PERCENT, FLIP_X, FLIP_Y
 from generic_filter import GenericFilter
@@ -119,6 +119,7 @@ if __name__ == "__main__":
                             mask_x=args[MASK_X],
                             mask_y=args[MASK_Y],
                             usb_camera=args[USB_CAMERA],
+                            usb_port=args[USB_PORT],
                             camera_name=args[CAMERA_NAME],
                             http_host=args[HTTP_HOST],
                             http_file=args[HTTP_FILE],

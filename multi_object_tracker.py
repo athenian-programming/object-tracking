@@ -4,7 +4,8 @@ import logging
 import cli_args as cli
 from cli_args import GRPC_PORT_DEFAULT
 from cli_args import LOG_LEVEL
-from constants import DRAW_CONTOUR, DRAW_BOX, VERTICAL_LINES, HORIZONTAL_LINES, HTTP_STARTUP_SLEEP_SECS, MASK_X, MASK_Y
+from constants import DRAW_CONTOUR, DRAW_BOX, VERTICAL_LINES, HORIZONTAL_LINES, HTTP_STARTUP_SLEEP_SECS, MASK_X, MASK_Y, \
+    USB_PORT
 from constants import HSV_RANGE, MIDDLE_PERCENT, FLIP_X, FLIP_Y
 from constants import HTTP_DELAY_SECS, HTTP_FILE, HTTP_VERBOSE
 from constants import MINIMUM_PIXELS, CAMERA_NAME, HTTP_HOST, USB_CAMERA, DISPLAY, WIDTH
@@ -64,6 +65,7 @@ if __name__ == "__main__":
                             mask_x=args[MASK_X],
                             mask_y=args[MASK_Y],
                             usb_camera=args[USB_CAMERA],
+                            usb_port=args[USB_PORT],
                             camera_name=args[CAMERA_NAME],
                             http_host=args[HTTP_HOST],
                             http_file=args[HTTP_FILE],
