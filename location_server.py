@@ -1,6 +1,5 @@
 import logging
 import time
-from threading import Thread
 
 import grpc
 from concurrent import futures
@@ -20,7 +19,7 @@ class LocationServer(ObjectLocationServerServicer, GenericServer):
 
     def registerClient(self, request, context):
         logger.info("Connected to {0} client {1} [{2}]".format(self.desc, context.peer(), request.info))
-        with self._cnt_lock:
+        with self.cnt_lock:
             self._invoke_cnt += 1
         return ServerInfo(info="Server invoke count {0}".format(self._invoke_cnt))
 
@@ -28,17 +27,10 @@ class LocationServer(ObjectLocationServerServicer, GenericServer):
         client_info = request.info
         return self.currval_generator(context.peer())
 
-    def write_location(self, x, y, width, height, middle_inc):
-        if not self.stopped:
-            self.set_currval(ObjectLocation(id=self._id,
-                                            x=x,
-                                            y=y,
-                                            width=width,
-                                            height=height,
-                                            middle_inc=middle_inc))
-            self._id += 1
+    def _init_values_on_start(self):
+        self.write_location(-1, -1, 0, 0, 0)
 
-    def _start_location_server(self):
+    def _start_server(self):
         logger.info("Starting gRPC {0} listening on {1}".format(self.desc, self._hostname))
         self._grpc_server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
         add_ObjectLocationServerServicer_to_server(self, self._grpc_server)
@@ -52,9 +44,12 @@ class LocationServer(ObjectLocationServerServicer, GenericServer):
         finally:
             self.stop()
 
-    def start(self):
-        logger.info("Starting {0}".format(self.desc))
-        self.write_location(-1, -1, 0, 0, 0)
-        Thread(target=self._start_location_server).start()
-        time.sleep(1)
-        return self
+    def write_location(self, x, y, width, height, middle_inc):
+        if not self.stopped:
+            self.set_currval(ObjectLocation(id=self._id,
+                                            x=x,
+                                            y=y,
+                                            width=width,
+                                            height=height,
+                                            middle_inc=middle_inc))
+            self._id += 1
