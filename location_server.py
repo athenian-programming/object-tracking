@@ -15,12 +15,11 @@ logger = logging.getLogger(__name__)
 
 class LocationServer(ObjectLocationServerServicer, GenericServer):
     def __init__(self, port):
-        super(LocationServer, self).__init__(port)
-        self._stopped = False
+        super(LocationServer, self).__init__(port, "location server")
         self._grpc_server = None
 
     def registerClient(self, request, context):
-        logger.info("Connected to client {0} [{1}]".format(context.peer(), request.info))
+        logger.info("Connected to {0} client {1} [{2}]".format(self.desc, context.peer(), request.info))
         with self._cnt_lock:
             self._invoke_cnt += 1
         return ServerInfo(info="Server invoke count {0}".format(self._invoke_cnt))
@@ -30,7 +29,7 @@ class LocationServer(ObjectLocationServerServicer, GenericServer):
         return self.currval_generator(context.peer())
 
     def write_location(self, x, y, width, height, middle_inc):
-        if not self._stopped:
+        if not self.stopped:
             self.set_currval(ObjectLocation(id=self._id,
                                             x=x,
                                             y=y,
@@ -40,13 +39,13 @@ class LocationServer(ObjectLocationServerServicer, GenericServer):
             self._id += 1
 
     def _start_location_server(self):
-        logger.info("Starting gRPC server listening on {0}".format(self._hostname))
+        logger.info("Starting gRPC {0} listening on {1}".format(self.desc, self._hostname))
         self._grpc_server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
         add_ObjectLocationServerServicer_to_server(self, self._grpc_server)
         self._grpc_server.add_insecure_port(self._hostname)
         self._grpc_server.start()
         try:
-            while not self._stopped:
+            while not self.stopped:
                 time.sleep(1)
         except KeyboardInterrupt:
             pass
@@ -54,13 +53,8 @@ class LocationServer(ObjectLocationServerServicer, GenericServer):
             self.stop()
 
     def start(self):
-        logger.info("Starting location server")
+        logger.info("Starting {0}".format(self.desc))
         self.write_location(-1, -1, 0, 0, 0)
         Thread(target=self._start_location_server).start()
         time.sleep(1)
         return self
-
-    def stop(self):
-        if not self._stopped:
-            logger.info("Stopping location server")
-            self._stopped = True

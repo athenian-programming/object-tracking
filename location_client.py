@@ -23,25 +23,24 @@ class LocationClient(GenericClient):
         self.__width = -1
         self.__height = -1
         self.__middle_inc = -1
-        self._stopped = False
 
     # Blocking
     def get_x(self, timeout=None):
-        while not self._stopped:
+        while not self.stopped:
             if not self.__x_ready.wait(timeout):
                 raise TimeoutException
             with self._lock:
-                if self.__x_ready.is_set() and not self._stopped:
+                if self.__x_ready.is_set() and not self.stopped:
                     self.__x_ready.clear()
                     return self.__x, self.__width, self.__middle_inc, self.__id
 
     # Blocking
     def get_y(self, timeout=None):
-        while not self._stopped:
+        while not self.stopped:
             if not self.__y_ready.wait(timeout):
                 raise TimeoutException
             with self._lock:
-                if self.__y_ready.is_set() and not self._stopped:
+                if self.__y_ready.is_set() and not self.stopped:
                     self.__y_ready.clear()
                     return self.__y, self.__height, self.__middle_inc, self.__id
 
@@ -60,7 +59,7 @@ class LocationClient(GenericClient):
     def read_locations(self, pause_secs=2.0):
         channel = grpc.insecure_channel(self._hostname)
         stub = ObjectLocationServerStub(channel)
-        while not self._stopped:
+        while not self.stopped:
             logger.info("Connecting to gRPC server at {0}...".format(self._hostname))
             try:
                 client_info = ClientInfo(info="{0} client".format(socket.gethostname()))
@@ -93,8 +92,8 @@ class LocationClient(GenericClient):
         return self
 
     def stop(self):
-        if not self._stopped:
+        if not self.stopped:
             logger.info("Stopping location client")
-            self._stopped = True
+            self.stopped = True
             self.__x_ready.set()
             self.__y_ready.set()
