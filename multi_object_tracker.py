@@ -4,8 +4,7 @@ import logging
 import cli_args as cli
 from cli_args import GRPC_PORT_DEFAULT
 from cli_args import LOG_LEVEL
-from constants import DRAW_CONTOUR, DRAW_BOX, VERTICAL_LINES, HORIZONTAL_LINES, HTTP_STARTUP_SLEEP_SECS, MASK_X, MASK_Y, \
-    USB_PORT
+from constants import DRAW_CONTOUR, DRAW_BOX, VERTICAL_LINES, HORIZONTAL_LINES, MASK_X, MASK_Y, USB_PORT
 from constants import HSV_RANGE, MIDDLE_PERCENT, FLIP_X, FLIP_Y
 from constants import HTTP_DELAY_SECS, HTTP_FILE, HTTP_VERBOSE
 from constants import MINIMUM_PIXELS, CAMERA_NAME, HTTP_HOST, USB_CAMERA, DISPLAY, WIDTH
@@ -42,7 +41,6 @@ if __name__ == "__main__":
     cli.draw_box(p),
     cli.http_host(p),
     cli.http_delay_secs(p),
-    cli.http_startup_sleep_secs(p),
     cli.http_file(p),
     cli.http_verbose(p),
     p.add_argument("--dualbgr", dest=DUAL_BGR, required=True, help="Dual color BGR value")
@@ -70,7 +68,6 @@ if __name__ == "__main__":
                             http_host=args[HTTP_HOST],
                             http_file=args[HTTP_FILE],
                             http_delay_secs=args[HTTP_DELAY_SECS],
-                            http_startup_sleep_secs=args[HTTP_STARTUP_SLEEP_SECS],
                             http_verbose=args[HTTP_VERBOSE])
 
     dual_filter = DualObjectFilter(tracker,

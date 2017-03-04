@@ -36,7 +36,6 @@ class ColorPicker(object):
                  http_host,
                  http_file,
                  http_delay_secs,
-                 http_startup_sleep_secs,
                  http_verbose):
         self.__width = width
         self.__usb_camera = usb_camera
@@ -49,7 +48,6 @@ class ColorPicker(object):
                                           camera_name="Color Picker",
                                           http_host=http_host,
                                           http_delay_secs=http_delay_secs,
-                                          http_startup_sleep_secs=http_startup_sleep_secs,
                                           http_verbose=http_verbose)
 
     # Do not run this in a background thread. cv2.waitKey has to run in main thread
@@ -151,7 +149,6 @@ if __name__ == "__main__":
                           cli.http_host,
                           cli.http_file,
                           cli.http_delay_secs,
-                          cli.http_startup_sleep_secs,
                           cli.http_verbose,
                           cli.verbose)
 

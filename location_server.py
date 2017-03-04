@@ -1,5 +1,6 @@
 import logging
 import time
+from threading import Thread
 
 import grpc
 from concurrent import futures
@@ -8,6 +9,8 @@ from gen.grpc_server_pb2 import ObjectLocationServerServicer
 from gen.grpc_server_pb2 import ServerInfo
 from gen.grpc_server_pb2 import add_ObjectLocationServerServicer_to_server
 from grpc_support import GenericServer
+from utils import setup_logging
+from utils import sleep
 
 logger = logging.getLogger(__name__)
 
@@ -19,9 +22,7 @@ class LocationServer(ObjectLocationServerServicer, GenericServer):
 
     def registerClient(self, request, context):
         logger.info("Connected to {0} client {1} [{2}]".format(self.desc, context.peer(), request.info))
-        with self.cnt_lock:
-            self._invoke_cnt += 1
-        return ServerInfo(info="Server invoke count {0}".format(self._invoke_cnt))
+        return ServerInfo(info="Server invoke count {0}".format(self.increment_cnt()))
 
     def getObjectLocations(self, request, context):
         client_info = request.info
@@ -53,3 +54,17 @@ class LocationServer(ObjectLocationServerServicer, GenericServer):
                                             height=height,
                                             middle_inc=middle_inc))
             self._id += 1
+
+
+if __name__ == "__main__":
+    def _run_server(port):
+        server = LocationServer(port).start()
+
+        for i in range(100):
+            server.write_location(x=i, y=i + 1, width=i + 2, height=i + 3, middle_inc=i + 4)
+            time.sleep(1)
+
+
+    setup_logging()
+    Thread(target=_run_server, args=(50052,)).start()
+    sleep()

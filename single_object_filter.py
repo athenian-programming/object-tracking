@@ -8,7 +8,7 @@ from cli_args import LOG_LEVEL
 from constants import DISPLAY, BGR_COLOR, WIDTH, MIDDLE_PERCENT, FLIP_X
 from constants import DRAW_CONTOUR, DRAW_BOX, VERTICAL_LINES, HORIZONTAL_LINES
 from constants import FLIP_Y, HTTP_DELAY_SECS, HTTP_FILE, HTTP_VERBOSE
-from constants import HTTP_STARTUP_SLEEP_SECS, MASK_X, MASK_Y, USB_PORT
+from constants import MASK_X, MASK_Y, USB_PORT
 from constants import MINIMUM_PIXELS, GRPC_PORT, LEDS, HSV_RANGE, CAMERA_NAME, USB_CAMERA, HTTP_HOST
 from generic_filter import GenericFilter
 from object_tracker import ObjectTracker
@@ -107,7 +107,6 @@ if __name__ == "__main__":
                             http_host=args[HTTP_HOST],
                             http_file=args[HTTP_FILE],
                             http_delay_secs=args[HTTP_DELAY_SECS],
-                            http_startup_sleep_secs=args[HTTP_STARTUP_SLEEP_SECS],
                             http_verbose=args[HTTP_VERBOSE])
 
     filter = SingleObjectFilter(tracker,

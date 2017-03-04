@@ -30,7 +30,6 @@ class ObjectTracker(object):
                  http_host,
                  http_file,
                  http_delay_secs,
-                 http_startup_sleep_secs,
                  http_verbose):
         self.__width = width
         self.__middle_percent = middle_percent
@@ -50,7 +49,6 @@ class ObjectTracker(object):
                                         camera_name=camera_name,
                                         http_host=http_host,
                                         http_delay_secs=http_delay_secs,
-                                        http_startup_sleep_secs=http_startup_sleep_secs,
                                         http_verbose=http_verbose)
 
     @property
@@ -205,6 +203,5 @@ class ObjectTracker(object):
                               cli.http_host,
                               cli.http_file,
                               cli.http_delay_secs,
-                              cli.http_startup_sleep_secs,
                               cli.http_verbose,
                               cli.verbose)

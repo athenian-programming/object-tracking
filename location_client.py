@@ -2,14 +2,18 @@ import logging
 import socket
 import time
 from threading import Event
+from threading import Thread
 
 import grpc
 from gen.grpc_server_pb2 import ClientInfo
 from gen.grpc_server_pb2 import ObjectLocationServerStub
 from grpc_support import GenericClient
 from grpc_support import TimeoutException
+from utils import setup_logging
+from utils import sleep
 
 logger = logging.getLogger(__name__)
+
 
 class LocationClient(GenericClient):
     def __init__(self, hostname):
@@ -87,3 +91,20 @@ class LocationClient(GenericClient):
     # Blocking
     def get_xy(self):
         return self.get_x(), self.get_y()
+
+
+if __name__ == "__main__":
+    def _run_client(hostname):
+        channel = grpc.insecure_channel(hostname)
+        stub = ObjectLocationServerStub(channel)
+        client_info = ClientInfo(info="{0} client".format(socket.gethostname()))
+        server_info = stub.registerClient(client_info)
+
+        for loc in stub.getObjectLocations(client_info):
+            print("Received location {0}".format(loc))
+        print("Disconnected from gRPC server at {0}".format(hostname))
+
+
+    setup_logging()
+    Thread(target=_run_client, args=("localhost:50052",)).start()
+    sleep()
