@@ -95,6 +95,11 @@ class ObjectTracker(object):
         while self.cam.is_open() and not self.stopped:
             try:
                 image = self.cam.read()
+                if image is None:
+                    logger.error("Null image read from camera")
+                    time.sleep(.5)
+                    continue
+
                 image = imutils.resize(image, width=self.width)
                 image = self.flip(image)
 

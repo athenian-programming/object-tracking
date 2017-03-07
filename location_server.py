@@ -16,9 +16,9 @@ logger = logging.getLogger(__name__)
 
 
 class LocationServer(ObjectLocationServerServicer, GenericServer):
-    def __init__(self, port):
-        super(LocationServer, self).__init__(port, "location server")
-        self._grpc_server = None
+    def __init__(self, port=None):
+        super(LocationServer, self).__init__(port=port, desc="location server")
+        self.grpc_server = None
 
     def registerClient(self, request, context):
         logger.info("Connected to {0} client {1} [{2}]".format(self.desc, context.peer(), request.info))
@@ -33,10 +33,10 @@ class LocationServer(ObjectLocationServerServicer, GenericServer):
 
     def _start_server(self):
         logger.info("Starting gRPC {0} listening on {1}".format(self.desc, self._hostname))
-        self._grpc_server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-        add_ObjectLocationServerServicer_to_server(self, self._grpc_server)
-        self._grpc_server.add_insecure_port(self._hostname)
-        self._grpc_server.start()
+        self.grpc_server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
+        add_ObjectLocationServerServicer_to_server(self, self.grpc_server)
+        self.grpc_server.add_insecure_port(self._hostname)
+        self.grpc_server.start()
         try:
             while not self.stopped:
                 time.sleep(1)
@@ -47,13 +47,13 @@ class LocationServer(ObjectLocationServerServicer, GenericServer):
 
     def write_location(self, x, y, width, height, middle_inc):
         if not self.stopped:
-            self.set_currval(ObjectLocation(id=self._id,
+            self.set_currval(ObjectLocation(id=self.__id,
                                             x=x,
                                             y=y,
                                             width=width,
                                             height=height,
                                             middle_inc=middle_inc))
-            self._id += 1
+            self.__id += 1
 
 
 if __name__ == "__main__":

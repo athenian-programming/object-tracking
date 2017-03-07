@@ -1,6 +1,7 @@
 #!/usr/bin/env python2
 
 import logging
+import time
 
 import camera
 import cli_args  as cli
@@ -56,6 +57,11 @@ class ColorPicker(object):
         cnt = 0
         while self.__cam.is_open():
             image = self.__cam.read()
+            if image is None:
+                logger.error("Null image read from camera")
+                time.sleep(.5)
+                continue
+
             image = imutils.resize(image, width=self.__width)
 
             if self.__flip_x:
