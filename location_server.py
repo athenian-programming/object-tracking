@@ -32,10 +32,10 @@ class LocationServer(ObjectLocationServerServicer, GenericServer):
         self.write_location(-1, -1, 0, 0, 0)
 
     def _start_server(self):
-        logger.info("Starting gRPC {0} listening on {1}".format(self.desc, self._hostname))
+        logger.info("Starting gRPC {0} listening on {1}".format(self.desc, self.hostname))
         self.grpc_server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
         add_ObjectLocationServerServicer_to_server(self, self.grpc_server)
-        self.grpc_server.add_insecure_port(self._hostname)
+        self.grpc_server.add_insecure_port(self.hostname)
         self.grpc_server.start()
         try:
             while not self.stopped:
@@ -47,13 +47,13 @@ class LocationServer(ObjectLocationServerServicer, GenericServer):
 
     def write_location(self, x, y, width, height, middle_inc):
         if not self.stopped:
-            self.set_currval(ObjectLocation(id=self.__id,
+            self.set_currval(ObjectLocation(id=self.id,
                                             x=x,
                                             y=y,
                                             width=width,
                                             height=height,
                                             middle_inc=middle_inc))
-            self.__id += 1
+            self.id += 1
 
 
 if __name__ == "__main__":

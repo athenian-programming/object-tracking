@@ -28,19 +28,19 @@ class LocationClient(GenericClient):
         self.__y_ready.set()
 
     def _get_values(self, pause_secs=2.0):
-        channel = grpc.insecure_channel(self.__hostname)
+        channel = grpc.insecure_channel(self.hostname)
         stub = ObjectLocationServerStub(channel)
         while not self.stopped:
-            logger.info("Connecting to gRPC server at {0}...".format(self.__hostname))
+            logger.info("Connecting to gRPC server at {0}...".format(self.hostname))
             try:
                 client_info = ClientInfo(info="{0} client".format(socket.gethostname()))
                 server_info = stub.registerClient(client_info)
             except BaseException as e:
-                logger.error("Failed to connect to gRPC server at {0} [{1}]".format(self.__hostname, e))
+                logger.error("Failed to connect to gRPC server at {0} [{1}]".format(self.hostname, e))
                 time.sleep(pause_secs)
                 continue
 
-            logger.info("Connected to gRPC server at {0} [{1}]".format(self.__hostname, server_info.info))
+            logger.info("Connected to gRPC server at {0} [{1}]".format(self.hostname, server_info.info))
 
             try:
                 for val in stub.getObjectLocations(client_info):
@@ -48,7 +48,7 @@ class LocationClient(GenericClient):
                         self.__currval = copy.deepcopy(val)
                     self._mark_ready()
             except BaseException as e:
-                logger.info("Disconnected from gRPC server at {0} [{1}]".format(self.__hostname, e))
+                logger.info("Disconnected from gRPC server at {0} [{1}]".format(self.hostname, e))
                 time.sleep(pause_secs)
 
     # Non-blocking
