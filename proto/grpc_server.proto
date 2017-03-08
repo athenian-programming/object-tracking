@@ -2,12 +2,12 @@ syntax = "proto3";
 
 package opencv_object_tracking;
 
-service ObjectLocationServer {
+service LocationServer {
 
     rpc registerClient (ClientInfo) returns (ServerInfo) {
     }
 
-    rpc getObjectLocations (ClientInfo) returns (stream ObjectLocation) {
+    rpc getLocations (ClientInfo) returns (stream Location) {
     }
 }
 
@@ -19,7 +19,7 @@ message ServerInfo {
     string info = 1;
 }
 
-message ObjectLocation {
+message Location {
     int32 id = 1;
     int32 x = 2;
     int32 y = 3;

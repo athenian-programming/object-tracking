@@ -109,19 +109,19 @@ if __name__ == "__main__":
                             http_delay_secs=args[HTTP_DELAY_SECS],
                             http_verbose=args[HTTP_VERBOSE])
 
-    filter = SingleObjectFilter(tracker,
-                                bgr_color=args[BGR_COLOR],
-                                hsv_range=args[HSV_RANGE],
-                                minimum_pixels=args[MINIMUM_PIXELS],
-                                grpc_port=args[GRPC_PORT],
-                                leds=args[LEDS],
-                                display_text=True,
-                                draw_contour=args[DRAW_CONTOUR],
-                                draw_box=args[DRAW_BOX],
-                                vertical_lines=args[VERTICAL_LINES],
-                                horizontal_lines=args[HORIZONTAL_LINES])
+    obj_filter = SingleObjectFilter(tracker,
+                                    bgr_color=args[BGR_COLOR],
+                                    hsv_range=args[HSV_RANGE],
+                                    minimum_pixels=args[MINIMUM_PIXELS],
+                                    grpc_port=args[GRPC_PORT],
+                                    leds=args[LEDS],
+                                    display_text=True,
+                                    draw_contour=args[DRAW_CONTOUR],
+                                    draw_box=args[DRAW_BOX],
+                                    vertical_lines=args[VERTICAL_LINES],
+                                    horizontal_lines=args[HORIZONTAL_LINES])
     try:
-        tracker.start(filter)
+        tracker.start(obj_filter)
     except KeyboardInterrupt:
         pass
     finally:

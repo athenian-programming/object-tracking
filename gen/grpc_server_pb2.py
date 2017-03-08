@@ -18,7 +18,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
     package='opencv_object_tracking',
     syntax='proto3',
     serialized_pb=_b(
-        '\n\x11grpc_server.proto\x12\x16opencv_object_tracking\"\x1a\n\nClientInfo\x12\x0c\n\x04info\x18\x01 \x01(\t\"\x1a\n\nServerInfo\x12\x0c\n\x04info\x18\x01 \x01(\t\"e\n\x0eObjectLocation\x12\n\n\x02id\x18\x01 \x01(\x05\x12\t\n\x01x\x18\x02 \x01(\x05\x12\t\n\x01y\x18\x03 \x01(\x05\x12\r\n\x05width\x18\x04 \x01(\x05\x12\x0e\n\x06height\x18\x05 \x01(\x05\x12\x12\n\nmiddle_inc\x18\x06 \x01(\x05\x32\xd8\x01\n\x14ObjectLocationServer\x12Z\n\x0eregisterClient\x12\".opencv_object_tracking.ClientInfo\x1a\".opencv_object_tracking.ServerInfo\"\x00\x12\x64\n\x12getObjectLocations\x12\".opencv_object_tracking.ClientInfo\x1a&.opencv_object_tracking.ObjectLocation\"\x00\x30\x01\x62\x06proto3')
+        '\n\x11grpc_server.proto\x12\x16opencv_object_tracking\"\x1a\n\nClientInfo\x12\x0c\n\x04info\x18\x01 \x01(\t\"\x1a\n\nServerInfo\x12\x0c\n\x04info\x18\x01 \x01(\t\"_\n\x08Location\x12\n\n\x02id\x18\x01 \x01(\x05\x12\t\n\x01x\x18\x02 \x01(\x05\x12\t\n\x01y\x18\x03 \x01(\x05\x12\r\n\x05width\x18\x04 \x01(\x05\x12\x0e\n\x06height\x18\x05 \x01(\x05\x12\x12\n\nmiddle_inc\x18\x06 \x01(\x05\x32\xc6\x01\n\x0eLocationServer\x12Z\n\x0eregisterClient\x12\".opencv_object_tracking.ClientInfo\x1a\".opencv_object_tracking.ServerInfo\"\x00\x12X\n\x0cgetLocations\x12\".opencv_object_tracking.ClientInfo\x1a .opencv_object_tracking.Location\"\x00\x30\x01\x62\x06proto3')
 )
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
@@ -83,51 +83,50 @@ _SERVERINFO = _descriptor.Descriptor(
     serialized_end=99,
 )
 
-
-_OBJECTLOCATION = _descriptor.Descriptor(
-    name='ObjectLocation',
-    full_name='opencv_object_tracking.ObjectLocation',
+_LOCATION = _descriptor.Descriptor(
+    name='Location',
+    full_name='opencv_object_tracking.Location',
     filename=None,
     file=DESCRIPTOR,
     containing_type=None,
     fields=[
         _descriptor.FieldDescriptor(
-            name='id', full_name='opencv_object_tracking.ObjectLocation.id', index=0,
+            name='id', full_name='opencv_object_tracking.Location.id', index=0,
             number=1, type=5, cpp_type=1, label=1,
             has_default_value=False, default_value=0,
             message_type=None, enum_type=None, containing_type=None,
             is_extension=False, extension_scope=None,
             options=None),
         _descriptor.FieldDescriptor(
-            name='x', full_name='opencv_object_tracking.ObjectLocation.x', index=1,
+            name='x', full_name='opencv_object_tracking.Location.x', index=1,
             number=2, type=5, cpp_type=1, label=1,
             has_default_value=False, default_value=0,
             message_type=None, enum_type=None, containing_type=None,
             is_extension=False, extension_scope=None,
             options=None),
         _descriptor.FieldDescriptor(
-            name='y', full_name='opencv_object_tracking.ObjectLocation.y', index=2,
+            name='y', full_name='opencv_object_tracking.Location.y', index=2,
             number=3, type=5, cpp_type=1, label=1,
             has_default_value=False, default_value=0,
             message_type=None, enum_type=None, containing_type=None,
             is_extension=False, extension_scope=None,
             options=None),
         _descriptor.FieldDescriptor(
-            name='width', full_name='opencv_object_tracking.ObjectLocation.width', index=3,
+            name='width', full_name='opencv_object_tracking.Location.width', index=3,
             number=4, type=5, cpp_type=1, label=1,
             has_default_value=False, default_value=0,
             message_type=None, enum_type=None, containing_type=None,
             is_extension=False, extension_scope=None,
             options=None),
         _descriptor.FieldDescriptor(
-            name='height', full_name='opencv_object_tracking.ObjectLocation.height', index=4,
+            name='height', full_name='opencv_object_tracking.Location.height', index=4,
             number=5, type=5, cpp_type=1, label=1,
             has_default_value=False, default_value=0,
             message_type=None, enum_type=None, containing_type=None,
             is_extension=False, extension_scope=None,
             options=None),
         _descriptor.FieldDescriptor(
-            name='middle_inc', full_name='opencv_object_tracking.ObjectLocation.middle_inc', index=5,
+            name='middle_inc', full_name='opencv_object_tracking.Location.middle_inc', index=5,
             number=6, type=5, cpp_type=1, label=1,
             has_default_value=False, default_value=0,
             message_type=None, enum_type=None, containing_type=None,
@@ -146,12 +145,12 @@ _OBJECTLOCATION = _descriptor.Descriptor(
     oneofs=[
     ],
     serialized_start=101,
-    serialized_end=202,
+    serialized_end=196,
 )
 
 DESCRIPTOR.message_types_by_name['ClientInfo'] = _CLIENTINFO
 DESCRIPTOR.message_types_by_name['ServerInfo'] = _SERVERINFO
-DESCRIPTOR.message_types_by_name['ObjectLocation'] = _OBJECTLOCATION
+DESCRIPTOR.message_types_by_name['Location'] = _LOCATION
 
 ClientInfo = _reflection.GeneratedProtocolMessageType('ClientInfo', (_message.Message,), dict(
     DESCRIPTOR=_CLIENTINFO,
@@ -167,12 +166,12 @@ ServerInfo = _reflection.GeneratedProtocolMessageType('ServerInfo', (_message.Me
 ))
 _sym_db.RegisterMessage(ServerInfo)
 
-ObjectLocation = _reflection.GeneratedProtocolMessageType('ObjectLocation', (_message.Message,), dict(
-    DESCRIPTOR=_OBJECTLOCATION,
+Location = _reflection.GeneratedProtocolMessageType('Location', (_message.Message,), dict(
+    DESCRIPTOR=_LOCATION,
     __module__='grpc_server_pb2'
-    # @@protoc_insertion_point(class_scope:opencv_object_tracking.ObjectLocation)
+    # @@protoc_insertion_point(class_scope:opencv_object_tracking.Location)
 ))
-_sym_db.RegisterMessage(ObjectLocation)
+_sym_db.RegisterMessage(Location)
 
 
 try:
@@ -185,60 +184,60 @@ try:
     from grpc.beta import interfaces as beta_interfaces
 
 
-    class ObjectLocationServerStub(object):
+    class LocationServerStub(object):
 
         def __init__(self, channel):
             """Constructor.
-
+      
             Args:
               channel: A grpc.Channel.
             """
             self.registerClient = channel.unary_unary(
-                '/opencv_object_tracking.ObjectLocationServer/registerClient',
+                '/opencv_object_tracking.LocationServer/registerClient',
                 request_serializer=ClientInfo.SerializeToString,
                 response_deserializer=ServerInfo.FromString,
             )
-            self.getObjectLocations = channel.unary_stream(
-                '/opencv_object_tracking.ObjectLocationServer/getObjectLocations',
+            self.getLocations = channel.unary_stream(
+                '/opencv_object_tracking.LocationServer/getLocations',
                 request_serializer=ClientInfo.SerializeToString,
-                response_deserializer=ObjectLocation.FromString,
+                response_deserializer=Location.FromString,
             )
 
 
-    class ObjectLocationServerServicer(object):
+    class LocationServerServicer(object):
 
         def registerClient(self, request, context):
             context.set_code(grpc.StatusCode.UNIMPLEMENTED)
             context.set_details('Method not implemented!')
             raise NotImplementedError('Method not implemented!')
 
-        def getObjectLocations(self, request, context):
+        def getLocations(self, request, context):
             context.set_code(grpc.StatusCode.UNIMPLEMENTED)
             context.set_details('Method not implemented!')
             raise NotImplementedError('Method not implemented!')
 
 
-    def add_ObjectLocationServerServicer_to_server(servicer, server):
+    def add_LocationServerServicer_to_server(servicer, server):
         rpc_method_handlers = {
             'registerClient': grpc.unary_unary_rpc_method_handler(
                 servicer.registerClient,
                 request_deserializer=ClientInfo.FromString,
                 response_serializer=ServerInfo.SerializeToString,
             ),
-            'getObjectLocations': grpc.unary_stream_rpc_method_handler(
-                servicer.getObjectLocations,
+            'getLocations': grpc.unary_stream_rpc_method_handler(
+                servicer.getLocations,
                 request_deserializer=ClientInfo.FromString,
-                response_serializer=ObjectLocation.SerializeToString,
+                response_serializer=Location.SerializeToString,
             ),
         }
         generic_handler = grpc.method_handlers_generic_handler(
-            'opencv_object_tracking.ObjectLocationServer', rpc_method_handlers)
+            'opencv_object_tracking.LocationServer', rpc_method_handlers)
         server.add_generic_rpc_handlers((generic_handler,))
 
 
-    class BetaObjectLocationServerServicer(object):
+    class BetaLocationServerServicer(object):
         """The Beta API is deprecated for 0.15.0 and later.
-
+    
         It is recommended to use the GA API (classes and functions in this
         file not marked beta) for all further purposes. This class was generated
         only to ease transition from grpcio<0.15.0 to grpcio>=0.15.0."""
@@ -246,13 +245,13 @@ try:
         def registerClient(self, request, context):
             context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
 
-        def getObjectLocations(self, request, context):
+        def getLocations(self, request, context):
             context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
 
 
-    class BetaObjectLocationServerStub(object):
+    class BetaLocationServerStub(object):
         """The Beta API is deprecated for 0.15.0 and later.
-
+    
         It is recommended to use the GA API (classes and functions in this
         file not marked beta) for all further purposes. This class was generated
         only to ease transition from grpcio<0.15.0 to grpcio>=0.15.0."""
@@ -262,29 +261,29 @@ try:
 
         registerClient.future = None
 
-        def getObjectLocations(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
+        def getLocations(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
             raise NotImplementedError()
 
 
-    def beta_create_ObjectLocationServer_server(servicer, pool=None, pool_size=None, default_timeout=None,
-                                                maximum_timeout=None):
+    def beta_create_LocationServer_server(servicer, pool=None, pool_size=None, default_timeout=None,
+                                          maximum_timeout=None):
         """The Beta API is deprecated for 0.15.0 and later.
-
+    
         It is recommended to use the GA API (classes and functions in this
         file not marked beta) for all further purposes. This function was
         generated only to ease transition from grpcio<0.15.0 to grpcio>=0.15.0"""
         request_deserializers = {
-            ('opencv_object_tracking.ObjectLocationServer', 'getObjectLocations'): ClientInfo.FromString,
-            ('opencv_object_tracking.ObjectLocationServer', 'registerClient'): ClientInfo.FromString,
+            ('opencv_object_tracking.LocationServer', 'getLocations'): ClientInfo.FromString,
+            ('opencv_object_tracking.LocationServer', 'registerClient'): ClientInfo.FromString,
         }
         response_serializers = {
-            ('opencv_object_tracking.ObjectLocationServer', 'getObjectLocations'): ObjectLocation.SerializeToString,
-            ('opencv_object_tracking.ObjectLocationServer', 'registerClient'): ServerInfo.SerializeToString,
+            ('opencv_object_tracking.LocationServer', 'getLocations'): Location.SerializeToString,
+            ('opencv_object_tracking.LocationServer', 'registerClient'): ServerInfo.SerializeToString,
         }
         method_implementations = {
-            ('opencv_object_tracking.ObjectLocationServer', 'getObjectLocations'): face_utilities.unary_stream_inline(
-                servicer.getObjectLocations),
-            ('opencv_object_tracking.ObjectLocationServer', 'registerClient'): face_utilities.unary_unary_inline(
+            ('opencv_object_tracking.LocationServer', 'getLocations'): face_utilities.unary_stream_inline(
+                servicer.getLocations),
+            ('opencv_object_tracking.LocationServer', 'registerClient'): face_utilities.unary_unary_inline(
                 servicer.registerClient),
         }
         server_options = beta_implementations.server_options(request_deserializers=request_deserializers,
@@ -295,29 +294,29 @@ try:
         return beta_implementations.server(method_implementations, options=server_options)
 
 
-    def beta_create_ObjectLocationServer_stub(channel, host=None, metadata_transformer=None, pool=None, pool_size=None):
+    def beta_create_LocationServer_stub(channel, host=None, metadata_transformer=None, pool=None, pool_size=None):
         """The Beta API is deprecated for 0.15.0 and later.
-
+    
         It is recommended to use the GA API (classes and functions in this
         file not marked beta) for all further purposes. This function was
         generated only to ease transition from grpcio<0.15.0 to grpcio>=0.15.0"""
         request_serializers = {
-            ('opencv_object_tracking.ObjectLocationServer', 'getObjectLocations'): ClientInfo.SerializeToString,
-            ('opencv_object_tracking.ObjectLocationServer', 'registerClient'): ClientInfo.SerializeToString,
+            ('opencv_object_tracking.LocationServer', 'getLocations'): ClientInfo.SerializeToString,
+            ('opencv_object_tracking.LocationServer', 'registerClient'): ClientInfo.SerializeToString,
         }
         response_deserializers = {
-            ('opencv_object_tracking.ObjectLocationServer', 'getObjectLocations'): ObjectLocation.FromString,
-            ('opencv_object_tracking.ObjectLocationServer', 'registerClient'): ServerInfo.FromString,
+            ('opencv_object_tracking.LocationServer', 'getLocations'): Location.FromString,
+            ('opencv_object_tracking.LocationServer', 'registerClient'): ServerInfo.FromString,
         }
         cardinalities = {
-            'getObjectLocations': cardinality.Cardinality.UNARY_STREAM,
+            'getLocations': cardinality.Cardinality.UNARY_STREAM,
             'registerClient': cardinality.Cardinality.UNARY_UNARY,
         }
         stub_options = beta_implementations.stub_options(host=host, metadata_transformer=metadata_transformer,
                                                          request_serializers=request_serializers,
                                                          response_deserializers=response_deserializers,
                                                          thread_pool=pool, thread_pool_size=pool_size)
-        return beta_implementations.dynamic_stub(channel, 'opencv_object_tracking.ObjectLocationServer', cardinalities,
+        return beta_implementations.dynamic_stub(channel, 'opencv_object_tracking.LocationServer', cardinalities,
                                                  options=stub_options)
 except ImportError:
     pass

@@ -15,19 +15,19 @@ from utils import setup_logging
 logger = logging.getLogger(__name__)
 
 
-def test_for_rope(filter):
+def test_for_rope(_filter):
     # Bail if no contour is available
-    if filter.contour is None:
-        filter.reset_data()
+    if _filter.contour is None:
+        _filter.reset_data()
         return
 
-    slope, degrees = contour_slope_degrees(filter.contour)
+    slope, degrees = contour_slope_degrees(_filter.contour)
 
     # logger.info("Slope: {0}".format(slope))
     # logger.info("Degrees: {0}".format(degrees))
 
     if abs(degrees) < 80 or (slope is not None and abs(slope) < 20):
-        filter.reset_data()
+        _filter.reset_data()
 
 
 if __name__ == "__main__":
@@ -52,20 +52,20 @@ if __name__ == "__main__":
                             http_delay_secs=args[HTTP_DELAY_SECS],
                             http_verbose=args[HTTP_VERBOSE])
 
-    filter = SingleObjectFilter(tracker,
-                                bgr_color=args[BGR_COLOR],
-                                hsv_range=args[HSV_RANGE],
-                                minimum_pixels=args[MINIMUM_PIXELS],
-                                grpc_port=args[GRPC_PORT],
-                                leds=args[LEDS],
-                                display_text=True,
-                                draw_contour=args[DRAW_CONTOUR],
-                                draw_box=args[DRAW_BOX],
-                                vertical_lines=args[VERTICAL_LINES],
-                                horizontal_lines=args[HORIZONTAL_LINES],
-                                predicate=test_for_rope)
+    obj_filter = SingleObjectFilter(tracker,
+                                    bgr_color=args[BGR_COLOR],
+                                    hsv_range=args[HSV_RANGE],
+                                    minimum_pixels=args[MINIMUM_PIXELS],
+                                    grpc_port=args[GRPC_PORT],
+                                    leds=args[LEDS],
+                                    display_text=True,
+                                    draw_contour=args[DRAW_CONTOUR],
+                                    draw_box=args[DRAW_BOX],
+                                    vertical_lines=args[VERTICAL_LINES],
+                                    horizontal_lines=args[HORIZONTAL_LINES],
+                                    predicate=test_for_rope)
     try:
-        tracker.start(filter)
+        tracker.start(obj_filter)
     except KeyboardInterrupt:
         pass
     finally:

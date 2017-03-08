@@ -60,8 +60,8 @@ class ObjectTracker(object):
         if 200 <= width <= 4000:
             self.__width = width
             if self.__filters:
-                for filter in self.__filters:
-                    filter.reset()
+                for f in self.__filters:
+                    f.reset()
 
     @property
     def middle_percent(self):
@@ -84,8 +84,8 @@ class ObjectTracker(object):
         self.__filters = filters
 
         if self.__filters:
-            for filter in self.__filters:
-                filter.start()
+            for f in self.__filters:
+                f.start()
 
         self.image_server.start()
 
@@ -121,13 +121,13 @@ class ObjectTracker(object):
                         image[0: height, width - mask_width: width] = BLACK
 
                 if self.__filters:
-                    for filter in self.__filters:
-                        filter.process_image(image)
-                    for filter in self.__filters:
-                        if filter.predicate:
-                            filter.predicate(filter)
-                        filter.publish_data()
-                        filter.markup_image(image)
+                    for f in self.__filters:
+                        f.process_image(image)
+                    for f in self.__filters:
+                        if f.predicate:
+                            f.predicate(f)
+                        f.publish_data()
+                        f.markup_image(image)
 
                 self.image_server.image = image
 
@@ -148,8 +148,8 @@ class ObjectTracker(object):
         self.stopped = True
 
         if self.__filters:
-            for filter in self.__filters:
-                filter.stop()
+            for f in self.__filters:
+                f.stop()
 
         self.image_server.stop()
 
