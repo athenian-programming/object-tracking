@@ -1,15 +1,5 @@
 syntax = "proto3";
-
 package opencv_object_tracking;
-
-service LocationServer {
-
-    rpc registerClient (ClientInfo) returns (ServerInfo) {
-    }
-
-    rpc getLocations (ClientInfo) returns (stream Location) {
-    }
-}
 
 message ClientInfo {
     string info = 1;
@@ -28,4 +18,12 @@ message Location {
     int32 middle_inc = 6;
 }
 
+service LocationServer {
+
+    rpc registerClient (ClientInfo) returns (ServerInfo) {
+    }
+
+    rpc getLocations (ClientInfo) returns (stream Location) {
+    }
+}
 

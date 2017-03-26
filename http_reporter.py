@@ -27,18 +27,18 @@ if __name__ == "__main__":
     def read_values():
         global count
         while True:
-            print("Got location: {0}".format(locations.get_xy()))
+            print("Got location: {0}".format(client.get_xy()))
             count += 1
 
 
     # Start client
-    locations = LocationClient(args[GRPC_HOST]).start()
+    with LocationClient(args[GRPC_HOST]) as client:
 
-    # Run read_values in a thread
-    count = 0
-    Thread(target=read_values).start()
+        # Run read_values in a thread
+        count = 0
+        Thread(target=read_values).start()
 
-    # Run HTTP server in a thread
-    Thread(target=http.run, kwargs={"port": 8080}).start()
+        # Run HTTP server in a thread
+        Thread(target=http.run, kwargs={"port": 8080}).start()
 
-    sleep()
+        sleep()

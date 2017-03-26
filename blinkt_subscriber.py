@@ -50,17 +50,13 @@ if __name__ == "__main__":
 
 
     # Setup MQTT client
-    mqtt_conn = MqttConnection(args[MQTT_HOST],
-                               userdata={TOPIC: args[LED_NAME]},
-                               on_connect=on_connect,
-                               on_message=on_message)
-    mqtt_conn.connect()
-
-    try:
-        sleep()
-    except KeyboardInterrupt:
-        pass
-    finally:
-        mqtt_conn.disconnect()
+    with MqttConnection(args[MQTT_HOST],
+                        userdata={TOPIC: args[LED_NAME]},
+                        on_connect=on_connect,
+                        on_message=on_message):
+        try:
+            sleep()
+        except KeyboardInterrupt:
+            pass
 
     logger.info("Exiting...")

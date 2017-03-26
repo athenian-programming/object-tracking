@@ -2,10 +2,10 @@ import logging
 import socket
 
 import grpc
-from gen.grpc_server_pb2 import ClientInfo
-from gen.grpc_server_pb2 import LocationServerStub
 from grpc_support import CannotConnectException
 from grpc_support import grpc_url
+from pb.location_server_pb2 import ClientInfo
+from pb.location_server_pb2 import LocationServerStub
 from utils import setup_logging
 
 logger = logging.getLogger(__name__)

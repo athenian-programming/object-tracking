@@ -69,30 +69,29 @@ if __name__ == "__main__":
 
     setup_logging(level=args[LOG_LEVEL])
 
-    locations = LocationClient(args[GRPC_HOST]).start()
+    with LocationClient(args[GRPC_HOST]) as client:
+        init_w, init_h = 800, 450
 
-    init_w, init_h = 800, 450
+        root = tk.Tk()
 
-    root = tk.Tk()
+        canvas = tk.Canvas(root, bg="white", width=init_w, height=init_h)
+        canvas.pack()
 
-    canvas = tk.Canvas(root, bg="white", width=init_w, height=init_h)
-    canvas.pack()
+        sketch = LocationSketch(canvas)
 
-    sketch = LocationSketch(canvas)
+        b = tk.Button(root, text="Clear", command=sketch.clear_canvas)
+        b.pack(side=tk.LEFT)
 
-    b = tk.Button(root, text="Clear", command=sketch.clear_canvas)
-    b.pack(side=tk.LEFT)
+        lb_var = tk.IntVar()
+        lb_var.set(1)
+        lb = tk.Checkbutton(root, text="Lines", variable=lb_var, command=sketch.toggle_lines)
+        lb.pack(side=tk.LEFT)
 
-    lb_var = tk.IntVar()
-    lb_var.set(1)
-    lb = tk.Checkbutton(root, text="Lines", variable=lb_var, command=sketch.toggle_lines)
-    lb.pack(side=tk.LEFT)
+        pb_var = tk.IntVar()
+        pb_var.set(1)
+        pb = tk.Checkbutton(root, text="Points", variable=pb_var, command=sketch.toggle_points)
+        pb.pack(side=tk.LEFT)
 
-    pb_var = tk.IntVar()
-    pb_var.set(1)
-    pb = tk.Checkbutton(root, text="Points", variable=pb_var, command=sketch.toggle_points)
-    pb.pack(side=tk.LEFT)
+        Thread(target=sketch.plot_vals, args=(client, init_w, init_h)).start()
 
-    Thread(target=sketch.plot_vals, args=(locations, init_w, init_h)).start()
-
-    root.mainloop()
+        root.mainloop()

@@ -23,15 +23,14 @@ if __name__ == "__main__":
 
     setup_logging(level=args[LOG_LEVEL])
 
-    locations = LocationClient(args[GRPC_HOST]).start()
+    with LocationClient(args[GRPC_HOST]) as client:
 
-    # Create servos
-    servo_x = HatServo("Pan", pth.pan, alternate, 1.0, 8)
-    servo_y = HatServo("Tilt", pth.tilt, alternate, 1.0, 8)
+        # Create servos
+        servo_x = HatServo("Pan", pth.pan, alternate, 1.0, 8)
+        servo_y = HatServo("Tilt", pth.tilt, alternate, 1.0, 8)
 
-    try:
         if calib:
-            calib_t = Thread(target=calibrate_servo.calibrate, args=(locations, servo_x, servo_y))
+            calib_t = Thread(target=calibrate_servo.calibrate, args=(client, servo_x, servo_y))
             calib_t.start()
             calib_t.join()
         else:
@@ -40,8 +39,8 @@ if __name__ == "__main__":
                 servo_x.ready_event.set()
 
             try:
-                servo_x.start(False, lambda: locations.get_x(), servo_y.ready_event if not calib else None)
-                servo_y.start(False, lambda: locations.get_y(), servo_x.ready_event if not calib else None)
+                servo_x.start(False, lambda: client.get_x(), servo_y.ready_event if not calib else None)
+                servo_y.start(False, lambda: client.get_y(), servo_x.ready_event if not calib else None)
                 servo_x.join()
                 servo_y.join()
             except KeyboardInterrupt:
@@ -49,7 +48,5 @@ if __name__ == "__main__":
             finally:
                 servo_x.stop()
                 servo_y.stop()
-    finally:
-        locations.stop()
 
     logger.info("Exiting...")

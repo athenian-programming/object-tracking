@@ -44,36 +44,34 @@ if __name__ == "__main__":
         logger.error("Failed to connect to Arduino at {0} - [{1}]".format(port, e))
         sys.exit(0)
 
-    locations = LocationClient(args[GRPC_HOST]).start()
+    with LocationClient(args[GRPC_HOST]) as client:
+        # Create servos
+        servo_x = FirmataServo("Pan", alternate, board, "d:{0}:s".format(xservo), 1.0, 8)
+        servo_y = FirmataServo("Tilt", alternate, board, "d:{0}:s".format(yservo), 1.0, 8)
 
-    # Create servos
-    servo_x = FirmataServo("Pan", alternate, board, "d:{0}:s".format(xservo), 1.0, 8)
-    servo_y = FirmataServo("Tilt", alternate, board, "d:{0}:s".format(yservo), 1.0, 8)
-
-    try:
-        if calib:
-            try:
-                calib_t = Thread(target=calibrate_servo.calibrate, args=(locations, servo_x, servo_y))
-                calib_t.start()
-                calib_t.join()
-            except KeyboardInterrupt:
-                pass
-        else:
-            if alternate:
-                # Set servo X to go first
-                servo_x.ready_event.set()
-            try:
-                servo_x.start(True, lambda: locations.get_x(), servo_y.ready_event if not calib else None)
-                servo_y.start(False, lambda: locations.get_y(), servo_x.ready_event if not calib else None)
-                servo_x.join()
-                servo_y.join()
-            except KeyboardInterrupt:
-                pass
-            finally:
-                servo_x.stop()
-                servo_y.stop()
-    finally:
-        board.exit()
-        locations.stop()
+        try:
+            if calib:
+                try:
+                    calib_t = Thread(target=calibrate_servo.calibrate, args=(client, servo_x, servo_y))
+                    calib_t.start()
+                    calib_t.join()
+                except KeyboardInterrupt:
+                    pass
+            else:
+                if alternate:
+                    # Set servo X to go first
+                    servo_x.ready_event.set()
+                try:
+                    servo_x.start(True, lambda: client.get_x(), servo_y.ready_event if not calib else None)
+                    servo_y.start(False, lambda: client.get_y(), servo_x.ready_event if not calib else None)
+                    servo_x.join()
+                    servo_y.join()
+                except KeyboardInterrupt:
+                    pass
+                finally:
+                    servo_x.stop()
+                    servo_y.stop()
+        finally:
+            board.exit()
 
     logger.info("Exiting...")

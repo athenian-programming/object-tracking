@@ -21,35 +21,29 @@ if __name__ == "__main__":
     setup_logging(level=args[LOG_LEVEL])
 
     # Start location reader
-    locations = LocationClient(args[GRPC_HOST]).start()
+    with LocationClient(args[GRPC_HOST]) as client:
+
+        # Define MQTT callbacks
+        def on_connect(client, userdata, flags, rc):
+            logger.info("Connected with result code: {0}".format(rc))
+            Thread(target=publish_locations, args=(client, userdata)).start()
 
 
-    # Define MQTT callbacks
-    def on_connect(client, userdata, flags, rc):
-        logger.info("Connected with result code: {0}".format(rc))
-        Thread(target=publish_locations, args=(client, userdata)).start()
+        def publish_locations(client, userdata):
+            while True:
+                x_loc, y_loc = client.get_xy()
+                if x_loc is not None and y_loc is not None:
+                    result, mid = client.publish("{0}/x".format(userdata[CAMERA_NAME]), payload=x_loc[0])
+                    result, mid = client.publish("{0}/y".format(userdata[CAMERA_NAME]), payload=y_loc[0])
 
 
-    def publish_locations(client, userdata):
-        while True:
-            x_loc, y_loc = locations.get_xy()
-            if x_loc is not None and y_loc is not None:
-                result, mid = client.publish("{0}/x".format(userdata[CAMERA_NAME]), payload=x_loc[0])
-                result, mid = client.publish("{0}/y".format(userdata[CAMERA_NAME]), payload=y_loc[0])
-
-
-    # Setup MQTT client
-    mqtt_conn = MqttConnection(args[MQTT_HOST],
-                               userdata={CAMERA_NAME: args[CAMERA_NAME]},
-                               on_connect=on_connect)
-    mqtt_conn.connect()
-
-    try:
-        sleep()
-    except KeyboardInterrupt:
-        pass
-    finally:
-        mqtt_conn.disconnect()
-        locations.stop()
+        # Setup MQTT client
+        with MqttConnection(args[MQTT_HOST],
+                            userdata={CAMERA_NAME: args[CAMERA_NAME]},
+                            on_connect=on_connect):
+            try:
+                sleep()
+            except KeyboardInterrupt:
+                pass
 
     logger.info("Exiting...")

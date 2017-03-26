@@ -4,11 +4,11 @@ from threading import Thread
 
 import grpc
 from concurrent import futures
-from gen.grpc_server_pb2 import Location
-from gen.grpc_server_pb2 import LocationServerServicer
-from gen.grpc_server_pb2 import ServerInfo
-from gen.grpc_server_pb2 import add_LocationServerServicer_to_server
 from grpc_support import GenericServer
+from pb.location_server_pb2 import Location
+from pb.location_server_pb2 import LocationServerServicer
+from pb.location_server_pb2 import ServerInfo
+from pb.location_server_pb2 import add_LocationServerServicer_to_server
 from utils import setup_logging
 from utils import sleep
 

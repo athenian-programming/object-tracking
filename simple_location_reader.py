@@ -16,14 +16,11 @@ if __name__ == "__main__":
     # Setup logging
     setup_logging(level=args[LOG_LEVEL])
 
-    locations = LocationClient(args[GRPC_HOST]).start()
-
-    try:
-        while True:
-            print("Got location: {0}".format(locations.get_xy()))
-    except KeyboardInterrupt:
-        pass
-    finally:
-        locations.stop()
+    with LocationClient(args[GRPC_HOST]) as client:
+        try:
+            while True:
+                print("Got location: {0}".format(client.get_xy()))
+        except KeyboardInterrupt:
+            pass
 
     logger.info("Exiting...")

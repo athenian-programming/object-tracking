@@ -2,26 +2,14 @@
 
 ## Package Dependencies
 
-Install the following Python packages: 
+Install the required Python packages with: 
 
-* [OpenCV](http://opencv.org) 
-as described [here](http://www.athenian-robotics.org/opencv/)
-
-* [gRPC](http://www.grpc.io/docs/guides/index.html) 
-as described [here](http://www.athenian-robotics.org/grpc/)
-
-* [imutils](https://github.com/jrosebr1/imutils)
-as described [here](http://www.athenian-robotics.org/imutils/)
-
-* [MQTT](http://mqtt.org) client 
-as described [here](http://www.athenian-robotics.org/mqtt-client/)
-
-* [numpy](http://www.numpy.org)
-as described [here](http://www.athenian-robotics.org/numpy/)
-
-* [pyFirmata](https://github.com/tino/pyFirmata) client 
-as described [here](http://www.athenian-robotics.org/arduino/)
-
+```bash
+$ source start_py2cv3.sh
+$
+$ pip install --upgrade pip
+$ pip install -r pip/requirements.txt
+```
 
 ## Color Picker 
 

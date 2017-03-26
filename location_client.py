@@ -5,10 +5,10 @@ import time
 from threading import Event
 
 import grpc
-from gen.grpc_server_pb2 import ClientInfo
-from gen.grpc_server_pb2 import LocationServerStub
 from grpc_support import GenericClient
 from grpc_support import TimeoutException
+from pb.location_server_pb2 import ClientInfo
+from pb.location_server_pb2 import LocationServerStub
 from utils import setup_logging
 
 logger = logging.getLogger(__name__)
@@ -20,6 +20,14 @@ class LocationClient(GenericClient):
         self.__x_ready = Event()
         self.__y_ready = Event()
         self.__currval = None
+
+    def __enter__(self):
+        self.start()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.stop()
+        return self
 
     def _mark_ready(self):
         self.__x_ready.set()
@@ -84,8 +92,7 @@ class LocationClient(GenericClient):
 
 if __name__ == "__main__":
     setup_logging()
-    client = LocationClient("localhost").start()
-    for i in range(1000):
-        logger.info("Read value: {0}".format(client.get_xy()))
-    client.stop()
+    with LocationClient("localhost") as client:
+        for i in range(1000):
+            logger.info("Read value: {0}".format(client.get_xy()))
     logger.info("Exiting...")
