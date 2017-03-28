@@ -51,7 +51,6 @@ if __name__ == "__main__":
 
                 stream.write(dict(x=x, y=y))
                 time.sleep(.10)
-
         except KeyboardInterrupt:
             pass
         finally:

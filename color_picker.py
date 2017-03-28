@@ -164,8 +164,9 @@ if __name__ == "__main__":
     color_picker = ColorPicker(**strip_loglevel(args))
     try:
         color_picker.start()
-    except KeyboardInterrupt as e:
+    except KeyboardInterrupt:
         pass
     finally:
         color_picker.stop()
-        logger.info("Exiting...")
+
+    logger.info("Exiting...")

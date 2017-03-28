@@ -4,8 +4,7 @@ import cli_args  as cli
 from cli_args import CAMERA_NAME, MQTT_HOST, LOG_LEVEL
 from cli_args import setup_cli_args
 from mqtt_connection import MqttConnection
-from utils import setup_logging
-from utils import sleep
+from utils import setup_logging, waitForKeyboardInterrupt
 
 logger = logging.getLogger(__name__)
 
@@ -31,9 +30,6 @@ if __name__ == "__main__":
                         userdata={CAMERA_NAME: args[CAMERA_NAME]},
                         on_connect=on_connect,
                         on_message=on_message):
-        try:
-            sleep()
-        except KeyboardInterrupt:
-            pass
+        waitForKeyboardInterrupt()
 
     logger.info("Exiting...")

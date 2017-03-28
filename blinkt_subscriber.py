@@ -2,7 +2,7 @@ import cli_args as cli
 from cli_args import setup_cli_args
 from constants import LOG_LEVEL, MQTT_HOST, TOPIC, LED_NAME, LED_BRIGHTNESS_DEFAULT, LED_BRIGHTNESS
 from mqtt_connection import MqttConnection
-from utils import is_raspi, setup_logging, sleep
+from utils import is_raspi, setup_logging, waitForKeyboardInterrupt
 
 if is_raspi():
     from blinkt import set_pixel, show
@@ -54,9 +54,6 @@ if __name__ == "__main__":
                         userdata={TOPIC: args[LED_NAME]},
                         on_connect=on_connect,
                         on_message=on_message):
-        try:
-            sleep()
-        except KeyboardInterrupt:
-            pass
+        waitForKeyboardInterrupt()
 
     logger.info("Exiting...")
