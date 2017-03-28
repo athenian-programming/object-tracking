@@ -17,11 +17,12 @@ if __name__ == "__main__":
 
 
     # Define MQTT callbacks
-    def on_connect(client, userdata, flags, rc):
+    def on_connect(mqtt_client, userdata, flags, rc):
         logger.info("Connected with result code: {0}".format(rc))
-        client.subscribe("{0}/#".format(userdata[CAMERA_NAME]))
+        mqtt_client.subscribe("{0}/#".format(userdata[CAMERA_NAME]))
 
-    def on_message(client, userdata, msg):
+
+    def on_message(mqtt_client, userdata, msg):
         logger.info("{0} {1}".format(msg.topic, msg.payload))
 
 
