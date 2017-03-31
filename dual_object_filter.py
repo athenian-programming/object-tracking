@@ -35,8 +35,8 @@ class DualObjectFilter(GenericFilter):
         self.reset_data()
         self.height, self.width = image.shape[:2]
 
-        # Find the 2 largest contours
-        self.contours = self.contour_finder.get_max_contours(image, count=2)
+        # Find the 2 largest vertical contours
+        self.contours = self.contour_finder.get_max_vertical_contours(image, count=2)
 
         # Check for > 2 in case one of the targets is divided.
         # The calculation will be off, but something will be better than nothing
