@@ -21,14 +21,6 @@ class LocationClient(GenericClient):
         self.__y_ready = Event()
         self.__currval = None
 
-    def __enter__(self):
-        self.start()
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        self.stop()
-        return self
-
     def _mark_ready(self):
         self.__x_ready.set()
         self.__y_ready.set()
