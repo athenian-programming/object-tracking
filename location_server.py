@@ -5,17 +5,17 @@ from threading import Thread
 import grpc
 from concurrent import futures
 from grpc_support import GenericServer
-from pb.location_server_pb2 import Location
-from pb.location_server_pb2 import LocationServerServicer
-from pb.location_server_pb2 import ServerInfo
-from pb.location_server_pb2 import add_LocationServerServicer_to_server
+from proto.location_service_pb2 import Location
+from proto.location_service_pb2 import LocationServiceServicer
+from proto.location_service_pb2 import ServerInfo
+from proto.location_service_pb2 import add_LocationServiceServicer_to_server
 from utils import setup_logging
 from utils import sleep
 
 logger = logging.getLogger(__name__)
 
 
-class LocationServer(LocationServerServicer, GenericServer):
+class LocationServer(LocationServiceServicer, GenericServer):
     def __init__(self, port=None):
         super(LocationServer, self).__init__(port=port, desc="location server")
         self.grpc_server = None
@@ -34,7 +34,7 @@ class LocationServer(LocationServerServicer, GenericServer):
     def _start_server(self):
         logger.info("Starting gRPC {0} listening on {1}".format(self.desc, self.hostname))
         self.grpc_server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-        add_LocationServerServicer_to_server(self, self.grpc_server)
+        add_LocationServiceServicer_to_server(self, self.grpc_server)
         self.grpc_server.add_insecure_port(self.hostname)
         self.grpc_server.start()
         try:

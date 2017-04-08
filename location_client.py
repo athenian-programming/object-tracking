@@ -7,8 +7,8 @@ from threading import Event
 import grpc
 from grpc_support import GenericClient
 from grpc_support import TimeoutException
-from pb.location_server_pb2 import ClientInfo
-from pb.location_server_pb2 import LocationServerStub
+from proto.location_service_pb2 import ClientInfo
+from proto.location_service_pb2 import LocationServiceStub
 from utils import setup_logging
 
 logger = logging.getLogger(__name__)
@@ -27,7 +27,7 @@ class LocationClient(GenericClient):
 
     def _get_values(self, pause_secs=2.0):
         channel = grpc.insecure_channel(self.hostname)
-        stub = LocationServerStub(channel)
+        stub = LocationServiceStub(channel)
         while not self.stopped:
             logger.info("Connecting to gRPC server at {0}...".format(self.hostname))
             try:

@@ -4,8 +4,8 @@ import socket
 import grpc
 from grpc_support import CannotConnectException
 from grpc_support import grpc_url
-from pb.location_server_pb2 import ClientInfo
-from pb.location_server_pb2 import LocationServerStub
+from proto.location_service_pb2 import ClientInfo
+from proto.location_service_pb2 import LocationServiceStub
 from utils import setup_logging
 
 logger = logging.getLogger(__name__)
@@ -16,7 +16,7 @@ class Locations(object):
         url = grpc_url(hostname)
         try:
             channel = grpc.insecure_channel(url)
-            self._stub = LocationServerStub(channel)
+            self._stub = LocationServiceStub(channel)
             self._client_info = ClientInfo(info="{0} client".format(socket.gethostname()))
             self._server_info = self._stub.registerClient(self._client_info)
         except grpc._channel._Rendezvous:

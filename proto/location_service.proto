@@ -18,7 +18,7 @@ message Location {
     int32 middle_inc = 6;
 }
 
-service LocationServer {
+service LocationService {
 
     rpc registerClient (ClientInfo) returns (ServerInfo) {
     }
