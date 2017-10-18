@@ -1,8 +1,9 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 
 import logging
 
 import cv2
+
 import opencv_defaults as defs
 from cli_args import LOG_LEVEL
 from constants import DISPLAY, BGR_COLOR, WIDTH, MIDDLE_PERCENT, FLIP_X
