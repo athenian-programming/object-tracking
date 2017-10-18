@@ -26,7 +26,7 @@ if __name__ == "__main__":
     parser.add_argument("-y", "--yservo", default=6, type=int, help="Y servo PWM pin [6]")
     cli.alternate(parser)
     cli.calib(parser)
-    cli.verbose(parser)
+    cli.log_level(parser)
     args = vars(parser.parse_args())
 
     alternate = args["alternate"]

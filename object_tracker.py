@@ -42,14 +42,14 @@ class ObjectTracker(object):
         self.__mask_y = mask_y
         self.__filters = None
 
-        self.stopped = False
-        self.cnt = 0
-        self.cam = Camera(usb_camera=usb_camera, usb_port=usb_port)
-        self.image_server = ImageServer(http_file,
-                                        camera_name=camera_name,
-                                        http_host=http_host,
-                                        http_delay_secs=http_delay_secs,
-                                        http_verbose=http_verbose)
+        self.__stopped = False
+        self.__cnt = 0
+        self.__cam = Camera(usb_camera=usb_camera, usb_port=usb_port)
+        self.__image_server = ImageServer(http_file,
+                                          camera_name=camera_name,
+                                          http_host=http_host,
+                                          http_delay_secs=http_delay_secs,
+                                          http_verbose=http_verbose)
 
     @property
     def width(self):
@@ -77,7 +77,7 @@ class ObjectTracker(object):
 
     @property
     def markup_image(self):
-        return self.__display or self.image_server.enabled
+        return self.__display or self.__image_server.enabled
 
     # Do not run this in a background thread. cv2.waitKey has to run in main thread
     def start(self, *filters):
@@ -87,14 +87,14 @@ class ObjectTracker(object):
             for f in self.__filters:
                 f.start()
 
-        self.image_server.start()
+        self.__image_server.start()
 
-        if not self.cam.is_open():
+        if not self.__cam.is_open():
             logger.error("Camera is closed")
 
-        while self.cam.is_open() and not self.stopped:
+        while self.__cam.is_open() and not self.__stopped:
             try:
-                image = self.cam.read()
+                image = self.__cam.read()
                 if image is None:
                     logger.error("Null image read from camera")
                     time.sleep(.5)
@@ -129,12 +129,12 @@ class ObjectTracker(object):
                         f.publish_data()
                         f.markup_image(image)
 
-                self.image_server.image = image
+                self.__image_server.image = image
 
                 if self.__display:
                     self.display_image(image)
 
-                self.cnt += 1
+                self.__cnt += 1
 
             except KeyboardInterrupt as e:
                 raise e
@@ -142,16 +142,16 @@ class ObjectTracker(object):
                 logger.error("Unexpected error in main loop [{0}]".format(e), exc_info=True)
                 time.sleep(1)
 
-        self.cam.close()
+        self.__cam.close()
 
     def stop(self):
-        self.stopped = True
+        self.__stopped = True
 
         if self.__filters:
             for f in self.__filters:
                 f.stop()
 
-        self.image_server.stop()
+        self.__image_server.stop()
 
     def display_image(self, image):
         cv2.imshow("Image", image)
@@ -187,7 +187,7 @@ class ObjectTracker(object):
     @staticmethod
     def cli_args():
         return setup_cli_args(cli.bgr,
-                              cli.usb,
+                              cli.usb_camera,
                               cli.usb_port,
                               cli.width,
                               cli.middle_percent,
@@ -209,4 +209,4 @@ class ObjectTracker(object):
                               cli.http_file,
                               cli.http_delay_secs,
                               cli.http_verbose,
-                              cli.verbose)
+                              cli.log_level)

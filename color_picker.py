@@ -148,7 +148,7 @@ class ColorPicker(object):
 if __name__ == "__main__":
     # Parse CLI args
     args = setup_cli_args(cli.width,
-                          cli.usb,
+                          cli.usb_camera,
                           cli.usb_port,
                           cli.display,
                           cli.flip_x,
@@ -157,7 +157,7 @@ if __name__ == "__main__":
                           cli.http_file,
                           cli.http_delay_secs,
                           cli.http_verbose,
-                          cli.verbose)
+                          cli.log_level)
 
     # Setup logging
     setup_logging(level=args[LOG_LEVEL])

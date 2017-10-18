@@ -31,7 +31,7 @@ class BlinktSubscriber(object):
 
 if __name__ == "__main__":
     # Parse CLI args
-    args = setup_cli_args(cli.grpc_host, cli.mqtt_host, cli.led_name, cli.led_brightness, cli.verbose)
+    args = setup_cli_args(cli.grpc_host, cli.mqtt_host, cli.led_name, cli.led_brightness, cli.log_level)
 
     # Setup logging
     setup_logging(level=args[LOG_LEVEL])

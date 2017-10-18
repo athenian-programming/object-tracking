@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 if __name__ == "__main__":
     # Setuo CLI args
-    args = setup_cli_args(cli.grpc_host, cli.alternate, cli.calib, cli.verbose)
+    args = setup_cli_args(cli.grpc_host, cli.alternate, cli.calib, cli.log_level)
 
     alternate = args["alternate"]
     calib = args["calib"]

@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 if __name__ == "__main__":
     # Parse CLI args
     p = argparse.ArgumentParser()
-    cli.usb(p),
+    cli.usb_camera(p),
     cli.width(p),
     cli.middle_percent(p),
     cli.minimum_pixels(p),
@@ -49,7 +49,7 @@ if __name__ == "__main__":
                    help="Dual gRPC port [{0}]".format(GRPC_PORT_DEFAULT))
     p.add_argument("--singleport", dest=SINGLE_PORT, default=GRPC_PORT_DEFAULT + 1, type=int,
                    help="Dual gRPC port [{0}]".format(GRPC_PORT_DEFAULT + 1))
-    cli.verbose(p)
+    cli.log_level(p)
     args = vars(p.parse_args())
 
     # Setup logging

@@ -10,7 +10,7 @@ from utils import sleep
 
 if __name__ == "__main__":
     # Parse CLI args
-    args = setup_cli_args(cli.grpc_host, cli.verbose)
+    args = setup_cli_args(cli.grpc_host, cli.log_level)
 
     # Setup logging
     setup_logging(level=args[LOG_LEVEL])
