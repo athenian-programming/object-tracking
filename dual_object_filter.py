@@ -1,8 +1,9 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 
 import logging
 
 import cv2
+
 import opencv_defaults as defs
 from cli_args import LOG_LEVEL
 from constants import DRAW_CONTOUR, DRAW_BOX, HTTP_DELAY_SECS, HTTP_VERBOSE, HTTP_FILE, VERTICAL_LINES

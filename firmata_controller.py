@@ -1,16 +1,17 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 
 import argparse
 import logging
 import sys
 from threading import Thread
 
+from pyfirmata import Arduino
+
 import calibrate_servo
 import cli_args as cli
 from cli_args import LOG_LEVEL, GRPC_HOST
 from firmata_servo import FirmataServo
 from location_client import LocationClient
-from pyfirmata import Arduino
 from utils import is_windows
 from utils import setup_logging
 
