@@ -3,12 +3,11 @@
 import logging
 import time
 
+import camera
+import cli_args  as cli
 import cv2
 import imutils
 import numpy as np
-
-import camera
-import cli_args  as cli
 import opencv_defaults as defs
 from cli_args import LOG_LEVEL
 from cli_args import setup_cli_args
@@ -149,7 +148,7 @@ if __name__ == "__main__":
     # Parse CLI args
     args = setup_cli_args(cli.width,
                           cli.usb_camera,
-                          cli.usb_port,
+                          # cli.usb_port,
                           cli.display,
                           cli.flip_x,
                           cli.flip_y,
