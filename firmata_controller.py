@@ -5,15 +5,15 @@ import logging
 import sys
 from threading import Thread
 
+import arc852.cli_args as cli
+from arc852.cli_args import LOG_LEVEL, GRPC_HOST
+from arc852.utils import is_windows
+from arc852.utils import setup_logging
 from pyfirmata import Arduino
 
 import calibrate_servo
-import cli_args as cli
-from cli_args import LOG_LEVEL, GRPC_HOST
 from firmata_servo import FirmataServo
 from location_client import LocationClient
-from utils import is_windows
-from utils import setup_logging
 
 logger = logging.getLogger(__name__)
 

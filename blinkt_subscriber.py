@@ -1,8 +1,8 @@
-import cli_args as cli
-from cli_args import setup_cli_args
-from constants import LOG_LEVEL, MQTT_HOST, TOPIC, LED_NAME, LED_BRIGHTNESS_DEFAULT, LED_BRIGHTNESS
-from mqtt_connection import MqttConnection
-from utils import is_raspi, setup_logging, waitForKeyboardInterrupt
+import arc852.cli_args as cli
+from arc852.cli_args import setup_cli_args
+from arc852.constants import LOG_LEVEL, MQTT_HOST, TOPIC, LED_NAME, LED_BRIGHTNESS_DEFAULT, LED_BRIGHTNESS
+from arc852.mqtt_connection import MqttConnection
+from arc852.utils import is_raspi, setup_logging, waitForKeyboardInterrupt
 
 if is_raspi():
     from blinkt import set_pixel, show

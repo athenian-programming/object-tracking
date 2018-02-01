@@ -2,12 +2,13 @@
 
 from threading import Thread
 
-import cli_args  as cli
-from cli_args import LOG_LEVEL, GRPC_HOST
-from cli_args import setup_cli_args
+import arc852.cli_args  as cli
+from arc852.cli_args import LOG_LEVEL, GRPC_HOST
+from arc852.cli_args import setup_cli_args
+from arc852.utils import is_python3
+from arc852.utils import setup_logging
+
 from location_client import LocationClient
-from utils import is_python3
-from utils import setup_logging
 
 if is_python3():
     import tkinter as tk

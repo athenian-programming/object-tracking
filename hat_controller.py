@@ -3,15 +3,15 @@
 import logging
 from threading import Thread
 
+import arc852.cli_args  as cli
 import pantilthat as pth
+from arc852.cli_args import LOG_LEVEL, GRPC_HOST
+from arc852.cli_args import setup_cli_args
+from arc852.utils import setup_logging
 
 import calibrate_servo
-import cli_args  as cli
-from cli_args import LOG_LEVEL, GRPC_HOST
-from cli_args import setup_cli_args
 from hat_servo import HatServo
 from location_client import LocationClient
-from utils import setup_logging
 
 logger = logging.getLogger(__name__)
 

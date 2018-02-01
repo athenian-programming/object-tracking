@@ -1,14 +1,15 @@
 import logging
 import time
 
-import cli_args  as cli
+import arc852.cli_args  as cli
 import plotly.graph_objs as go
 import plotly.plotly as py
 import plotly.tools as tls
-from cli_args import LOG_LEVEL, GRPC_HOST
-from cli_args import setup_cli_args
+from arc852.cli_args import LOG_LEVEL, GRPC_HOST
+from arc852.cli_args import setup_cli_args
+from arc852.utils import setup_logging
+
 from location_client import LocationClient
-from utils import setup_logging
 
 logger = logging.getLogger(__name__)
 

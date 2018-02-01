@@ -3,12 +3,13 @@
 import logging
 from threading import Thread
 
-import cli_args  as cli
-from cli_args import CAMERA_NAME, LOG_LEVEL, MQTT_HOST, GRPC_HOST
-from cli_args import setup_cli_args
+import arc852.cli_args  as cli
+from arc852.cli_args import CAMERA_NAME, LOG_LEVEL, MQTT_HOST, GRPC_HOST
+from arc852.cli_args import setup_cli_args
+from arc852.mqtt_connection import MqttConnection
+from arc852.utils import setup_logging, waitForKeyboardInterrupt
+
 from location_client import LocationClient
-from mqtt_connection import MqttConnection
-from utils import setup_logging, waitForKeyboardInterrupt
 
 logger = logging.getLogger(__name__)
 

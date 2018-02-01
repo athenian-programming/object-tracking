@@ -3,19 +3,18 @@
 import logging
 import time
 
-import camera
-import cli_args  as cli
+import arc852.cli_args  as cli
+import arc852.opencv_defaults as defs
 import cv2
 import imutils
 import numpy as np
-import opencv_defaults as defs
-from cli_args import LOG_LEVEL
-from cli_args import setup_cli_args
-from image_server import ImageServer
-from opencv_utils import GREEN
-from opencv_utils import RED
-from utils import setup_logging
-from utils import strip_loglevel
+from arc852.cli_args import LOG_LEVEL
+from arc852.cli_args import setup_cli_args
+from arc852.image_server import ImageServer
+from arc852.opencv_utils import GREEN
+from arc852.opencv_utils import RED
+from arc852.utils import setup_logging
+from arc852.utils import strip_loglevel
 
 logger = logging.getLogger(__name__)
 

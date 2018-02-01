@@ -1,14 +1,14 @@
 import logging
 import time
 
-import cli_args  as cli
+import arc852.cli_args  as cli
+import arc852.opencv_utils as utils
 import cv2
 import imutils
 import numpy as np
-import opencv_utils as utils
-from camera import Camera
-from cli_args import setup_cli_args
-from image_server import ImageServer
+from arc852.camera import Camera
+from arc852.cli_args import setup_cli_args
+from arc852.image_server import ImageServer
 
 logger = logging.getLogger(__name__)
 

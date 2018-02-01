@@ -1,12 +1,13 @@
 from threading import Thread
 
-import cli_args  as cli
-from cli_args import LOG_LEVEL, GRPC_HOST
-from cli_args import setup_cli_args
+import arc852.cli_args  as cli
+from arc852.cli_args import LOG_LEVEL, GRPC_HOST
+from arc852.cli_args import setup_cli_args
+from arc852.utils import setup_logging
+from arc852.utils import sleep
 from flask import Flask
+
 from location_client import LocationClient
-from utils import setup_logging
-from utils import sleep
 
 if __name__ == "__main__":
     # Parse CLI args
