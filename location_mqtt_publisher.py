@@ -13,7 +13,8 @@ from location_client import LocationClient
 
 logger = logging.getLogger(__name__)
 
-if __name__ == "__main__":
+
+def main():
     # Parse CLI args
     args = setup_cli_args(cli.grpc_host, cli.mqtt_host, cli.camera_name, cli.log_level)
 
@@ -44,3 +45,7 @@ if __name__ == "__main__":
             waitForKeyboardInterrupt()
 
     logger.info("Exiting...")
+
+
+if __name__ == "__main__":
+    main()

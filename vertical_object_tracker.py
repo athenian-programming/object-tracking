@@ -7,10 +7,11 @@ from constants import DISPLAY, BGR_COLOR, WIDTH, MIDDLE_PERCENT, MASK_X, MASK_Y,
 from constants import FLIP_X, DRAW_CONTOUR, DRAW_BOX, VERTICAL_LINES, HORIZONTAL_LINES
 from constants import FLIP_Y, HTTP_DELAY_SECS, HTTP_FILE, HTTP_VERBOSE
 from constants import MINIMUM_PIXELS, GRPC_PORT, LEDS, HSV_RANGE, CAMERA_NAME, USB_CAMERA, HTTP_HOST
-from object_tracker import ObjectTracker
 from opencv_utils import contour_slope_degrees
-from single_object_filter import SingleObjectFilter
 from utils import setup_logging
+
+from object_tracker import ObjectTracker
+from single_object_filter import SingleObjectFilter
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +31,7 @@ def test_for_rope(_filter):
         _filter.reset_data()
 
 
-if __name__ == "__main__":
+def main():
     # Parse CLI args
     args = ObjectTracker.cli_args()
 
@@ -72,3 +73,7 @@ if __name__ == "__main__":
         tracker.stop()
 
     logger.info("Exiting...")
+
+
+if __name__ == "__main__":
+    main()

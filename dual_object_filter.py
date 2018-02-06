@@ -3,18 +3,18 @@
 import logging
 
 import cv2
-
 import opencv_defaults as defs
 from cli_args import LOG_LEVEL
 from constants import DRAW_CONTOUR, DRAW_BOX, HTTP_DELAY_SECS, HTTP_VERBOSE, HTTP_FILE, VERTICAL_LINES
 from constants import HORIZONTAL_LINES, MASK_X, MASK_Y, USB_PORT
 from constants import MINIMUM_PIXELS, GRPC_PORT, HSV_RANGE, LEDS, CAMERA_NAME, HTTP_HOST, USB_CAMERA
 from constants import WIDTH, DISPLAY, BGR_COLOR, MIDDLE_PERCENT, FLIP_X, FLIP_Y
-from generic_filter import GenericFilter
-from object_tracker import ObjectTracker
 from opencv_utils import BLUE, GREEN, RED, YELLOW
 from opencv_utils import get_moment
 from utils import setup_logging
+
+from generic_filter import GenericFilter
+from object_tracker import ObjectTracker
 
 logger = logging.getLogger(__name__)
 
@@ -105,7 +105,7 @@ class DualObjectFilter(GenericFilter):
             cv2.putText(image, text, defs.TEXT_LOC, defs.TEXT_FONT, defs.TEXT_SIZE, RED, 1)
 
 
-if __name__ == "__main__":
+def main():
     # Parse CLI args
     args = ObjectTracker.cli_args()
 
@@ -146,3 +146,7 @@ if __name__ == "__main__":
         tracker.stop()
 
     logger.info("Exiting...")
+
+
+if __name__ == "__main__":
+    main()

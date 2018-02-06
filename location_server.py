@@ -5,12 +5,13 @@ from threading import Thread
 import grpc
 from concurrent import futures
 from grpc_support import GenericServer
+from utils import setup_logging
+from utils import sleep
+
 from proto.location_service_pb2 import Location
 from proto.location_service_pb2 import LocationServiceServicer
 from proto.location_service_pb2 import ServerInfo
 from proto.location_service_pb2 import add_LocationServiceServicer_to_server
-from utils import setup_logging
-from utils import sleep
 
 logger = logging.getLogger(__name__)
 
@@ -56,7 +57,7 @@ class LocationServer(LocationServiceServicer, GenericServer):
             self.id += 1
 
 
-if __name__ == "__main__":
+def main():
     def _run_server(port):
         server = LocationServer(port).start()
 
@@ -68,3 +69,7 @@ if __name__ == "__main__":
     setup_logging()
     Thread(target=_run_server, args=(50052,)).start()
     sleep()
+
+
+if __name__ == "__main__":
+    main()

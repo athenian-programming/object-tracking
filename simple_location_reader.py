@@ -11,7 +11,8 @@ from location_client import LocationClient
 
 logger = logging.getLogger(__name__)
 
-if __name__ == "__main__":
+
+def main():
     # Parse CLI args
     args = setup_cli_args(cli.grpc_host, cli.log_level)
 
@@ -26,3 +27,7 @@ if __name__ == "__main__":
             pass
 
     logger.info("Exiting...")
+
+
+if __name__ == "__main__":
+    main()

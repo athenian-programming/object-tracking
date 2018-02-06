@@ -9,7 +9,8 @@ from flask import Flask
 
 from location_client import LocationClient
 
-if __name__ == "__main__":
+
+def main():
     # Parse CLI args
     args = setup_cli_args(cli.grpc_host, cli.log_level)
 
@@ -43,3 +44,7 @@ if __name__ == "__main__":
         Thread(target=http.run, kwargs={"port": 8080}).start()
 
         sleep()
+
+
+if __name__ == "__main__":
+    main()

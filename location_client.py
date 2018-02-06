@@ -5,11 +5,12 @@ import time
 from threading import Event
 
 import grpc
-from grpc_support import GenericClient
-from grpc_support import TimeoutException
+from arc852.grpc_support import GenericClient
+from arc852.grpc_support import TimeoutException
+from arc852.utils import setup_logging
+
 from proto.location_service_pb2 import ClientInfo
 from proto.location_service_pb2 import LocationServiceStub
-from utils import setup_logging
 
 logger = logging.getLogger(__name__)
 
@@ -82,9 +83,13 @@ class LocationClient(GenericClient):
         return self.get_x(), self.get_y()
 
 
-if __name__ == "__main__":
+def main():
     setup_logging()
     with LocationClient("localhost") as client:
         for i in range(1000):
             logger.info("Read value: {0}".format(client.get_xy()))
     logger.info("Exiting...")
+
+
+if __name__ == "__main__":
+    main()

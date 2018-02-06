@@ -17,7 +17,8 @@ from location_client import LocationClient
 
 logger = logging.getLogger(__name__)
 
-if __name__ == "__main__":
+
+def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("-s", "--serial", default="ttyACM0", type=str,
                         help="Arduino serial port [ttyACM0] (OSX is cu.usbmodemXXXX)")
@@ -76,3 +77,7 @@ if __name__ == "__main__":
             board.exit()
 
     logger.info("Exiting...")
+
+
+if __name__ == "__main__":
+    main()

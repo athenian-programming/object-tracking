@@ -4,9 +4,10 @@ import socket
 import grpc
 from grpc_support import CannotConnectException
 from grpc_support import grpc_url
+from utils import setup_logging
+
 from proto.location_service_pb2 import ClientInfo
 from proto.location_service_pb2 import LocationServiceStub
-from utils import setup_logging
 
 logger = logging.getLogger(__name__)
 
@@ -26,8 +27,12 @@ class Locations(object):
         return self._stub.getLocations(self._client_info)
 
 
-if __name__ == "__main__":
+def main():
     setup_logging()
     for val in Locations("localhost").values():
         logger.info("Read value:\n{0}".format(val))
     logger.info("Exiting...")
+
+
+if __name__ == "__main__":
+    main()

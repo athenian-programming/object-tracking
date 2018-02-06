@@ -21,7 +21,8 @@ SINGLE_PORT = "single_port"
 
 logger = logging.getLogger(__name__)
 
-if __name__ == "__main__":
+
+def main():
     # Parse CLI args
     p = argparse.ArgumentParser()
     cli.usb_camera(p),
@@ -103,3 +104,7 @@ if __name__ == "__main__":
         tracker.stop()
 
     logger.info("Exiting...")
+
+
+if __name__ == "__main__":
+    main()

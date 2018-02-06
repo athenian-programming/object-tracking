@@ -143,7 +143,7 @@ class ColorPicker(object):
         self.__image_server.stop()
 
 
-if __name__ == "__main__":
+def main():
     # Parse CLI args
     args = setup_cli_args(cli.width,
                           cli.usb_camera,
@@ -169,3 +169,7 @@ if __name__ == "__main__":
         color_picker.stop()
 
     logger.info("Exiting...")
+
+
+if __name__ == "__main__":
+    main()

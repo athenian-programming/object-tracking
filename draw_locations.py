@@ -64,7 +64,8 @@ class LocationSketch(object):
     def stop(self):
         self.__stopped = True
 
-if __name__ == "__main__":
+
+def main():
     # Parse CLI args
     args = setup_cli_args(cli.grpc_host, cli.log_level)
 
@@ -96,3 +97,7 @@ if __name__ == "__main__":
         Thread(target=sketch.plot_vals, args=(client, init_w, init_h)).start()
 
         root.mainloop()
+
+
+if __name__ == "__main__":
+    main()

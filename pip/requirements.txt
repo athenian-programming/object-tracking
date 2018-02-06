@@ -1,11 +1,4 @@
 imutils
-numpy
-
 grpcio
-paho-mqtt
-flask
-requests
-pyserial
-
 blinkt
 
