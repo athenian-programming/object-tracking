@@ -4,6 +4,7 @@
 import logging
 import time
 
+import arc852.camera as camera
 import arc852.cli_args  as cli
 import arc852.opencv_defaults as defs
 import cv2
@@ -72,8 +73,8 @@ class ColorPicker(object):
 
             height, width = image.shape[:2]
 
-            roi_x = (width / 2) - (self.roi_size / 2) + self.x_adj
-            roi_y = (height / 2) - (self.roi_size / 2) + self.y_adj
+            roi_x = int((width / 2) - (self.roi_size / 2) + self.x_adj)
+            roi_y = int((height / 2) - (self.roi_size / 2) + self.y_adj)
             roi = image[roi_y:roi_y + self.roi_size, roi_x:roi_x + self.roi_size]
 
             roi_h, roi_w = roi.shape[:2]
@@ -99,7 +100,8 @@ class ColorPicker(object):
 
             cnt += 1
 
-            if self.__image_server.enabled and cnt % 30 == 0:
+            # if self.__image_server.enabled and cnt % 30 == 0:
+            if cnt % 30 == 0:
                 logger.info(bgr_text)
 
             self.__image_server.image = image
@@ -132,9 +134,9 @@ class ColorPicker(object):
                 elif key == ord("r"):
                     self.__width = self.__orig_width
                     self.roi_size = self.orig_roi_size
-                elif key == ord("w"):
+                elif key == ord("<"):
                     self.__width -= 10
-                elif key == ord("W"):
+                elif key == ord(">"):
                     self.__width += 10
                 elif key == ord("q"):
                     self.__cam.close()
