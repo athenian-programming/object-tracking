@@ -54,8 +54,8 @@ $ ./color_picker.py
 | k          | Move ROI right                                     |
 | -          | Decrease ROI size                                  |
 | +          | Increase ROI size                                  |
-| w          | Decrease image size                                |
-| W          | Increase image size                                |
+| <          | Decrease image size                                |
+| >          | Increase image size                                |
 | r          | Reset ROI size and image size                      |
 | q          | Quit                                               |
 
